@@ -1,3 +1,4 @@
+using CRM.Data;
 using CRM.Models;
 using CRM.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
