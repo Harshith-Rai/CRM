@@ -1,0 +1,104 @@
+﻿@using CRM.DTOS;
+@model RegisterDto;
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRI CRM - Register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="~/css/Register.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Background decorations -->
+    <div class="bg-decoration"></div>
+    <div class="bg-decoration"></div>
+    <div class="bg-decoration"></div>
+
+    <div class="register-container">
+        <!-- Left side - Brand section -->
+        <div class="brand-section">
+            <div class="brand-content">
+                <div class="logo">mni</div>
+                <div class="logo-subtitle">REAL ESTATE SOFTWARE</div>
+                <div class="decorative-line"></div>
+                <h1 class="brand-tagline">Start your journey with us</h1>
+                <p class="brand-description">
+                    Join thousands of real estate professionals who trust MRI CRM to manage their business.
+                    Create your account and unlock powerful tools designed for success.
+                </p>
+            </div>
+        </div>
+
+        <!-- Right side - Register form -->
+        <div class="form-section">
+            <div class="register-card">
+                <div class="register-header">
+                    <h2>Create Account</h2>
+                    <p>Fill in your details to get started</p>
+                </div>
+
+                @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { id = "registerForm" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    @Html.ValidationSummary(true, "", new { @class = "validation-summary-errors" })
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.FullName, "Full Name")
+                        <div class="input-wrapper">
+                            <span class="input-icon">👤</span>
+                            @Html.TextBoxFor(m => m.FullName, new {
+                            @class = "form-control",
+                                                placeholder = "John Doe",
+                                                type = "text"
+                                                })
+                        @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "field-validation-error" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Email, "Email Address")
+                    <div class="input-wrapper">
+                        <span class="input-icon">📧</span>
+                        @Html.TextBoxFor(m => m.Email, new {
+                                                @class = "form-control",
+                                                placeholder = "you@example.com",
+                                                type = "email",
+                                                autocomplete = "username"
+                                                })
+                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "field-validation-error" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Password, "Password")
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        @Html.PasswordFor(m => m.Password, new {
+                                                @class = "form-control",
+                                                placeholder = "Create a strong password",
+                                                autocomplete = "new-password"
+                                                })
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "field-validation-error" })
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-register">Create Account</button>
+                                }
+
+                <div class="signin-link">
+                    Already have an account? @Html.ActionLink("Sign in", "Login", "Account")
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
