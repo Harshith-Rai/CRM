@@ -23,8 +23,7 @@ namespace CRM.Controllers // Namespace is important!
                 TotalCustomers = await _context.Customers.CountAsync(c => c.IsActive), // Only count Active ones!
                 TotalContacts = await _context.Contacts.CountAsync(),
 
-                // FIX: Use .Select() to pick specific fields. 
-                // This prevents the "Json Cycle" crash and automatically includes the Company Name.
+          
                 RecentNotes = await _context.Notes
                     .OrderByDescending(n => n.CreatedAt)
                     .Take(5)

@@ -52,6 +52,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IUserAdminService, UserAdminService>();
 
 builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 var app = builder.Build();
 
