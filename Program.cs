@@ -49,6 +49,8 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+builder.Services.AddScoped<IUserAdminService, UserAdminService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
