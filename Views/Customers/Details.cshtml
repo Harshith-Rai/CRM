@@ -1,0 +1,124 @@
+﻿@model CRM.Models.Customer
+
+@{
+    ViewData["Title"] = Model.CompanyName;
+    Layout = "~/Views/Shared/_Layout_App.cshtml";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-0">@Model.CompanyName</h1>
+            <span class="badge bg-secondary">@Model.Industry</span>
+        </div>
+        <div>
+            <a href="#" class="btn btn-outline-primary btn-sm">Edit Customer</a>
+            <a asp-action="Index" class="btn btn-light btn-sm">Back to List</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white fw-bold">Details</div>
+                <div class="card-body">
+                    <p class="mb-2"><i class="fa fa-envelope me-2 text-muted"></i> @(Model.Email ?? "No Email")</p>
+                    <p class="mb-2"><i class="fa fa-phone me-2 text-muted"></i> @(Model.Phone ?? "No Phone")</p>
+                    <p class="mb-0"><i class="fa fa-map-marker-alt me-2 text-muted"></i> @(Model.Address ?? "No Address")</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Contacts</span>
+                    <a href="#" class="btn btn-sm btn-light py-0 text-primary fw-bold">+ Add</a>
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var contact in Model.Contacts)
+                    {
+                        <li class="list-group-item">
+                            <div class="fw-bold text-dark">@contact.FullName</div>
+                            <div class="small text-muted">@contact.Position</div>
+                            <div class="small text-muted">@contact.Email</div>
+                        </li>
+                    }
+                    @if (!Model.Contacts.Any())
+                    {
+                        <li class="list-group-item text-muted small fst-italic">No contacts added yet.</li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-bold">Activity Log & Notes</div>
+                <div class="card-body bg-light">
+
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted mb-3">Log an interaction</h6>
+                            <form asp-action="AddNote" method="post">
+                                <input type="hidden" name="customerId" value="@Model.Id" />
+
+                                <div class="mb-2">
+                                    <input type="text" name="title" class="form-control" placeholder="Subject (e.g. Follow-up Call)" required />
+                                </div>
+                                <div class="mb-2">
+                                    <textarea name="content" class="form-control" rows="2" placeholder="What did you discuss?" required></textarea>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="input-group input-group-sm" style="width: 200px;">
+                                        <span class="input-group-text">Reminder</span>
+                                        <input type="date" name="reminderDate" class="form-control" />
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm px-4">Log Note</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="activity-feed">
+                        @if (Model.Notes.Any())
+                        {
+                            @foreach (var note in Model.Notes.OrderByDescending(n => n.CreatedAt))
+                            {
+                                <div class="card mb-3 border-0 shadow-sm">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="fw-bold text-primary">@note.Title</span>
+                                            <small class="text-muted">@note.CreatedAt.ToString("MMM dd, hh:mm tt")</small>
+                                        </div>
+                                        <p class="mb-2 text-secondary">@note.Content</p>
+
+                                        <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
+                                            <small class="text-muted fst-italic">
+                                                Logged by: @(note.Author?.UserName ?? "Unknown")
+                                            </small>
+
+                                            @if (note.ReminderDate.HasValue)
+                                            {
+                                                <small class="text-warning fw-bold">
+                                                    <i class="fa fa-bell"></i> Reminder: @note.ReminderDate.Value.ToShortDateString()
+                                                </small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted py-5">
+                                <i class="fa-regular fa-clipboard fa-2x mb-3 opacity-50"></i>
+                                <p>No notes found. Start tracking your interactions!</p>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

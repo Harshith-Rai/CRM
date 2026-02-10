@@ -1,24 +1,28 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CRM.Models
 {
-    public class Contact //the Contact model represents the specific people you communicate with at a client organization
+    public class Contact
     {
         public int Id { get; set; }
 
         [Required]
+        [Display(Name = "Full Name")]
         public string FullName { get; set; }
 
-        public string Position { get; set; }
+        public string Position { get; set; } // e.g. "Procurement Manager"
 
         [EmailAddress]
         public string Email { get; set; }
 
         public string Phone { get; set; }
 
-        // Foreign Key: Links this contact to a specific Customer
+        // Link back to Customer
         [Required]
         public int CustomerId { get; set; }
+
+        [ForeignKey("CustomerId")]
         public virtual Customer Customer { get; set; }
     }
 }

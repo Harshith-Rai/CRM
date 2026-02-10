@@ -1,0 +1,62 @@
+﻿/* wwwroot/css/admin-layout.css */
+:root {
+    --mri-blue: #044D66;
+    --light-blue: #C2E6F2;
+    --bg-gray: #F1F5F9;
+}
+
+body {
+    background-color: var(--bg-gray);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Sidebar Core Logic */
+.sidebar {
+    width: 260px;
+    background-color: var(--mri-blue);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s;
+}
+
+    .sidebar .brand {
+        padding: 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--light-blue);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar .menu-item {
+        padding: 0.8rem 1.5rem;
+        color: rgba(255,255,255,0.7);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        transition: 0.2s;
+        border-left: 4px solid transparent;
+    }
+
+        .sidebar .menu-item:hover,
+        .sidebar .menu-item.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-left-color: var(--light-blue);
+        }
+
+        .sidebar .menu-item i {
+            width: 25px;
+            font-size: 1.1rem;
+        }
+
+/* Content Area Logic */
+.main-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}

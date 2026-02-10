@@ -9,47 +9,53 @@ namespace CRM.Data.seed
 
         public static async Task SeedAsync(IServiceProvider services)
         {
-            var RoleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-            var UserManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-            if (!await RoleManager.RoleExistsAsync("Admin"))
+            string[] roleNames = { "Admin", "SalesManager", "SalesExecutive" };
+
+            // 2. Loop through them and create if they don't exist
+            foreach (var roleName in roleNames)
             {
-                await RoleManager.CreateAsync(new IdentityRole("Admin"));
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
             }
 
-            if (!await RoleManager.RoleExistsAsync("User"))
-            {
-                await RoleManager.CreateAsync(new IdentityRole("User"));
-            }
+            // 3. Define Admin User Details
+            var adminEmail = "admin@crm.com"; // Use a professional domain if possible
+            var adminName = "System Administrator";
 
-
-            var adminEmail = "admin@gmail.com";
-            var adminpassword = "Admin@123";
-            var adminName = "admin";
-
-            var existingAdmin = await UserManager.FindByEmailAsync(adminEmail);
-
-            Console.WriteLine("execyuting is " + existingAdmin + " here how ");
+            var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
 
             if (existingAdmin == null)
             {
-
-
-                Console.WriteLine("admin is null");
-                var admin = new ApplicationUser()
+                var adminUser = new ApplicationUser
                 {
-                    Email = adminEmail,
-                    EmailConfirmed = true,
                     UserName = adminEmail,
+                    Email = adminEmail,
                     FullName = adminName,
-
+                    EmailConfirmed = true,
                 };
 
+                // 4. Create the user
+                var createResult = await userManager.CreateAsync(adminUser, "Admin@123");
 
-                var result = await UserManager.CreateAsync(admin, adminpassword);
-
-                await UserManager.AddToRoleAsync(admin, "Admin");
+                // 5. Assign the Admin role
+                if (createResult.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                    Console.WriteLine("Admin user seeded successfully.");
+                }
+                else
+                {
+                    // Log errors if seeding fails (e.g. password too weak)
+                    var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                    Console.WriteLine($"Error seeding Admin user: {errors}");
+                }
             }
+        }
 
         }
         }
