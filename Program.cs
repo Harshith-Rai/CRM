@@ -22,6 +22,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.AddScoped<JwtService>();
 
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -49,6 +50,9 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+
+builder.Services.AddScoped<IUserAdminService, UserAdminService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

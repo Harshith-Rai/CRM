@@ -139,7 +139,8 @@ body {
 
 /* Glassmorphism card - slightly lighter background for improved readability */
 .login-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.22));
+/*    background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.22));*/
+background-color:whitesmoke;
     border-radius: 24px;
     padding: 56px 48px;
     width: 100%;
@@ -368,36 +369,7 @@ input[type="text"] {
         padding: 0 16px;
     }
 
-.social-login {
-    display: flex;
-    gap: 12px;
-}
 
-.btn-social {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid rgba(15, 23, 42, 0.06);
-    border-radius: 12px;
-    background: rgba(255,255,255,0.12);
-    cursor: pointer;
-    transition: all 0.22s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #0b2b30;
-    text-decoration: none;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-}
-
-    .btn-social:hover {
-        border-color: var(--bright-blue);
-        background: rgba(255,255,255,0.18);
-        transform: translateY(-2px);
-    }
 
 .signup-link {
     text-align: center;

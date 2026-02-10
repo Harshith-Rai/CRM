@@ -135,8 +135,9 @@ body {
 }
 
 .register-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.22));
-    background: linear-gradient(180deg, rgba(255,255,255,0.36), rgba(255,255,255,0.22));
+/*    background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.22));*/
+/*    background: linear-gradient(180deg, rgba(255,255,255,0.36), rgba(255,255,255,0.22));*/
+    background-color:whitesmoke;
     border-radius: 24px;
     padding: 56px 48px;
     width: 100%;
