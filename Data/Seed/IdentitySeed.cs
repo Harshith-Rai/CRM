@@ -58,5 +58,5 @@ namespace CRM.Data.seed
         }
 
         }
-        }
+    
     }
