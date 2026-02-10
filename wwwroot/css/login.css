@@ -24,6 +24,8 @@ body {
     overflow: hidden;
     background: linear-gradient(135deg, var(--mri-blue) 0%, var(--medium-blue) 50%, var(--bright-blue) 100%);
     position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Background decorations */
@@ -122,28 +124,37 @@ body {
 }
 
 /* Right side - Login form */
+/* Subtle blurred backdrop for the form area to support glassmorphism */
 .form-section {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 60px;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+/* Glassmorphism card - slightly lighter background for improved readability */
 .login-card {
-    background: white;
+    background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.22));
     border-radius: 24px;
     padding: 56px 48px;
     width: 100%;
     max-width: 460px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     position: relative;
     overflow: hidden;
+    /* Stronger frosted shadow + softer inset highlight */
+    box-shadow: 0 12px 40px rgba(6, 12, 30, 0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.32);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #052629; /* default text color inside card for readability */
 }
 
+    /* Softer top gradient stripe */
     .login-card::before {
         content: '';
         position: absolute;
@@ -151,9 +162,23 @@ body {
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, var(--bright-blue), var(--light-green), var(--orange));
+        background: linear-gradient(90deg, rgba(23,154,215,0.95), rgba(188,179,54,0.9), rgba(250,164,28,0.9));
     }
 
+    /* Soft glossy highlight overlay (reduced) */
+    .login-card::after {
+        content: '';
+        position: absolute;
+        top: -25%;
+        left: -25%;
+        width: 150%;
+        height: 50%;
+        transform: rotate(-12deg);
+        background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.00));
+        pointer-events: none;
+    }
+
+/* Header tuned for glass aesthetic */
 .login-header {
     margin-bottom: 40px;
 }
@@ -161,13 +186,14 @@ body {
     .login-header h2 {
         font-family: 'Outfit', sans-serif;
         font-size: 32px;
-        color: var(--mri-blue);
+        color: #022b33; /* darker for legibility */
         margin-bottom: 8px;
-        font-weight: 600;
+        font-weight: 700;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.25);
     }
 
     .login-header p {
-        color: #64748b;
+        color: rgba(4, 40, 45, 0.75);
         font-size: 15px;
     }
 
@@ -178,8 +204,8 @@ body {
 label {
     display: block;
     margin-bottom: 8px;
-    color: var(--mri-blue);
-    font-weight: 500;
+    color: #052629; /* darker label color for readability */
+    font-weight: 600;
     font-size: 14px;
 }
 
@@ -187,26 +213,37 @@ label {
     position: relative;
 }
 
+/* Inputs tuned for glass look: semi-transparent but readable */
 input[type="email"],
 input[type="password"],
 input[type="text"] {
     width: 100%;
     padding: 14px 16px 14px 48px;
-    border: 2px solid #e2e8f0;
+    border: 1px solid rgba(15, 23, 42, 0.06);
     border-radius: 12px;
     font-size: 15px;
-    transition: all 0.3s ease;
+    transition: all 0.22s ease;
     font-family: 'DM Sans', sans-serif;
-    background: #f8fafc;
+    background: rgba(255,255,255,0.36); /* increased opacity for readability */
+    color: #052629; /* readable, darker text */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
 }
+
+    input[type="email"]::placeholder,
+    input[type="password"]::placeholder,
+    input[type="text"]::placeholder {
+        color: rgba(5,38,41,0.5);
+    }
 
     input[type="email"]:focus,
     input[type="password"]:focus,
     input[type="text"]:focus {
         outline: none;
-        border-color: var(--bright-blue);
-        background: white;
-        box-shadow: 0 0 0 4px rgba(23, 154, 215, 0.1);
+        border-color: rgba(23,154,215,0.98);
+        background: rgba(255,255,255,0.32); /* stronger on focus */
+        box-shadow: 0 10px 30px rgba(23,154,215,0.12);
     }
 
 .input-validation-error {
@@ -221,11 +258,12 @@ input[type="text"] {
 }
 
 .validation-summary-errors {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+    background: #fff4f4;
+    border: 1px solid #f6c9c9;
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 24px;
+    color: #7a1f1f;
 }
 
     .validation-summary-errors ul {
@@ -244,7 +282,7 @@ input[type="text"] {
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
+    color: rgba(7, 26, 32, 0.45);
     font-size: 18px;
 }
 
@@ -254,6 +292,7 @@ input[type="text"] {
     align-items: center;
     margin-bottom: 28px;
     font-size: 14px;
+    color: rgba(7, 40, 44, 0.85);
 }
 
 .remember-me {
@@ -269,19 +308,22 @@ input[type="text"] {
         padding: 0;
         cursor: pointer;
         accent-color: var(--bright-blue);
+        background: rgba(255,255,255,0.9);
+        border-radius: 4px;
     }
 
 .forgot-password {
     color: var(--bright-blue);
     text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
+    font-weight: 600;
+    transition: color 0.2s ease;
 }
 
     .forgot-password:hover {
         color: var(--medium-blue);
     }
 
+/* Primary button remains vibrant to maintain CTA contrast */
 .btn-login {
     width: 100%;
     padding: 16px;
@@ -290,16 +332,16 @@ input[type="text"] {
     border: none;
     border-radius: 12px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     font-family: 'DM Sans', sans-serif;
-    box-shadow: 0 4px 14px rgba(23, 154, 215, 0.4);
+    box-shadow: 0 10px 30px rgba(23, 154, 215, 0.35);
 }
 
     .btn-login:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(23, 154, 215, 0.5);
+        box-shadow: 0 14px 40px rgba(23, 154, 215, 0.45);
     }
 
     .btn-login:active {
@@ -334,90 +376,94 @@ input[type="text"] {
 .btn-social {
     flex: 1;
     padding: 12px;
-    border: 2px solid #e2e8f0;
+    border: 1px solid rgba(15, 23, 42, 0.06);
     border-radius: 12px;
-    background: white;
+    background: rgba(255,255,255,0.12);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.22s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     font-size: 14px;
-    font-weight: 500;
-    color: #334155;
+    font-weight: 600;
+    color: #0b2b30;
     text-decoration: none;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
     .btn-social:hover {
         border-color: var(--bright-blue);
-        background: #f8fafc;
+        background: rgba(255,255,255,0.18);
         transform: translateY(-2px);
     }
 
 .signup-link {
     text-align: center;
     margin-top: 32px;
-    color: #64748b;
+    color: rgba(4,40,45,0.75);
     font-size: 14px;
 }
 
     .signup-link a {
         color: var(--bright-blue);
         text-decoration: none;
-        font-weight: 600;
-        transition: color 0.3s ease;
+        font-weight: 700;
+        transition: color 0.2s ease;
     }
 
         .signup-link a:hover {
             color: var(--medium-blue);
         }
 
-/* Responsive */
+/* Accessibility helpers */
+.login-card button,
+.login-card input,
+.login-card a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Responsive tweaks */
 @media (max-width: 1024px) {
-    .login-container {
-        flex-direction: column;
-    }
-
     .brand-section {
-        flex: 0;
-        padding: 40px 30px;
-        min-height: 300px;
+        display: none; /* This hides the left side brand info */
     }
 
-    .brand-content {
-        max-width: 100%;
-    }
-
-    .logo {
-        font-size: 48px;
-    }
-
-    .brand-tagline {
-        font-size: 24px;
+    .login-container {
+        justify-content: center;
+        align-items: center;
     }
 
     .form-section {
         flex: 1;
+        width: 100%;
         border-left: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: transparent; /* Makes it look cleaner on mobile */
+        padding: 20px;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    .login-card {
+        border-radius: 20px;
     }
 }
 
 @media (max-width: 640px) {
-    .brand-section {
-        padding: 30px 20px;
-    }
-
     .form-section {
-        padding: 30px 20px;
+        padding: 15px;
     }
 
     .login-card {
-        padding: 40px 28px;
+        padding: 32px 20px; /* Reduced padding to give form more room */
+        max-width: 100%; /* Allows the card to fill the screen width */
+        border-radius: 16px; /* Slightly smaller radius for mobile */
+        background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.12));
+        box-shadow: 0 8px 26px rgba(6, 12, 30, 0.45);
     }
 
-    .social-login {
-        flex-direction: column;
+    .login-header h2 {
+        font-size: 26px; /* Smaller title for mobile */
     }
 }

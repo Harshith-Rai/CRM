@@ -53,7 +53,7 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    await MovieReview.Data.seed.identitySeed.SeedAsync(scope.ServiceProvider);
+    await CRM.Data.seed.IdentitySeed.SeedAsync(scope.ServiceProvider);
 }
 
 // Configure the HTTP request pipeline.

@@ -121,27 +121,35 @@ body {
     border-radius: 2px;
 }
 
-/* Right side - Register form */
+/* Right side - Register form (glassmorphism) */
 .form-section {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 60px;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .register-card {
-    background: white;
+    background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.22));
+    background: linear-gradient(180deg, rgba(255,255,255,0.36), rgba(255,255,255,0.22));
     border-radius: 24px;
     padding: 56px 48px;
     width: 100%;
     max-width: 460px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     position: relative;
     overflow: hidden;
+
+    /* Frosted shadow + subtle inset highlight */
+    box-shadow: 0 12px 40px rgba(6, 12, 30, 0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.26);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #052629; /* default text color inside card for readability */
 }
 
     .register-card::before {
@@ -151,7 +159,19 @@ body {
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, var(--bright-blue), var(--light-green), var(--orange));
+        background: linear-gradient(90deg, rgba(23,154,215,0.95), rgba(188,179,54,0.9), rgba(250,164,28,0.9));
+    }
+
+    .register-card::after {
+        content: '';
+        position: absolute;
+        top: -25%;
+        left: -25%;
+        width: 150%;
+        height: 50%;
+        transform: rotate(-12deg);
+        background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.00));
+        pointer-events: none;
     }
 
 .register-header {
@@ -161,13 +181,14 @@ body {
     .register-header h2 {
         font-family: 'Outfit', sans-serif;
         font-size: 32px;
-        color: var(--mri-blue);
+        color: #022b33; /* darker for legibility */
         margin-bottom: 8px;
-        font-weight: 600;
+        font-weight: 700;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.25);
     }
 
     .register-header p {
-        color: #64748b;
+        color: rgba(4, 40, 45, 0.75);
         font-size: 15px;
     }
 
@@ -178,8 +199,8 @@ body {
 label {
     display: block;
     margin-bottom: 8px;
-    color: var(--mri-blue);
-    font-weight: 500;
+    color: #052629; /* darker label color for readability */
+    font-weight: 600;
     font-size: 14px;
 }
 
@@ -193,12 +214,23 @@ input[type="text"],
 input[type="tel"] {
     width: 100%;
     padding: 14px 16px 14px 48px;
-    border: 2px solid #e2e8f0;
+    border: 1px solid rgba(15, 23, 42, 0.06);
     border-radius: 12px;
     font-size: 15px;
-    transition: all 0.3s ease;
+    transition: all 0.22s ease;
     font-family: 'DM Sans', sans-serif;
-    background: #f8fafc;
+    background: rgba(255,255,255,0.22);
+    color: #052629; /* readable, darker text */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="text"]::placeholder,
+input[type="tel"]::placeholder {
+    color: rgba(5,38,41,0.45);
 }
 
     input[type="email"]:focus,
@@ -206,9 +238,9 @@ input[type="tel"] {
     input[type="text"]:focus,
     input[type="tel"]:focus {
         outline: none;
-        border-color: var(--bright-blue);
-        background: white;
-        box-shadow: 0 0 0 4px rgba(23, 154, 215, 0.1);
+        border-color: rgba(23,154,215,0.98);
+        background: rgba(255,255,255,0.30);
+        box-shadow: 0 10px 30px rgba(23,154,215,0.10);
     }
 
 .input-validation-error {
@@ -246,7 +278,7 @@ input[type="tel"] {
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
+    color: rgba(7, 26, 32, 0.45);
     font-size: 18px;
 }
 
@@ -260,7 +292,7 @@ input[type="tel"] {
     gap: 8px;
     cursor: pointer;
     font-size: 14px;
-    color: #64748b;
+    color: rgba(4,40,45,0.75);
 }
 
     .checkbox-label input[type="checkbox"] {
@@ -276,7 +308,7 @@ input[type="tel"] {
     .checkbox-label a {
         color: var(--bright-blue);
         text-decoration: none;
-        font-weight: 500;
+        font-weight: 600;
     }
 
         .checkbox-label a:hover {
@@ -310,7 +342,7 @@ input[type="tel"] {
 
 .signin-link {
     text-align: center;
-    color: #64748b;
+    color: rgba(4,40,45,0.75);
     font-size: 14px;
     margin-top: 24px;
 }
@@ -318,8 +350,8 @@ input[type="tel"] {
     .signin-link a {
         color: var(--bright-blue);
         text-decoration: none;
-        font-weight: 600;
-        transition: color 0.3s ease;
+        font-weight: 700;
+        transition: color 0.2s ease;
     }
 
         .signin-link a:hover {
@@ -327,50 +359,46 @@ input[type="tel"] {
         }
 
 /* Responsive */
+/* Responsive adjustments for Login */
 @media (max-width: 1024px) {
-    .register-container {
-        flex-direction: column;
+    .login-container {
+        flex-direction: column; /* Stack vertically if needed, though we hide brand below [cite: 3] */
+        justify-content: center;
     }
 
     .brand-section {
-        flex: 0;
-        padding: 40px 30px;
-        min-height: 300px;
-    }
-
-    .brand-content {
-        max-width: 100%;
-    }
-
-    .logo {
-        font-size: 48px;
-    }
-
-    .brand-tagline {
-        font-size: 24px;
+        display: none;
     }
 
     .form-section {
         flex: 1;
-        border-left: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        padding: 40px 20px;
+        border-left: none; /* Remove the vertical divider line  */
+        background: transparent; /* Remove the semi-transparent background for a cleaner look */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 420px; /* Ensures the card doesn't get too wide on tablets */
     }
 }
 
 @media (max-width: 640px) {
-    .brand-section {
-        padding: 30px 20px;
-    }
-
     .form-section {
-        padding: 30px 20px;
+        padding: 20px 15px; /* Tighter padding for mobile phones [cite: 7] */
     }
 
-    .register-card {
-        padding: 40px 28px;
+    .login-card {
+        padding: 32px 24px; /* Give the internal form elements more room [cite: 8] */
+        box-shadow: none; /* Optional: remove shadow for a flat modern mobile look */
+        border-radius: 16px;
     }
 
-    .social-register {
-        flex-direction: column;
+    .login-header h2 {
+        font-size: 26px; /* Slightly smaller heading for small screens [cite: 7] */
     }
 }
