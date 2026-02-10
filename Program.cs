@@ -51,6 +51,8 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddScoped<IUserAdminService, UserAdminService>();
 
+builder.Services.AddScoped<IHomeService, HomeService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
