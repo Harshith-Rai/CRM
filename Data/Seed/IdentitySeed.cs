@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using CRM.Models;
 
-namespace MovieReview.Data.seed
+namespace CRM.Data.seed
+
 {
-    public class identitySeed
+    public class IdentitySeed
     {
 
         public static async Task SeedAsync(IServiceProvider services)
@@ -50,10 +51,6 @@ namespace MovieReview.Data.seed
                 await UserManager.AddToRoleAsync(admin, "Admin");
             }
 
-
         }
-
-
-
+        }
     }
-}

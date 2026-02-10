@@ -6,12 +6,59 @@
     <title>@ViewData["Title"] - CRM</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CRM.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/navbar.css"/>
 </head>
 <body>
     <header>
-       
+        @{
+            var routeValues = ViewContext.RouteData.Values;
+            var currentController = routeValues["controller"]?.ToString();
+            var currentAction = routeValues["action"]?.ToString();
+            var hideNav = currentController?.ToLowerInvariant() == "account" && (currentAction?.ToLowerInvariant() == "login" || currentAction?.ToLowerInvariant() == "register");
+        }
+
+        @if (!hideNav)
+        {
+            <nav class="navbar navbar-expand-lg app-navbar">
+                <div class="container px-4">
+                    <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index", "Home")">Hello User</a>
+
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="mainNavbar">
+                        <form class="d-flex mx-3 navbar-search" role="search" method="get" action="@Url.Action("Index", "Home")">
+                            <div class="input-group w-100">
+                                <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="q">
+                                <button class="btn btn-light" type="submit"><i class="fas fa-search"></i></button>
+                            </div>
+                        </form>
+
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-xl-center">
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "Dashboard")">Dashboard</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle fa-2x"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" href="@Url.Action("Logout", "Account")">
+                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                            Sign out
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        }
     </header>
     <div class="container">
         <main role="main" class="pb-3">
