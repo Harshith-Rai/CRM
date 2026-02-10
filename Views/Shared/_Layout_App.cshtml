@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --light-blue: #C2E6F2;
+            --mri-blue: #044D66;
+            --medium-blue: #187ABF;
+            --white: #ffffff;
+            --bg-gray: #F1F5F9;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-gray);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--mri-blue);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--light-blue);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .menu {
+            flex: 1;
+            padding-top: 20px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+            .menu-item:hover, .menu-item.active {
+                background: rgba(255,255,255,0.1);
+                color: var(--white);
+                border-left: 4px solid var(--light-blue);
+            }
+
+            .menu-item i {
+                width: 25px;
+                margin-right: 10px;
+            }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .topbar {
+            background: var(--white);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="brand">CRM Portal</div>
+        <div class="menu">
+            <a href="/SalesRep" class="menu-item active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+            <a href="#" class="menu-item"><i class="fa-solid fa-address-book"></i> My Leads</a>
+            <a href="#" class="menu-item"><i class="fa-solid fa-money-bill-trend-up"></i> Pipeline</a>
+            <a href="#" class="menu-item"><i class="fa-solid fa-calendar-check"></i> Tasks</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <h3 style="margin:0; color: var(--mri-blue);">@ViewData["Title"]</h3>
+            <div style="font-weight:600;">Welcome, User</div>
+        </div>
+        <div style="padding: 30px;">
+            @RenderBody()
+        </div>
+    </div>
+</body>
+</html>
