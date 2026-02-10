@@ -27,11 +27,18 @@ namespace CRM.Controllers
                     new LeadItem { Name = "Tech Solutions Ltd", Company = "IT Sector", Score = 95 },
                     new LeadItem { Name = "Green Energy Inc", Company = "Power", Score = 88 }
                 },
+                RecentActivities = new List<ActivityItem>
+                {
+                    new ActivityItem { CustomerName = "Tech Solutions Ltd", Action = "Logged a call regarding Q3", TimeAgo = "2h ago", Type = "Call" },
+                    new ActivityItem { CustomerName = "Green Energy Inc", Action = "Updated status to Negotiation", TimeAgo = "5h ago", Type = "Status" },
+                    new ActivityItem { CustomerName = "Alpha Corp", Action = "Added a new contact: Mike Ross", TimeAgo = "1d ago", Type = "Contact" }
+                },
 
                 DealsInProposal = 4,
                 DealsInNegotiation = 2,
                 DealsClosedWon = 7
             };
+
 
             return View(model);
         }

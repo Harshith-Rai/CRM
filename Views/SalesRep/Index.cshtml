@@ -319,6 +319,38 @@
             <div class="card-header">
                 <h3 class="card-title">🔥 Hot Leads</h3>
             </div>
+            <div class="mri-card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Activity</h3>
+                </div>
+
+                <div class="activity-feed">
+                    @foreach (var activity in Model.RecentActivities)
+                    {
+                        <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start;">
+                            <div style="
+                        width: 32px; height: 32px; border-radius: 50%;
+                        background: @(activity.Type == "Call" ? "#E0F2FE" : activity.Type == "Status" ? "#DCFCE7" : "#F1F5F9");
+                        color: @(activity.Type == "Call" ? "#187ABF" : activity.Type == "Status" ? "#00B188" : "#64748b");
+                        display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
+                                <i class="fa-solid @(activity.Type == "Call" ? "fa-phone" : activity.Type == "Status" ? "fa-arrows-rotate" : "fa-user-plus")"></i>
+                            </div>
+
+                            <div>
+                                <div style="font-size: 0.9rem; font-weight: 500; color: var(--text-dark);">
+                                    @activity.CustomerName
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 2px;">
+                                    @activity.Action
+                                </div>
+                                <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 4px;">
+                                    @activity.TimeAgo
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
             @foreach (var lead in Model.HotLeads)
             {
                 <div class="lead-row">

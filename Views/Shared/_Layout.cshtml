@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using CRM.Models
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -97,6 +101,13 @@
         var currentAction = routeValues["action"]?.ToString();
         var isAuthPage = currentController?.ToLowerInvariant() == "account" &&
         (currentAction?.ToLowerInvariant() == "login" || currentAction?.ToLowerInvariant() == "register");
+
+        // Fetch User Data for Display
+        ApplicationUser currentUser = null;
+        if (User.Identity.IsAuthenticated)
+        {
+            currentUser = await UserManager.GetUserAsync(User);
+        }
     }
 
     @if (!isAuthPage)
@@ -104,11 +115,18 @@
         <div class="sidebar">
             <a href="/" class="brand">CRM Portal</a>
             <div class="menu">
-                <a href="@Url.Action("Index", "SalesRep")" class="menu-item @(currentController == "SalesRep" ? "active" : "")">
+                <a href="@Url.Action("Index", "Home")" class="menu-item @(currentController == "Home" ? "active" : "")">
                     <i class="fa-solid fa-gauge-high"></i> Dashboard
                 </a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-address-book"></i> My Leads</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-money-bill-trend-up"></i> Pipeline</a>
+
+                <a href="@Url.Action("Index", "Customers")" class="menu-item @(currentController == "Customers" ? "active" : "")">
+                    <i class="fa-solid fa-address-book"></i> My Customers
+                </a>
+
+                <a href="@Url.Action("Index", "Leads")" class="menu-item @(currentController == "Leads" ? "active" : "")">
+                    <i class="fa-solid fa-money-bill-trend-up"></i> Sales Pipeline
+                </a>
+
                 <a href="#" class="menu-item"><i class="fa-solid fa-calendar-check"></i> Tasks</a>
             </div>
         </div>
@@ -119,8 +137,9 @@
         {
             <nav class="navbar navbar-expand-lg app-navbar sticky-top">
                 <div class="container-fluid px-4">
+
                     <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index", "Home")" style="color: var(--mri-blue); font-weight: 700;">
-                        Hello User
+                        Hello, @(currentUser?.FullName ?? User.Identity?.Name ?? "Guest")
                     </a>
 
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
@@ -141,6 +160,10 @@
                                     <i class="fas fa-user-circle fa-2x" style="color: var(--mri-blue);"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li style="padding: 0 16px; font-size: 0.85rem; color: #64748b; margin-bottom: 8px;">
+                                        Logged in as <br><strong>@(User.Identity?.Name)</strong>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign out</a></li>
                                 </ul>
                             </li>

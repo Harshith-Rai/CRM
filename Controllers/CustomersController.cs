@@ -39,8 +39,10 @@ namespace CRM.Controllers
 
         // --- 2. CREATE (GET & POST) ---
         [HttpGet]
-        public IActionResult Create() => View();
-
+        public IActionResult Create()
+        {
+            return View(new Customer());
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Customer customer)
@@ -95,13 +97,20 @@ namespace CRM.Controllers
             if (string.IsNullOrWhiteSpace(content))
                 return RedirectToAction("Details", new { id = customerId });
 
+            // --- FIX: FORCE UTC FOR POSTGRESQL ---
+            if (reminderDate.HasValue)
+            {
+                // Convert the date from the form to UTC so Postgres accepts it
+                reminderDate = DateTime.SpecifyKind(reminderDate.Value, DateTimeKind.Utc);
+            }
+
             var note = new Note
             {
                 CustomerId = customerId,
                 Title = title ?? "Interaction",
                 Content = content,
-                CreatedAt = DateTime.UtcNow,
-                ReminderDate = reminderDate,
+                CreatedAt = DateTime.UtcNow, // This is already UTC, so it's safe
+                ReminderDate = reminderDate, // Now this is safe too
                 AuthorId = _userManager.GetUserId(User)
             };
 
@@ -109,6 +118,52 @@ namespace CRM.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Details", new { id = customerId });
+        }
+        // GET: Customers/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var customer = await _context.Customers.FindAsync(id);
+            if (customer == null) return NotFound();
+
+            return View(customer);
+        }
+
+        // POST: Customers/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Customer customer)
+        {
+            if (id != customer.Id) return NotFound();
+
+            // Remove validation for SalesRepId as we aren't changing it in the form usually
+            ModelState.Remove("SalesRepId");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Keep the original creation date and owner
+                    var existingCustomer = await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+                    if (existingCustomer != null)
+                    {
+                        customer.CreatedAt = existingCustomer.CreatedAt;
+                        customer.SalesRepId = existingCustomer.SalesRepId;
+                        customer.IsActive = existingCustomer.IsActive;
+                    }
+
+                    _context.Update(customer);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Customers.Any(e => e.Id == customer.Id)) return NotFound();
+                    else throw;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(customer);
         }
 
         // --- 5. SOFT DELETE ---
@@ -123,6 +178,39 @@ namespace CRM.Controllers
                 customer.IsActive = false; // Soft Delete
                 await _context.SaveChangesAsync();
             }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // --- 6. ARCHIVE / RECYCLE BIN ---
+
+        // GET: Customers/Archived
+        public async Task<IActionResult> Archived()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // Fetch ONLY the inactive customers for this user
+            var archivedCustomers = await _context.Customers
+                .Where(c => !c.IsActive) // Notice the "!" (Not Active)
+                .Where(c => c.SalesRepId == userId || User.IsInRole("Admin")) // Security check
+                .ToListAsync();
+
+            return View(archivedCustomers);
+        }
+
+        // GET: Customers/Restore/5
+        public async Task<IActionResult> Restore(int id)
+        {
+            var customer = await _context.Customers.FindAsync(id);
+            var userId = _userManager.GetUserId(User);
+
+            // Security check: Ensure they own the record or are Admin
+            if (customer != null && (customer.SalesRepId == userId || User.IsInRole("Admin")))
+            {
+                customer.IsActive = true; // <--- THE MAGIC SWITCH
+                await _context.SaveChangesAsync();
+            }
+
+            // Send them back to the main list to see their restored friend
             return RedirectToAction(nameof(Index));
         }
     }

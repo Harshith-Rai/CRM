@@ -1,123 +1,705 @@
 ﻿@model CRM.Models.Customer
 
 @{
-    ViewData["Title"] = Model.CompanyName;
-    Layout = "~/Views/Shared/_Layout_App.cshtml";
+    ViewData["Title"] = "Customer Details";
 }
 
-<div class="container-fluid">
+<style>
+    /* Import fonts if not already in layout */
+    @@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+    /* Color Variables matching Register page */
+    :root {
+        --primary-blue: #0066CC;
+        --deep-blue: #003D82;
+        --light-blue: #E6F2FF;
+        --accent-teal: #00B4D8;
+        --text-dark: #1A1A1A;
+        --text-light: #6B7280;
+        --border-color: #E2E8F0;
+        --success-green: #10B981;
+        --orange: #F59E0B;
+        --white: #FFFFFF;
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 fw-bold text-dark mb-0">@Model.CompanyName</h1>
-            <span class="badge bg-secondary">@Model.Industry</span>
-        </div>
-        <div>
-            <a href="#" class="btn btn-outline-primary btn-sm">Edit Customer</a>
-            <a asp-action="Index" class="btn btn-light btn-sm">Back to List</a>
+    body {
+        background: linear-gradient(135deg, #f8fafc 0%, #e6f2ff 100%);
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Page Container */
+    .customer-details-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 32px 24px;
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Header Section */
+    .customer-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
+        color: var(--white);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 102, 204, 0.15);
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .customer-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+    .customer-header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+
+    .customer-title-section h1 {
+        margin: 0 0 12px 0;
+        font-size: 2.2rem;
+        font-weight: 700;
+        font-family: 'Outfit', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .badge {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-success {
+        background: var(--success-green);
+        color: white;
+    }
+
+    .customer-meta {
+        display: flex;
+        gap: 24px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .customer-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .customer-meta-item i {
+            opacity: 0.8;
+        }
+
+    .customer-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-white {
+        background: var(--white);
+        color: var(--primary-blue);
+    }
+
+        .btn-white:hover {
+            background: var(--light-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+    .btn-light-outline {
+        background: transparent;
+        color: var(--white);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+        .btn-light-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--white);
+        }
+
+    /* Grid Layout */
+    .grid-layout {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 32px;
+    }
+
+    /* Section Headers */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+        .section-header h4 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--deep-blue);
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+    .section-icon {
+        color: var(--primary-blue);
+        font-size: 1.2rem;
+    }
+
+    .btn-add {
+        background: var(--primary-blue);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-add:hover {
+            background: var(--deep-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+        }
+
+    /* Contact Cards */
+    .contacts-section {
+        background: var(--white);
+        padding: 28px;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        height: fit-content;
+    }
+
+    .contact-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        padding: 20px;
+        border-radius: 16px;
+        border: 2px solid var(--border-color);
+        margin-bottom: 16px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary-blue), var(--accent-teal));
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .contact-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 8px 24px rgba(0, 102, 204, 0.12);
+            transform: translateX(4px);
+        }
+
+            .contact-card:hover::before {
+                transform: scaleY(1);
+            }
+
+    .contact-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--deep-blue);
+        margin-bottom: 4px;
+    }
+
+    .contact-position {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin-bottom: 16px;
+    }
+
+    .contact-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-sm {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        border-radius: 10px;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn-sm:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-light);
+        font-style: italic;
+    }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--border-color);
+            margin-bottom: 16px;
+        }
+
+    /* Timeline Section */
+    .timeline-section {
+        background: var(--white);
+        padding: 28px;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Add Note Form */
+    .add-note-card {
+        background: linear-gradient(135deg, var(--light-blue) 0%, #ffffff 100%);
+        padding: 24px;
+        border-radius: 16px;
+        border: 2px solid var(--primary-blue);
+        margin-bottom: 40px;
+        box-shadow: 0 4px 16px rgba(0, 102, 204, 0.1);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-light);
+        }
+
+    .form-title-input {
+        font-weight: 600;
+        font-size: 1rem;
+        border: none;
+        background: white;
+    }
+
+    .form-content-input {
+        border: none;
+        background: #F8FAFC;
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
+        color: white;
+        padding: 10px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.3);
+        }
+
+    /* Timeline Items */
+    .timeline-wrapper {
+        margin-left: 10px;
+        position: relative;
+    }
+
+    .timeline-item {
+        display: flex;
+        gap: 20px;
+        padding-bottom: 32px;
+        border-left: 3px solid var(--border-color);
+        padding-left: 32px;
+        position: relative;
+    }
+
+        .timeline-item:last-child {
+            border-left-color: transparent;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -11px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-teal));
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px var(--primary-blue);
+            z-index: 2;
+        }
+
+    .note-box {
+        background: white;
+        padding: 24px;
+        border-radius: 16px;
+        width: 100%;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+        .note-box:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+    .note-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 12px;
+        gap: 16px;
+    }
+
+    .note-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--deep-blue);
+        flex: 1;
+    }
+
+    .note-date {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        white-space: nowrap;
+    }
+
+    .note-content {
+        color: var(--text-dark);
+        line-height: 1.7;
+        margin: 0;
+        white-space: pre-wrap;
+    }
+
+    .reminder-badge {
+        margin-top: 16px;
+        font-size: 0.85rem;
+        color: var(--orange);
+        background: #FFF7ED;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: 1px solid #fed7aa;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 1024px) {
+        .grid-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .customer-header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .customer-actions {
+            width: 100%;
+        }
+
+        .btn {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .customer-details-wrapper {
+            padding: 20px 16px;
+        }
+
+        .customer-header {
+            padding: 28px 24px;
+        }
+
+        .customer-title-section h1 {
+            font-size: 1.6rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .customer-meta {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .contacts-section,
+        .timeline-section {
+            padding: 20px;
+        }
+
+        .section-header h4 {
+            font-size: 1.2rem;
+        }
+
+        .form-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+            .form-footer input[type="date"] {
+                width: 100% !important;
+            }
+
+        .btn-primary {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .customer-title-section h1 {
+            font-size: 1.4rem;
+        }
+
+        .contact-card {
+            padding: 16px;
+        }
+
+        .timeline-item {
+            padding-left: 24px;
+        }
+
+        .note-box {
+            padding: 16px;
+        }
+
+        .note-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="customer-details-wrapper">
+    <!-- Header Section -->
+    <div class="customer-header">
+        <div class="customer-header-content">
+            <div class="customer-title-section">
+                <h1>
+                    @Model.CompanyName
+                    <span class="badge badge-success">Active</span>
+                </h1>
+                <div class="customer-meta">
+                    <div class="customer-meta-item">
+                        <i class="fa-solid fa-industry"></i>
+                        <span>@Model.Industry</span>
+                    </div>
+                    <div class="customer-meta-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>@Model.Address</span>
+                    </div>
+                </div>
+            </div>
+            <div class="customer-actions">
+                <a href="mailto:@Model.Email" class="btn btn-white">
+                    <i class="fa-regular fa-envelope"></i> Email Company
+                </a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-light-outline">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white fw-bold">Details</div>
-                <div class="card-body">
-                    <p class="mb-2"><i class="fa fa-envelope me-2 text-muted"></i> @(Model.Email ?? "No Email")</p>
-                    <p class="mb-2"><i class="fa fa-phone me-2 text-muted"></i> @(Model.Phone ?? "No Phone")</p>
-                    <p class="mb-0"><i class="fa fa-map-marker-alt me-2 text-muted"></i> @(Model.Address ?? "No Address")</p>
-                </div>
+    <!-- Main Content Grid -->
+    <div class="grid-layout">
+        <!-- Left Column: Contacts -->
+        <div class="contacts-section">
+            <div class="section-header">
+                <h4>
+                    <i class="fa-solid fa-users section-icon"></i>
+                    People
+                </h4>
+                <a href="/Contacts/Create?customerId=@Model.Id" class="btn-add">
+                    <i class="fa-solid fa-plus"></i> Add Contact
+                </a>
             </div>
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">Contacts</span>
-                    <a href="#" class="btn btn-sm btn-light py-0 text-primary fw-bold">+ Add</a>
-                </div>
-                <ul class="list-group list-group-flush">
-                    @foreach (var contact in Model.Contacts)
-                    {
-                        <li class="list-group-item">
-                            <div class="fw-bold text-dark">@contact.FullName</div>
-                            <div class="small text-muted">@contact.Position</div>
-                            <div class="small text-muted">@contact.Email</div>
-                        </li>
-                    }
-                    @if (!Model.Contacts.Any())
-                    {
-                        <li class="list-group-item text-muted small fst-italic">No contacts added yet.</li>
-                    }
-                </ul>
-            </div>
-        </div>
-
-        <div class="col-md-8">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white fw-bold">Activity Log & Notes</div>
-                <div class="card-body bg-light">
-
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body">
-                            <h6 class="card-title text-muted mb-3">Log an interaction</h6>
-                            <form asp-action="AddNote" method="post">
-                                <input type="hidden" name="customerId" value="@Model.Id" />
-
-                                <div class="mb-2">
-                                    <input type="text" name="title" class="form-control" placeholder="Subject (e.g. Follow-up Call)" required />
-                                </div>
-                                <div class="mb-2">
-                                    <textarea name="content" class="form-control" rows="2" placeholder="What did you discuss?" required></textarea>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="input-group input-group-sm" style="width: 200px;">
-                                        <span class="input-group-text">Reminder</span>
-                                        <input type="date" name="reminderDate" class="form-control" />
-                                    </div>
-                                    <button type="submit" class="btn btn-primary btn-sm px-4">Log Note</button>
-                                </div>
-                            </form>
+            @if (Model.Contacts != null && Model.Contacts.Any())
+            {
+                foreach (var contact in Model.Contacts)
+                {
+                    <div class="contact-card">
+                        <div class="contact-name">@contact.FullName</div>
+                        <div class="contact-position">@contact.Position</div>
+                        <div class="contact-actions">
+                            <a href="mailto:@contact.Email" class="btn-sm">
+                                <i class="fa-solid fa-envelope"></i> Email
+                            </a>
+                            <a href="tel:@contact.Phone" class="btn-sm">
+                                <i class="fa-solid fa-phone"></i> Call
+                            </a>
                         </div>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div><i class="fa-regular fa-address-book"></i></div>
+                    <div>No contacts added yet.</div>
+                    <div style="margin-top: 8px; font-size: 0.9rem;">Add your first contact to get started!</div>
+                </div>
+            }
+        </div>
 
-                    <div class="activity-feed">
-                        @if (Model.Notes.Any())
-                        {
-                            @foreach (var note in Model.Notes.OrderByDescending(n => n.CreatedAt))
-                            {
-                                <div class="card mb-3 border-0 shadow-sm">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex justify-content-between mb-1">
-                                            <span class="fw-bold text-primary">@note.Title</span>
-                                            <small class="text-muted">@note.CreatedAt.ToString("MMM dd, hh:mm tt")</small>
-                                        </div>
-                                        <p class="mb-2 text-secondary">@note.Content</p>
+        <!-- Right Column: Timeline -->
+        <div class="timeline-section">
+            <div class="section-header">
+                <h4>
+                    <i class="fa-solid fa-clock-rotate-left section-icon"></i>
+                    Interaction Timeline
+                </h4>
+            </div>
 
-                                        <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
-                                            <small class="text-muted fst-italic">
-                                                Logged by: @(note.Author?.UserName ?? "Unknown")
-                                            </small>
+            <!-- Add Note Form -->
+            <div class="add-note-card">
+                <form asp-action="AddNote" method="post">
+                    <input type="hidden" name="customerId" value="@Model.Id" />
+                    <div style="margin-bottom: 12px;">
+                        <input name="title" class="form-control form-title-input" placeholder="Subject (e.g., Call Summary, Meeting Notes)" required />
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <textarea name="content" class="form-control form-content-input" rows="4" placeholder="What happened? Jot down your notes here..." required></textarea>
+                    </div>
+                    <div class="form-footer">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-regular fa-bell" style="color: var(--text-light);"></i>
+                            <input type="date" name="reminderDate" class="form-control" style="width: auto; max-width: 200px;" title="Set Follow-up Reminder" />
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Note
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-                                            @if (note.ReminderDate.HasValue)
-                                            {
-                                                <small class="text-warning fw-bold">
-                                                    <i class="fa fa-bell"></i> Reminder: @note.ReminderDate.Value.ToShortDateString()
-                                                </small>
-                                            }
-                                        </div>
+            <!-- Timeline -->
+            <div class="timeline-wrapper">
+                @if (Model.Notes != null && Model.Notes.Any())
+                {
+                    @foreach (var note in Model.Notes.OrderByDescending(n => n.CreatedAt))
+                    {
+                        <div class="timeline-item">
+                            <div class="note-box">
+                                <div class="note-header">
+                                    <div class="note-title">@note.Title</div>
+                                    <div class="note-date">
+                                        <i class="fa-regular fa-calendar"></i> @note.CreatedAt.ToString("MMM dd, yyyy")
                                     </div>
                                 </div>
-                            }
-                        }
-                        else
-                        {
-                            <div class="text-center text-muted py-5">
-                                <i class="fa-regular fa-clipboard fa-2x mb-3 opacity-50"></i>
-                                <p>No notes found. Start tracking your interactions!</p>
+                                <p class="note-content">@note.Content</p>
+                                @if (note.ReminderDate.HasValue)
+                                {
+                                    <div class="reminder-badge">
+                                        <i class="fa-regular fa-bell"></i>
+                                        Follow up: @note.ReminderDate.Value.ToString("MMM dd, yyyy")
+                                    </div>
+                                }
                             </div>
-                        }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <div><i class="fa-regular fa-note-sticky"></i></div>
+                        <div>No notes yet.</div>
+                        <div style="margin-top: 8px; font-size: 0.9rem;">Start documenting interactions above!</div>
                     </div>
-
-                </div>
+                }
             </div>
         </div>
     </div>

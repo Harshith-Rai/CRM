@@ -1,3 +1,15 @@
+:root {
+    --mri-blue: #044D66;
+    --medium-blue: #187ABF;
+    --bright-blue: #179AD7;
+    --light-blue: #C2E6F2;
+    --light-green: #00B188; /* This is the missing color */
+    --orange: #FAA41C;
+    --red-orange: #F36C3C;
+    --white: #ffffff;
+    --text-dark: #1e293b;
+    --text-light: #64748b;
+}
 html {
   font-size: 14px;
 }

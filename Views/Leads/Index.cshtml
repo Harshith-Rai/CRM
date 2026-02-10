@@ -1,0 +1,178 @@
+﻿@model IEnumerable<CRM.Models.Lead>
+@using CRM.Models
+
+@{
+    ViewData["Title"] = "Sales Pipeline";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Kanban Container */
+    .kanban-board {
+        display: flex;
+        overflow-x: auto;
+        gap: 24px;
+        padding-bottom: 20px;
+        min-height: calc(100vh - 200px);
+    }
+
+    /* Individual Column */
+    .kanban-column {
+        min-width: 300px;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .column-header {
+        font-weight: 700;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    /* The Deal Card */
+    .lead-card {
+        background: white;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+        transition: transform 0.2s;
+    }
+
+        .lead-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #cbd5e1;
+        }
+
+    .lead-value {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 1.1rem;
+    }
+
+    .lead-company {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+
+    /* Status Colors */
+    .status-new {
+        border-top: 4px solid #3b82f6;
+    }
+    /* Blue */
+    .status-negotiation {
+        border-top: 4px solid #f59e0b;
+    }
+    /* Orange */
+    .status-won {
+        border-top: 4px solid #10b981;
+    }
+    /* Green */
+    .status-lost {
+        border-top: 4px solid #ef4444;
+    }
+    /* Red */
+
+    /* Action Buttons */
+    .card-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px dashed #e2e8f0;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold" style="color: var(--deep-blue);">Sales Pipeline</h2>
+            <p class="text-muted">Manage your deals and track revenue.</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> New Deal
+        </a>
+    </div>
+
+    <div class="kanban-board">
+
+        @foreach (LeadStatus status in Enum.GetValues(typeof(LeadStatus)))
+        {
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span>@status</span>
+                    <span class="badge bg-light text-dark border">
+                        @Model.Count(l => l.Status == status)
+                    </span>
+                </div>
+
+                @foreach (var lead in Model.Where(l => l.Status == status))
+                {
+                    <div class="lead-card status-@status.ToString().ToLower()">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="fw-bold mb-1">@lead.Title</h6>
+                            <a asp-action="Delete" asp-route-id="@lead.Id" class="text-danger small"
+                               onclick="return confirm('Delete this deal?');"><i class="fa-solid fa-xmark"></i></a>
+                        </div>
+
+                        <div class="lead-company">
+                            <i class="fa-regular fa-building me-1"></i> @lead.Customer.CompanyName
+                        </div>
+
+                        <div class="lead-value">
+                            $@lead.Value.ToString("N0")
+                        </div>
+
+                        <div class="card-actions">
+                            @if (status != LeadStatus.New)
+                            {
+                                // Move Backwards
+                                <form asp-action="UpdateStatus" method="post">
+                                    <input type="hidden" name="id" value="@lead.Id" />
+                                    <input type="hidden" name="status" value="@(status - 1)" />
+                                    <button type="submit" class="btn btn-sm btn-light border" title="Move Back">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </button>
+                                </form>
+                            }
+
+                            @if (status != LeadStatus.Lost) // Can't move forward from Lost (usually)
+                            {
+                                // Move Forwards
+                                <form asp-action="UpdateStatus" method="post">
+                                    <input type="hidden" name="id" value="@lead.Id" />
+                                     @* Logic to stop at "Won" or "Lost" boundary *@
+                                    <input type="hidden" name="status" value="@(status == LeadStatus.Won ? LeadStatus.Won : status + 1)" />
+
+                                    @if (status != LeadStatus.Won)
+                                    {
+                                        <button type="submit" class="btn btn-sm btn-primary" title="Advance Stage">
+                                            <i class="fa-solid fa-arrow-right"></i>
+                                        </button>
+                                    }
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if (!Model.Any(l => l.Status == status))
+                {
+                    <div class="text-center text-muted py-4 small opacity-50">
+                        No deals here
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
