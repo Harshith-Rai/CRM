@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CRM.Models
 {
@@ -6,24 +8,22 @@ namespace CRM.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Please provide a title for this interaction")]
-        public string Title { get; set; } // e.g., "Follow-up Call", "Initial Meeting"
+        [Required(ErrorMessage = "Please provide a title")]
+        public string Title { get; set; } // e.g., "Call Summary"
 
-        [Required(ErrorMessage = "Note content cannot be empty")]
-        public string Content { get; set; }
-
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-        // Optional: Project Requirement #4 (Reminder System)
-        public DateTime? ReminderDate { get; set; }
-
-        // Foreign Key: Links this note to a specific Customer
         [Required]
+        public string Content { get; set; } // e.g., "Client is interested in..."
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? ReminderDate { get; set; } // Optional Reminder
+
+        // Foreign Keys
         public int CustomerId { get; set; }
+        [ForeignKey("CustomerId")]
         public virtual Customer Customer { get; set; }
 
-        // Security: Link to the ApplicationUser (Admin/Sales Rep) who wrote the note
-        public string AuthorId { get; set; }
+        public string AuthorId { get; set; } // The User who wrote the note
+        [ForeignKey("AuthorId")]
         public virtual ApplicationUser Author { get; set; }
     }
 }

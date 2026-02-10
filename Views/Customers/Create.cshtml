@@ -1,0 +1,75 @@
+﻿@model CRM.Models.Customer
+
+@{
+    ViewData["Title"] = "Add New Customer";
+    Layout = "~/Views/Shared/_Layout_App.cshtml";
+}
+
+<div class="container mt-4" style="max-width: 800px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom">
+            <h4 class="mb-0 fw-bold" style="color: var(--mri-blue);">
+                <i class="fa-solid fa-user-plus me-2"></i> Add New Customer
+            </h4>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <h6 class="text-muted text-uppercase small fw-bold mb-3">Company Information</h6>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="CompanyName" class="form-label fw-bold">Company Name</label>
+                        <input asp-for="CompanyName" class="form-control" placeholder="e.g. Acme Corp" />
+                        <span asp-validation-for="CompanyName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Industry" class="form-label">Industry</label>
+                        <select asp-for="Industry" class="form-select">
+                            <option value="">Select Industry...</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Finance">Finance</option>
+                        </select>
+                        <span asp-validation-for="Industry" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <h6 class="text-muted text-uppercase small fw-bold mb-3 mt-4">Contact Details</h6>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label">Main Email</label>
+                        <input asp-for="Email" class="form-control" type="email" placeholder="info@company.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Phone" class="form-label">Main Phone</label>
+                        <input asp-for="Phone" class="form-control" placeholder="(555) 123-4567" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Address" class="form-label">Office Address</label>
+                    <textarea asp-for="Address" class="form-control" rows="2" placeholder="123 Business Rd, City, State"></textarea>
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="btn btn-light border">Cancel</a>
+                    <button type="submit" class="btn text-white px-4" style="background-color: var(--mri-blue);">
+                        <i class="fa-solid fa-check"></i> Save Customer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
