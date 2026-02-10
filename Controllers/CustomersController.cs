@@ -213,5 +213,29 @@ namespace CRM.Controllers
             // Send them back to the main list to see their restored friend
             return RedirectToAction(nameof(Index));
         }
+
+        //Extra Feature:Export to CSV
+        // GET: Customers/Export
+        public async Task<IActionResult> Export()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // Get my customers
+            var customers = await _context.Customers
+                .Where(c => c.IsActive && c.SalesRepId == userId)
+                .ToListAsync();
+
+            // Build CSV String
+            var builder = new System.Text.StringBuilder();
+            builder.AppendLine("Company Name,Industry,Email,Phone,Address,Created Date");
+
+            foreach (var c in customers)
+            {
+                builder.AppendLine($"{c.CompanyName},{c.Industry},{c.Email},{c.Phone},{c.Address},{c.CreatedAt.ToShortDateString()}");
+            }
+
+            // Return file
+            return File(System.Text.Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", "MyCustomers.csv");
+        }
     }
 }

@@ -127,7 +127,9 @@
                     <i class="fa-solid fa-money-bill-trend-up"></i> Sales Pipeline
                 </a>
 
-                <a href="#" class="menu-item"><i class="fa-solid fa-calendar-check"></i> Tasks</a>
+                <a href="@Url.Action("Index", "Tasks")" class="menu-item @(currentController == "Tasks" ? "active" : "")">
+                    <i class="fa-solid fa-calendar-check"></i> My Tasks
+                </a>
             </div>
         </div>
     }
