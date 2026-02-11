@@ -1,0 +1,171 @@
+﻿@using CRM.DTOS.admin
+@model IEnumerable<UserListDto>
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>User Management</title>
+    <link rel="stylesheet" href="~/css/AdminDashBoard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="~/js/pages/admin-user-management.js"></script>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                @TempData["Success"]
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h2>User Management</h2>
+            </div>
+            <div class="search-filter-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search users..." onkeyup="searchUsers()">
+                </div>
+                <select id="roleFilter" class="filter-select" onchange="filterUsersByRole(this.value)">
+                    <option value="all">All Roles</option>
+                    <option value="SalesManager">Sales Manager</option>
+                    <option value="SalesExecutive">Sales Executive</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-container">
+        <div class="loading-bar" id="loadingBar"></div>
+
+        @if (Model != null && Model.Any())
+        {
+            <table class="table table-hover" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr data-name="@user.FullName" data-email="@user.Email" data-role="@user.CurrentRole">
+                            <td>
+                                <div class="user-info">
+                                    <i class="fas fa-user-circle user-icon"></i>
+                                    <div class="user-details">
+                                        <span class="user-name">@user.FullName</span>
+                                        <span class="user-email">@user.Email</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="role-badge">@user.CurrentRole</span>
+                            </td>
+                            <td class="text-end">
+                                <div class="action-btn-group">
+                                    <button type="button" class="action-btn btn-update"
+                                            onclick="showRoleModal('@user.Id', '@user.FullName', '@user.CurrentRole')">
+                                        <i class="fas fa-edit"></i>Update Role
+                                    </button>
+                                    <button type="button" class="action-btn btn-delete"
+                                            onclick="confirmDelete('@user.Id', '@user.FullName')">
+                                        <i class="fas fa-trash"></i>Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-users-slash"></i>
+                <h4>No Users Found</h4>
+                <p>There are currently no users in the system.</p>
+            </div>
+        }
+    </div>
+
+    <!-- Update Role Modal -->
+    <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roleModalLabel">
+                        <i class="fas fa-user-edit me-2"></i>Update User Role
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Update role for <strong id="roleUserName"></strong></p>
+                    <form id="roleForm" asp-action="UpdateRole" method="post" asp-route-id="">
+                        <input type="hidden" id="roleUserId" name="id" />
+                        <div class="mb-3">
+                            <label for="roleSelect" class="form-label">Select Role</label>
+                            <select id="roleSelect" name="newRole" class="form-select">
+                                <option value="">Select a role</option>
+                                <option value="SalesManager">SalesManager</option>
+                                <option value="SalesExecutive">SalesExecutive</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="roleForm" class="btn btn-confirm-block" onclick="submitRoleForm()">
+                        <i class="fas fa-check me-2"></i>Update Role
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Confirmation Modal -->
+    <!-- Delete User Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <strong id="deleteUserName"></strong>?</p>
+                    <p class="text-danger mb-0" style="font-size: 14px;">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        This action cannot be undone. All user data will be permanently deleted.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <input type="hidden" id="deleteUserId" />
+                    <button type="button" class="btn btn-confirm-block" onclick="submitDeleteForm()">
+                        <i class="fas fa-trash me-2"></i>Yes, Delete User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

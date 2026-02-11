@@ -17,11 +17,19 @@ namespace CRM.Services
         public async Task<IEnumerable<UserListDto>> GetAllUsersAsync()
         {
             var users = await _userManager.Users.ToListAsync();
+
             var userDto = new List<UserListDto>();
 
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
+
+                // Skip admin users - only show non-admin users
+                if (roles.Contains("Admin"))
+                {
+                    continue;
+                }
+
                 userDto.Add(new UserListDto
                 {
                     Id = user.Id,
@@ -29,8 +37,6 @@ namespace CRM.Services
                     Email = user.Email,
                     CurrentRole = roles.FirstOrDefault() ?? "No Role"
                 });
-
-                return userDto;
             }
 
             return userDto;
@@ -54,6 +60,23 @@ namespace CRM.Services
             var res = _userManager.AddToRoleAsync(user, newRole);
             return res.Result.Succeeded;
 
+        }
+
+        public async Task<bool> DeleteUserAsync(string userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null) return false;
+
+                var result = await _userManager.DeleteAsync(user);
+                return result.Succeeded;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
         }
     }
 }
