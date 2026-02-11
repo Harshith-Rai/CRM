@@ -84,40 +84,98 @@
         </div>
     </div>
 
-    <!-- Search and Filter Bar with Bootstrap -->
+    <!-- Enhanced Search and Filter Bar with Status and Location -->
     <div class="filter-bar">
-        <div class="row g-3 align-items-center">
-            <div class="col-12 col-lg-5">
+        <div class="row g-3">
+            <!-- Search Section -->
+            <div class="col-12">
+                <label class="filter-section-title">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Search
+                </label>
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text"
                            id="searchInput"
                            class="form-control"
-                           placeholder="Search by company, email, or phone..."
+                           placeholder="Search by name, email, company, or phone..."
                            aria-label="Search customers" />
                 </div>
             </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <select class="filter-select form-select" id="industryFilter" aria-label="Filter by industry">
-                    <option value="">All Industries</option>
-                    @foreach (var industry in Model.Select(c => c.Industry).Distinct().OrderBy(i => i))
-                    {
-                        <option value="@industry">@industry</option>
-                    }
-                </select>
+        </div>
+
+        <div class="row g-3 mt-2">
+            <!-- Filter Section -->
+            <div class="col-12">
+                <label class="filter-section-title">
+                    <i class="fa-solid fa-filter"></i>
+                    Filters
+                </label>
             </div>
-            <div class="col-6 col-md-4 col-lg-3">
+
+            <!-- Industry Filter -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div style="position: relative;">
+                    <select class="filter-select form-select" id="industryFilter" aria-label="Filter by industry">
+                        <option value="">All Industries</option>
+                        @foreach (var industry in Model.Select(c => c.Industry).Distinct().OrderBy(i => i))
+                        {
+                            <option value="@industry">@industry</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Status Filter (NEW) -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div style="position: relative;">
+                    <select class="filter-select form-select" id="statusFilter" aria-label="Filter by status">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Location Filter (NEW) -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div style="position: relative;">
+                    <select class="filter-select form-select" id="locationFilter" aria-label="Filter by location">
+                        <option value="">All Locations</option>
+                        @foreach (var location in Model.Where(c => !string.IsNullOrEmpty(c.Address))
+                                                .Select(c => c.Address.Split(',').LastOrDefault()?.Trim())
+                                                .Where(l => !string.IsNullOrEmpty(l))
+                                                .Distinct()
+                                                .OrderBy(l => l))
+                        {
+                            <option value="@location">@location</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sort Filter -->
+            <div class="col-12 col-sm-6 col-lg-2">
                 <select class="filter-select form-select" id="sortFilter" aria-label="Sort customers">
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
                     <option value="name">Company Name</option>
+                    <option value="status">Status</option>
                 </select>
             </div>
-            <div class="col-12 col-md-4 col-lg-1">
+
+            <!-- Reset Button -->
+            <div class="col-12 col-lg-1">
                 <button class="btn btn-light-custom w-100" id="resetFilters" title="Reset all filters">
                     <i class="fa-solid fa-rotate-right"></i>
                 </button>
             </div>
+        </div>
+
+        <!-- Active Filters Display -->
+        <div id="activeFiltersContainer" class="active-filters-container" style="display: none;">
+            <span class="active-filters-label">Active Filters:</span>
+            <div id="activeFiltersChips"></div>
         </div>
     </div>
 
@@ -132,7 +190,9 @@
                      data-industry="@item.Industry"
                      data-date="@item.CreatedAt.Ticks"
                      data-email="@item.Email"
-                     data-phone="@item.Phone">
+                     data-phone="@item.Phone"
+                     data-status="@(item.IsActive ? "active" : "inactive")"
+                     data-location="@(item.Address?.Split(',').LastOrDefault()?.Trim() ?? "")">
                     <div class="customer-card">
                         <!-- Company Header -->
                         <div class="company-header">
@@ -148,11 +208,26 @@
                             </div>
                         </div>
 
-                        <!-- Industry Badge -->
-                        <div class="industry-badge">
-                            <i class="fa-solid fa-building me-2"></i>
-                            @item.Industry
+                        <!-- Industry and Status Badges -->
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+                            <div class="industry-badge">
+                                <i class="fa-solid fa-building me-2"></i>
+                                @item.Industry
+                            </div>
+                            <div class="status-badge @(item.IsActive ? "active" : "inactive")">
+                                <i class="fa-solid fa-circle"></i>
+                                @(item.IsActive ? "Active" : "Inactive")
+                            </div>
                         </div>
+
+                        <!-- Location (if available) -->
+                        @if (!string.IsNullOrEmpty(item.Address))
+                        {
+                            <div class="location-text">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span>@item.Address</span>
+                            </div>
+                        }
 
                         <!-- Contact Information -->
                         <div class="contact-info">
@@ -226,10 +301,14 @@
         // DOM Elements
         const searchInput = document.getElementById('searchInput');
         const industryFilter = document.getElementById('industryFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const locationFilter = document.getElementById('locationFilter');
         const sortFilter = document.getElementById('sortFilter');
         const resetButton = document.getElementById('resetFilters');
         const customersGrid = document.getElementById('customersGrid');
         const visibleCountElement = document.getElementById('visibleCount');
+        const activeFiltersContainer = document.getElementById('activeFiltersContainer');
+        const activeFiltersChips = document.getElementById('activeFiltersChips');
 
         // Search functionality with debounce
         let searchTimeout;
@@ -242,6 +321,8 @@
 
         // Industry filter
         industryFilter?.addEventListener('change', filterCustomers);
+        statusFilter?.addEventListener('change', filterCustomers);
+        locationFilter?.addEventListener('change', filterCustomers);
 
         // Sort filter
         sortFilter?.addEventListener('change', function() {
@@ -252,6 +333,8 @@
         resetButton?.addEventListener('click', function() {
             searchInput.value = '';
             industryFilter.value = '';
+            statusFilter.value = '';
+            locationFilter.value = '';
             sortFilter.value = 'newest';
             filterCustomers();
             sortCustomers('newest');
@@ -261,12 +344,16 @@
         function filterCustomers() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             const selectedIndustry = industryFilter.value;
+            const selectedStatus = statusFilter.value;
+            const selectedLocation = locationFilter.value;
             const cards = document.querySelectorAll('#customersGrid > div[data-company]');
             let visibleCount = 0;
 
             cards.forEach(cardWrapper => {
                 const company = cardWrapper.dataset.company.toLowerCase();
                 const industry = cardWrapper.dataset.industry;
+                const status = cardWrapper.dataset.status;
+                const location = cardWrapper.dataset.location;
                 const email = (cardWrapper.dataset.email || '').toLowerCase();
                 const phone = (cardWrapper.dataset.phone || '').toLowerCase();
 
@@ -276,8 +363,10 @@
                                     phone.includes(searchTerm);
 
                 const matchesIndustry = !selectedIndustry || industry === selectedIndustry;
+                const matchesStatus = !selectedStatus || status === selectedStatus;
+                const matchesLocation = !selectedLocation || location.toLowerCase().includes(selectedLocation.toLowerCase());
 
-                if (matchesSearch && matchesIndustry) {
+                if (matchesSearch && matchesIndustry && matchesStatus && matchesLocation) {
                     cardWrapper.style.display = 'block';
                     visibleCount++;
                 } else {
@@ -290,9 +379,63 @@
                 visibleCountElement.textContent = visibleCount;
             }
 
+            // Update active filters display
+            updateActiveFilters();
+
             // Show "no results" message if needed
             showNoResultsMessage(visibleCount === 0);
         }
+
+        // Update active filters chips
+        function updateActiveFilters() {
+            const activeFilters = [];
+
+            if (searchInput.value) {
+                activeFilters.push({ type: 'search', label: `Search: "${searchInput.value}"`, value: searchInput.value });
+            }
+            if (industryFilter.value) {
+                activeFilters.push({ type: 'industry', label: `Industry: ${industryFilter.value}`, value: industryFilter.value });
+            }
+            if (statusFilter.value) {
+                activeFilters.push({ type: 'status', label: `Status: ${statusFilter.value}`, value: statusFilter.value });
+            }
+            if (locationFilter.value) {
+                activeFilters.push({ type: 'location', label: `Location: ${locationFilter.value}`, value: locationFilter.value });
+            }
+
+            if (activeFilters.length > 0) {
+                activeFiltersContainer.style.display = 'flex';
+                activeFiltersChips.innerHTML = activeFilters.map(filter => `
+                    <div class="filter-chip">
+                        <span>${filter.label}</span>
+                        <span class="remove-chip" onclick="removeFilter('${filter.type}')">
+                            <i class="fa-solid fa-xmark"></i>
+                        </span>
+                    </div>
+                `).join('');
+            } else {
+                activeFiltersContainer.style.display = 'none';
+            }
+        }
+
+        // Remove individual filter
+        window.removeFilter = function(filterType) {
+            switch(filterType) {
+                case 'search':
+                    searchInput.value = '';
+                    break;
+                case 'industry':
+                    industryFilter.value = '';
+                    break;
+                case 'status':
+                    statusFilter.value = '';
+                    break;
+                case 'location':
+                    locationFilter.value = '';
+                    break;
+            }
+            filterCustomers();
+        };
 
         // Sort customers function
         function sortCustomers(sortType) {
@@ -307,6 +450,8 @@
                     return a.dataset.date - b.dataset.date;
                 } else if (sortType === 'name') {
                     return a.dataset.company.localeCompare(b.dataset.company);
+                } else if (sortType === 'status') {
+                    return a.dataset.status.localeCompare(b.dataset.status);
                 }
                 return 0;
             });
@@ -363,7 +508,15 @@
                     e.preventDefault();
                     searchInput?.focus();
                 }
+                // Escape to clear search
+                if (e.key === 'Escape' && document.activeElement === searchInput) {
+                    searchInput.value = '';
+                    filterCustomers();
+                }
             });
+
+            // Initialize active filters display
+            updateActiveFilters();
         });
 
         // Add smooth scroll to top when filtering (optional)

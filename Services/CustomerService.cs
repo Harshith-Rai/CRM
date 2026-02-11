@@ -11,11 +11,18 @@ public class CustomerService : ICustomerService
     {
         _context = context;
     }
-    public async Task<List<Customer>> GetAllActiveAsync(string userId, bool isAdmin)
+    public async Task<List<Customer>> GetAllCustomersAsync(string userId, bool isAdmin) // Renamed
     {
-        var query = _context.Customers.Where(c => c.IsActive);
-        if (!isAdmin) query = query.Where(c => c.SalesRepId == userId);
-        return await query.ToListAsync();
+        // REMOVED: .Where(c => c.IsActive)
+        var query = _context.Customers.AsQueryable();
+
+        if (!isAdmin)
+        {
+            query = query.Where(c => c.SalesRepId == userId);
+        }
+
+        // Order by newest first usually makes sense for a main list
+        return await query.OrderByDescending(c => c.CreatedAt).ToListAsync();
     }
     public async Task CreateAsync(Customer customer, string userId)
         {

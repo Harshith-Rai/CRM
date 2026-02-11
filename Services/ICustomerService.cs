@@ -4,7 +4,7 @@ namespace CRM.Services
 {
     public interface ICustomerService
     {
-        Task<List<Customer>> GetAllActiveAsync(string userId, bool isAdmin);
+        Task<List<Customer>> GetAllCustomersAsync(string userId, bool isAdmin);
         Task<List<Customer>> GetAllArchivedAsync(string userId, bool isAdmin);
         Task<Customer> GetDetailsAsync(int id);
         Task CreateAsync(Customer customer, string userId);

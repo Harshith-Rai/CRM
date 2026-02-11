@@ -23,7 +23,10 @@ namespace CRM.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
-            var customers = await _customerService.GetAllActiveAsync(userId, User.IsInRole("Admin"));
+
+            // Call the new method that returns BOTH Active and Inactive
+            var customers = await _customerService.GetAllCustomersAsync(userId, User.IsInRole("Admin"));
+
             return View(customers);
         }
 
