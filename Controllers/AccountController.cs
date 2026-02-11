@@ -44,7 +44,7 @@ namespace CRM.Controllers
                 return View(model);
             }
 
-            await userManager.AddToRoleAsync(user, "User");
+            await userManager.AddToRoleAsync(user, "SalesExecutive");
             return RedirectToAction("login");
         }
 
