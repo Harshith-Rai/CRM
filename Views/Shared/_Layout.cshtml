@@ -11,195 +11,10 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/navbar.css" />
+    <link rel="stylesheet" href="/css/layout/_layout.css" />
 
     <style>
-        :root {
-            --light-blue: #C2E6F2;
-            --mri-blue: #044D66;
-            --medium-blue: #187ABF;
-            --white: #ffffff;
-            --bg-gray: #F1F5F9;
-            --sidebar-width: 250px;
-        }
-
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-gray);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* --- Sidebar --- */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--mri-blue);
-            color: var(--white);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-            position: relative;
-            z-index: 1100;
-        }
-
-        .brand {
-            padding: 20px;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--light-blue);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            text-decoration: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .menu {
-            flex: 1;
-            padding-top: 20px;
-            overflow-y: auto;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 25px;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            transition: 0.2s;
-        }
-
-            .menu-item:hover, .menu-item.active {
-                background: rgba(255,255,255,0.1);
-                color: var(--white);
-                border-left: 4px solid var(--light-blue);
-            }
-
-            .menu-item i {
-                width: 25px;
-                margin-right: 10px;
-            }
-
-        /* Mobile toggle button */
-        .sidebar-toggle {
-            display: none;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 1200;
-            background: var(--mri-blue);
-            color: var(--white);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .sidebar-close {
-            display: none;
-            background: transparent;
-            border: none;
-            color: var(--white);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* Overlay for mobile */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1050;
-        }
-
-        /* --- Content Area --- */
-        .main-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .app-navbar {
-            background: var(--white);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            z-index: 1000;
-        }
-
-        /* --- Mobile Responsiveness --- */
-        @@media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                transform: translateX(-100%);
-                z-index: 1100;
-            }
-
-                .sidebar.active {
-                    transform: translateX(0);
-                }
-
-            .sidebar-toggle {
-                display: block;
-            }
-
-            .sidebar-close {
-                display: block;
-            }
-
-            .sidebar-overlay.active {
-                display: block;
-            }
-
-            .main-wrapper {
-                width: 100%;
-            }
-
-            .app-navbar .container-fluid {
-                padding-left: 70px !important; /* Make room for toggle button */
-            }
-
-            .navbar-search {
-                margin: 10px 0 !important;
-                max-width: 100% !important;
-            }
-
-            .navbar-brand {
-                font-size: 0.9rem !important;
-            }
-        }
-
-        @@media (max-width: 576px) {
-            .brand {
-                font-size: 1.2rem;
-                padding: 15px;
-            }
-
-            .menu-item {
-                padding: 12px 20px;
-                font-size: 0.9rem;
-            }
-
-            main.p-4 {
-                padding: 1rem !important;
-            }
-        }
-
-        /* Smooth scrolling for main content */
-        .main-wrapper {
-            scroll-behavior: smooth;
-        }
+        
     </style>
 </head>
 <body>
@@ -253,6 +68,13 @@
                 <a href="@Url.Action("Index", "Tasks")" class="menu-item @(currentController == "Tasks" ? "active" : "")">
                     <i class="fa-solid fa-calendar-check"></i> My Tasks
                 </a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <hr style="border-color: rgba(255,255,255,0.2); margin: 15px 0;" />
+                    <a asp-controller="AdminUser" asp-action="index" class="menu-item @(currentController == "AdminUser" ? "active" : "")">
+                        <i class="fa-solid fa-shield-halved"></i> Admin Panel
+                    </a>
+                }
             </div>
         </div>
     }
@@ -274,21 +96,21 @@
                     <div class="collapse navbar-collapse" id="mainNavbar">
                         <form class="d-flex mx-auto navbar-search" role="search" style="max-width: 400px; width: 100%;">
                             <div class="input-group">
-                                <input class="form-control" type="search" placeholder="Search leads...">
+                                <input class="form-control" type="search" placeholder="Search Options...">
                                 <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
                             </div>
                         </form>
 
                         <ul class="navbar-nav ms-auto align-items-center">
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-user-circle fa-2x" style="color: var(--mri-blue);"></i>
+                                    <div class="d-none d-lg-block" style="font-size: 0.85rem; line-height: 1.3;">
+                                        <div style="font-weight: 600; color: var(--mri-blue);">@(currentUser?.FullName ?? User.Identity?.Name)</div>
+                                        <div style="color: #64748b; font-size: 0.8rem;">@(currentUser?.Email ?? "user@example.com")</div>
+                                    </div>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow">
-                                    <li style="padding: 0 16px; font-size: 0.85rem; color: #64748b; margin-bottom: 8px;">
-                                        Logged in as <br><strong>@(User.Identity?.Name)</strong>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign out</a></li>
                                 </ul>
                             </li>
