@@ -1,0 +1,139 @@
+﻿:root {
+    --mri-blue: #044D66;
+    --medium-blue: #187ABF;
+    --bright-blue: #179AD7;
+    --light-blue: #C2E6F2;
+    --light-green: #00B188;
+    --orange: #FAA41C;
+    --red-orange: #F36C3C;
+    --white: #ffffff;
+    --text-dark: #1e293b;
+    --text-light: #64748b;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #F8FAFC;
+    color: var(--text-dark);
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Decorative blobs */
+.bg-decoration {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.6;
+}
+
+.blob-1 {
+    top: -10%;
+    right: -5%;
+    width: 400px;
+    height: 400px;
+    background: rgba(194, 230, 242, 0.4);
+}
+
+.blob-2 {
+    bottom: -10%;
+    left: -5%;
+    width: 300px;
+    height: 300px;
+    background: rgba(24, 122, 191, 0.1);
+}
+
+/* Card container */
+.mri-card {
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    padding: 40px;
+    max-width: 720px;
+    margin: 60px auto;
+    border: 1px solid rgba(255,255,255,0.5);
+}
+
+    .mri-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+.card-header-custom {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 10px;
+}
+
+    .card-header-custom h4 {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        color: var(--mri-blue);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+}
+
+input.form-control,
+select.form-select,
+textarea.form-control {
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--medium-blue);
+    box-shadow: 0 0 0 3px rgba(24, 122, 191, 0.1);
+    outline: none;
+}
+
+.btn-main {
+    background-color: var(--mri-blue);
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 10px 24px;
+    transition: background 0.2s ease;
+}
+
+    .btn-main:hover {
+        background-color: var(--bright-blue);
+    }
+
+.btn-cancel {
+    border: 1px solid #E2E8F0;
+    background: white;
+    color: var(--text-dark);
+    border-radius: 10px;
+    padding: 10px 24px;
+}
+
+    .btn-cancel:hover {
+        background: #F1F5F9;
+    }
+
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.text-danger {
+    font-size: 0.85rem;
+}
