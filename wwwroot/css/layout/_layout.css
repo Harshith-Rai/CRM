@@ -1,0 +1,302 @@
+﻿:root {
+    --light-blue: #C2E6F2;
+    --mri-blue: #044D66;
+    --medium-blue: #187ABF;
+    --white: #ffffff;
+    --bg-gray: #F1F5F9;
+    --sidebar-width: 250px;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-gray);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--mri-blue);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1100;
+}
+
+.brand {
+    padding: 20px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--light-blue);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-decoration: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu {
+    flex: 1;
+    padding-top: 20px;
+    overflow-y: auto;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+    .menu-item:hover, .menu-item.active {
+        background: rgba(255,255,255,0.1);
+        color: var(--white);
+        border-left: 4px solid var(--light-blue);
+    }
+
+    .menu-item i {
+        width: 25px;
+        margin-right: 10px;
+    }
+
+/* Mobile toggle button */
+.sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1200;
+    background: var(--mri-blue);
+    color: var(--white);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.sidebar-close {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--white);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Overlay for mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1050;
+}
+
+/* --- Content Area --- */
+.main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    position: relative;
+}
+
+.app-navbar {
+    background: var(--white);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+/* --- Mobile Responsiveness --- */
+@@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        z-index: 1100;
+    }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+    .sidebar-toggle {
+        display: block;
+    }
+
+    .sidebar-close {
+        display: block;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    .main-wrapper {
+        width: 100%;
+    }
+
+    .app-navbar .container-fluid {
+        padding-left: 70px !important; /* Make room for toggle button */
+    }
+
+    .navbar-search {
+        margin: 10px 0 !important;
+        max-width: 100% !important;
+    }
+
+    .navbar-brand {
+        font-size: 0.9rem !important;
+    }
+}
+
+@@media (max-width: 576px) {
+    .brand {
+        font-size: 1.2rem;
+        padding: 15px;
+    }
+
+    .menu-item {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+
+    main.p-4 {
+        padding: 1rem !important;
+    }
+}
+
+/* Smooth scrolling for main content */
+.main-wrapper {
+    scroll-behavior: smooth;
+}
+
+/* User profile dropdown styling */
+.navbar-nav .nav-link.dropdown-toggle {
+    padding: 0.5rem 1rem !important;
+}
+
+.navbar-nav .dropdown-toggle::after {
+    margin-left: 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+.navbar-nav .dropdown-toggle[aria-expanded="true"]::after {
+    transform: rotate(180deg);
+}
+
+/* Ensure proper spacing on mobile */
+@@media (max-width: 992px) {
+    .navbar-nav .dropdown-toggle d-none d-lg-block {
+        display: none !important;
+    }
+}
+.app-navbar {
+/*    background: linear-gradient(90deg, rgba(4,77,102,0.92), rgba(20,115,150,0.88));*/
+    color: #eaf6f8;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    min-height: 72px;
+    box-shadow: 0 8px 24px rgba(2,24,34,0.25);
+}
+
+    .app-navbar .container {
+        padding-left: 1.25rem; /* give some space from left corner */
+        padding-right: 1.25rem; /* give some space from right corner */
+    }
+
+    .app-navbar .navbar-brand {
+        color: var(--mri-blue);  /* Change from #eaf6f8 */
+        font-weight: 700;
+        font-size: 1.125rem;
+        margin-left: -10px; /* nudge greeting slightly to the left */
+        padding-right: 12px;
+    }
+
+/* fixed width search bar to avoid stretching */
+.navbar-search {
+    width: 320px; /* reduced fixed width */
+    max-width: 55vw;
+}
+
+.app-navbar .navbar-search .input-group {
+    position: relative;
+    width: 100%;
+}
+
+.app-navbar .navbar-search .form-control {
+    background: rgba(255,255,255,0.95);
+    border-radius: 8px; /* slightly rounded rectangle */
+    padding-left: 1rem;
+    padding-right: 3rem; /* space for icon inside */
+    height: 44px;
+    font-size: 1.02rem; /* slightly larger font */
+}
+
+.app-navbar .navbar-search .btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #05313a;
+    padding: 6px 8px;
+    cursor: pointer; /* pointer on hover */
+    font-size: 1.05rem; /* slightly bigger icon */
+}
+
+/* remove the default browser X (clear) button inside search inputs on webkit */
+input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
+
+input[type="search"]::-ms-clear {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.app-navbar .nav-link,
+.app-navbar .btn-link {
+    color: var(--mri-blue);  /* Change from #eaf6f8 */
+    font-weight: 600;
+}
+
+.app-navbar .nav-item {
+    margin-left: 0.75rem;
+}
+
+    /* Add extra spacing between dashboard and user icon */
+    .app-navbar .nav-item + .nav-item {
+        margin-left: 1.5rem;
+    }
+
+/* adjust dropdown alignment for dropup to appear right of icon */
+.dropdown .dropdown-menu.dropdown-menu-end {
+    right: 0;
+    left: auto;
+    top: calc(100% + 6px) !important; /* position below the toggle */
+    transform: none;
+    min-width: 160px;
+}
+
+/* make the dropdown icon stand out */
+.app-navbar .fa-user-circle {
+    color: #eaf6f8;
+}
