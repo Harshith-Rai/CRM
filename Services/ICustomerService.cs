@@ -12,6 +12,10 @@ namespace CRM.Services
         Task SoftDeleteAsync(int id, string userId, bool isAdmin);
         Task RestoreAsync(int id, string userId, bool isAdmin);
         Task<string> GenerateCsvAsync(string userId);
+
         Task AddNoteAsync(int customerId, string title, string content, DateTime? reminderDate, string userId);
+        Task<Note> GetNoteAsync(int id);
+        Task UpdateNoteAsync(Note note);
+        Task DeleteNoteAsync(int id);
     }
 }

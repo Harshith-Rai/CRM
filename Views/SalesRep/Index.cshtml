@@ -1,9 +1,8 @@
 ﻿@model CRM.Models.SalesRepDashboardViewModel
 
 @{
-    ViewData["Title"] = "Home Page";
-    // Layout = "~/Views/Shared/_Layout_App.cshtml";
-	// Layout = null;
+    ViewData["Title"] = "Sales Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +27,7 @@
 
     body {
         font-family: 'DM Sans', sans-serif;
-        background-color: #F8FAFC; /* Light gray background */
+        background-color: #F8FAFC;
         color: var(--text-dark);
     }
 
@@ -36,7 +35,7 @@
         font-family: 'Outfit', sans-serif;
     }
 
-    /* --- Background Decorations (Matches Login) --- */
+    /* --- Background Decorations --- */
     .bg-decoration {
         position: fixed;
         border-radius: 50%;
@@ -52,7 +51,7 @@
         height: 400px;
         background: rgba(194, 230, 242, 0.4);
     }
-    /* Light Blue */
+
     .blob-2 {
         bottom: -10%;
         left: -5%;
@@ -60,7 +59,6 @@
         height: 300px;
         background: rgba(24, 122, 191, 0.1);
     }
-    /* Medium Blue */
 
     /* --- Layout Grid --- */
     .dashboard-container {
@@ -70,12 +68,18 @@
         gap: 24px;
     }
 
-    /* --- Cards (Based on Login Card) --- */
+    @@media (max-width: 992px) {
+        .dashboard-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* --- Cards --- */
     .mri-card {
         background: var(--white);
         border-radius: 20px;
         padding: 24px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* Soft subtle shadow */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         border: 1px solid rgba(255,255,255,0.5);
         margin-bottom: 24px;
         transition: transform 0.2s ease;
@@ -108,7 +112,6 @@
         overflow: hidden;
     }
 
-        /* Decorative line from login brand section */
         .hero-card::after {
             content: '';
             position: absolute;
@@ -164,6 +167,7 @@
         justify-content: center;
         margin-right: 16px;
         font-size: 1.2rem;
+        flex-shrink: 0;
     }
 
     .icon-call {
@@ -209,6 +213,43 @@
         .btn-action:hover {
             opacity: 0.9;
         }
+
+    /* --- Activity Feed Styles --- */
+    .activity-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        align-items: flex-start;
+    }
+
+    .activity-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+
+    .activity-content {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    .activity-sub {
+        font-size: 0.8rem;
+        color: var(--text-light);
+        margin-top: 2px;
+    }
+
+    .activity-time {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        margin-top: 4px;
+    }
 
     /* --- Sidebar Widgets --- */
     .lead-row {
@@ -311,6 +352,36 @@
                 <p style="text-align: center; color: var(--text-light); padding: 20px;">No pending tasks for today.</p>
             }
         </div>
+
+        <div class="mri-card">
+            <div class="card-header">
+                <h3 class="card-title">Recent Activity</h3>
+            </div>
+
+            <div class="activity-feed">
+                @foreach (var activity in Model.RecentActivities)
+                {
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: @(activity.Type == "Call" ? "#E0F2FE" : activity.Type == "Status" ? "#DCFCE7" : "#F1F5F9");
+                                        color: @(activity.Type == "Call" ? "#187ABF" : activity.Type == "Status" ? "#00B188" : "#64748b");">
+                            <i class="fa-solid @(activity.Type == "Call" ? "fa-phone" : activity.Type == "Status" ? "fa-arrows-rotate" : "fa-user-plus")"></i>
+                        </div>
+
+                        <div>
+                            <div class="activity-content">@activity.CustomerName</div>
+                            <div class="activity-sub">@activity.Action</div>
+                            <div class="activity-time">@activity.TimeAgo</div>
+                        </div>
+                    </div>
+                }
+
+                @if (!Model.RecentActivities.Any())
+                {
+                    <p style="text-align: center; color: var(--text-light); padding: 20px;">No recent activity found.</p>
+                }
+            </div>
+        </div>
+
     </div>
 
     <div class="side-content">
@@ -319,38 +390,7 @@
             <div class="card-header">
                 <h3 class="card-title">🔥 Hot Leads</h3>
             </div>
-            <div class="mri-card">
-                <div class="card-header">
-                    <h3 class="card-title">Recent Activity</h3>
-                </div>
 
-                <div class="activity-feed">
-                    @foreach (var activity in Model.RecentActivities)
-                    {
-                        <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start;">
-                            <div style="
-                        width: 32px; height: 32px; border-radius: 50%;
-                        background: @(activity.Type == "Call" ? "#E0F2FE" : activity.Type == "Status" ? "#DCFCE7" : "#F1F5F9");
-                        color: @(activity.Type == "Call" ? "#187ABF" : activity.Type == "Status" ? "#00B188" : "#64748b");
-                        display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
-                                <i class="fa-solid @(activity.Type == "Call" ? "fa-phone" : activity.Type == "Status" ? "fa-arrows-rotate" : "fa-user-plus")"></i>
-                            </div>
-
-                            <div>
-                                <div style="font-size: 0.9rem; font-weight: 500; color: var(--text-dark);">
-                                    @activity.CustomerName
-                                </div>
-                                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 2px;">
-                                    @activity.Action
-                                </div>
-                                <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 4px;">
-                                    @activity.TimeAgo
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
             @foreach (var lead in Model.HotLeads)
             {
                 <div class="lead-row">
