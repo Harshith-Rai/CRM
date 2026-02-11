@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CRM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260211040832_initial")]
-    partial class initial
+    [Migration("20260211163816_previous-version")]
+    partial class previousversion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

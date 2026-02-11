@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CRM.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class AddIsReminderDoneColumn : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -238,7 +238,8 @@ namespace CRM.Migrations
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ReminderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CustomerId = table.Column<int>(type: "integer", nullable: false),
-                    AuthorId = table.Column<string>(type: "text", nullable: false)
+                    AuthorId = table.Column<string>(type: "text", nullable: false),
+                    IsReminderDone = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {

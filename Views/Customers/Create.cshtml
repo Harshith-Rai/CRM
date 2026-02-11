@@ -4,68 +4,180 @@
     ViewData["Title"] = "Add New Customer";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<link rel="stylesheet" href="~/css/Customers/create.css" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* Professional Layout Overrides */
+    .crm-header-bar {
+        background: #fff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 20px 32px;
+        margin: -24px -24px 30px -24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-<div class="bg-decoration blob-1"></div>
-<div class="bg-decoration blob-2"></div>
+    .form-pane {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        margin-bottom: 24px;
+    }
 
-<div class="mri-card">
-    <div class="card-header-custom">
-        <h4><i class="fa-solid fa-building"></i> Add New Company</h4>
+    .pane-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        color: #044D66;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.1rem;
+    }
+
+    .form-label-top {
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .input-group-text {
+        background-color: #f8fafc;
+        border-color: #e2e8f0;
+        color: #94a3b8;
+    }
+
+    .sidebar-widget {
+        background: #f0f9ff;
+        border: 1px dashed #bae6fd;
+        border-radius: 12px;
+        padding: 20px;
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div>
+        <h2 class="fw-bold mb-0" style="font-family: 'Outfit', sans-serif; color: #044D66;">Create Company Profile</h2>
+        <p class="text-muted small mb-0">establish a new legal entity record for your pipeline.</p>
     </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary px-4 fw-bold rounded-pill">Cancel</a>
+        <button type="submit" form="createCustomerForm" class="btn btn-primary px-4 fw-bold rounded-pill shadow-sm" style="background: #044D66; border: none;">
+            <i class="fa-solid fa-floppy-disk me-2"></i> Save Record
+        </button>
+    </div>
+</div>
 
-    <form asp-action="Create">
+<div class="container-fluid px-0">
+    <form asp-action="Create" id="createCustomerForm">
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-        <div class="mb-3">
-            <label asp-for="CompanyName">Company Name</label>
-            <input asp-for="CompanyName" class="form-control" placeholder="e.g. Acme Corp" />
-            <span asp-validation-for="CompanyName" class="text-danger"></span>
-        </div>
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="form-pane">
+                    <span class="pane-title"><i class="fa-solid fa-building-circle-check"></i> Primary Identity</span>
 
-        <div class="mb-3">
-            <label asp-for="Industry">Industry</label>
-            <select asp-for="Industry" class="form-select">
-                <option value="">-- Select Industry --</option>
-                <option value="Technology">Technology</option>
-                <option value="Finance">Finance</option>
-                <option value="Manufacturing">Manufacturing</option>
-                <option value="Healthcare">Healthcare</option>
-                <option value="Retail">Retail</option>
-                <option value="Other">Other</option>
-            </select>
-            <span asp-validation-for="Industry" class="text-danger"></span>
-        </div>
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <label asp-for="CompanyName" class="form-label-top">Company Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-signature"></i></span>
+                                <input asp-for="CompanyName" class="form-control form-control-lg" placeholder="e.g. Acme Corporation" />
+                            </div>
+                            <span asp-validation-for="CompanyName" class="text-danger small"></span>
+                        </div>
 
-        <div class="row mb-3">
-            <div class="col-md-6 mb-3 mb-md-0">
-                <label asp-for="Email">Company Email</label>
-                <input asp-for="Email" class="form-control" placeholder="info@company.com" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+                        <div class="col-md-6">
+                            <label asp-for="Industry" class="form-label-top">Industry Vertical</label>
+                            <select asp-for="Industry" class="form-select">
+                                <option value="">-- Select Industry --</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="Industry" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label-top">Expected Annual Value</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" placeholder="0.00" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-pane">
+                    <span class="pane-title"><i class="fa-solid fa-address-card"></i> Contact & Location</span>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label-top">Official Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                <input asp-for="Email" class="form-control" placeholder="contact@company.com" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Phone" class="form-label-top">Main Phone</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                <input asp-for="Phone" class="form-control" placeholder="+1 555-0123" />
+                            </div>
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Address" class="form-label-top">Physical Address</label>
+                            <textarea asp-for="Address" class="form-control" rows="3" placeholder="Street, City, ZIP..."></textarea>
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6">
-                <label asp-for="Phone">Phone</label>
-                <input asp-for="Phone" class="form-control" placeholder="+1 555-0123" />
-                <span asp-validation-for="Phone" class="text-danger"></span>
+
+            <div class="col-lg-4">
+                <div class="form-pane h-100">
+                    <span class="pane-title"><i class="fa-solid fa-user-shield"></i> Administration</span>
+
+                    <div class="mb-4 text-center py-4 bg-light rounded-3">
+                        <div class="avatar-circle bg-primary text-white mx-auto d-flex align-items-center justify-content-center mb-3" style="width:64px; height:64px; border-radius: 50%; font-size: 1.5rem;">
+                            @{
+                                var initial = "U"; // Default 'U' for User
+                                if (User.Identity?.Name != null && User.Identity.Name.Length > 0)
+                                {
+                                    initial = User.Identity.Name.Substring(0, 1).ToUpper();
+                                }
+                            }
+                            @initial
+                        </div>
+                        <h6 class="fw-bold mb-0">@User.Identity.Name</h6>
+                        <small class="text-muted">Account Manager</small>
+                    </div>
+
+                    <div class="sidebar-widget mb-4">
+                        <h6 class="fw-bold" style="color: #0369a1;"><i class="fa-solid fa-circle-info me-2"></i>Dashboard Insight</h6>
+                        <p class="small text-muted mb-0">Providing an accurate Industry vertical helps the system generate better lead conversion metrics for your personal performance charts.</p>
+                    </div>
+
+                    <div class="p-3 border rounded-3 bg-white">
+                        <div class="form-check form-switch">
+                            <input class="form-check-test-input form-check-input" type="checkbox" checked disabled>
+                            <label class="form-check-label small fw-bold text-muted">Active Prospect</label>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Address">Address</label>
-            <textarea asp-for="Address" class="form-control" rows="2" placeholder="123 Business Rd"></textarea>
-            <span asp-validation-for="Address" class="text-danger"></span>
-        </div>
-
-        <div class="form-footer">
-            <a asp-action="Index" class="btn btn-cancel">Cancel</a>
-            <button type="submit" class="btn btn-main">
-                <i class="fa-solid fa-save me-2"></i> Save Customer
-            </button>
         </div>
     </form>
 </div>

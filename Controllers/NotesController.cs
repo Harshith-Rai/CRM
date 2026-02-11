@@ -22,16 +22,22 @@ public class NotesController : Controller
     }
 
     // POST: Notes/Edit/5
+    // POST: Notes/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Note note)
     {
+        ModelState.Remove("Customer");
+        ModelState.Remove("Author");
+
         if (ModelState.IsValid)
         {
             await _customerService.UpdateNoteAsync(note);
-            // Redirect back to the Customer Details timeline
             return RedirectToAction("Details", "Customers", new { id = note.CustomerId });
         }
+
+        // If we get here, validation failed. 
+        // This reloads the page so you can see the errors.
         return View(note);
     }
 

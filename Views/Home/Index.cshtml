@@ -4,124 +4,215 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold" style="color: var(--mri-blue);">Dashboard</h2>
-            <p class="text-muted">Welcome back! Here is what's happening with your accounts.</p>
-        </div>
-        <a asp-controller="Customers" asp-action="Create" class="btn btn-primary px-4">
-            <i class="fa-solid fa-plus me-2"></i> Quick Add Customer
-        </a>
-    </div>
+<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 
-    <div class="row mb-4 g-3">
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-circle p-3 me-3" style="background: #E6F2FF; color: #0066CC;">
-                        <i class="fa-solid fa-users fa-xl"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted small mb-1">Active Customers</h6>
-                        <h3 class="fw-bold mb-0">@Model.TotalCustomers</h3>
-                    </div>
-                </div>
+<div class="container-fluid p-4">
+
+    <div class="dashboard-header animate-in">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2>Dashboard</h2>
+                <p>Welcome back! Here's what's happening with your sales pipeline and customer growth.</p>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-circle p-3 me-3" style="background: #E6FFFA; color: #00B188;">
-                        <i class="fa-solid fa-chart-line fa-xl"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted small mb-1">New This Month</h6>
-                        <h3 class="fw-bold mb-0">@Model.NewCustomersThisMonth</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-circle p-3 me-3" style="background: #FFF7ED; color: #F59E0B;">
-                        <i class="fa-regular fa-address-card fa-xl"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted small mb-1">Total Contacts</h6>
-                        <h3 class="fw-bold mb-0">@Model.TotalContacts</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-circle p-3 me-3" style="background: #F1F5F9; color: #475569;">
-                        <i class="fa-solid fa-sack-dollar fa-xl"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted small mb-1">Pipeline Value</h6>
-                        <h3 class="fw-bold mb-0">$@Model.TotalPipelineValue.ToString("N0")</h3>
-                    </div>
-                </div>
-            </div>
+            <a asp-controller="Customers" asp-action="Create" class="btn btn-header">
+                <i class="fa-solid fa-plus me-2"></i> New Customer
+            </a>
         </div>
     </div>
 
-    <div class="row mb-4 g-3">
+    <div class="quick-stats-bar animate-in animate-delay-1">
+        <div class="quick-stat">
+            <div class="quick-stat-icon" style="background: #E0F2FE; color: #0284C7;">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div class="quick-stat-content">
+                <h6>Growth Rate</h6>
+                <p>+@((Model.NewCustomersThisMonth * 100.0 / Math.Max(Model.TotalCustomers, 1)).ToString("F0"))%</p>
+            </div>
+        </div>
+
+        <div class="quick-stat">
+            <div class="quick-stat-icon" style="background: #DCFCE7; color: #16A34A;">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div class="quick-stat-content">
+                <h6>This Month</h6>
+                <p>@DateTime.Now.ToString("MMMM yyyy")</p>
+            </div>
+        </div>
+
+        <div class="quick-stat">
+            <div class="quick-stat-icon" style="background: #FEF3C7; color: #D97706;">
+                <i class="fa-solid fa-fire"></i>
+            </div>
+            <div class="quick-stat-content">
+                <h6>Active Deals</h6>
+                <p>@Model.RecentActivities.Count()</p>
+            </div>
+        </div>
+
+        <div class="performance-badge">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+            <span>Performing Well</span>
+        </div>
+    </div>
+
+    <div class="row mb-4 g-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card kpi-card animate-in animate-delay-1">
+                <div class="d-flex align-items-start justify-content-between">
+                    <div class="d-flex align-items-start">
+                        <div class="stat-icon-circle me-3" style="background: #E0F2FE; color: #0284C7;">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label">Active Customers</div>
+                            <div class="stat-value">@Model.TotalCustomers</div>
+                            <div class="stat-change positive">
+                                <i class="fa-solid fa-arrow-up"></i>
+                                <span>Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card kpi-card animate-in animate-delay-2">
+                <div class="d-flex align-items-start justify-content-between">
+                    <div class="d-flex align-items-start">
+                        <div class="stat-icon-circle me-3" style="background: #DCFCE7; color: #16A34A;">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label">New This Month</div>
+                            <div class="stat-value">@Model.NewCustomersThisMonth</div>
+                            <div class="stat-change positive">
+                                <i class="fa-solid fa-arrow-up"></i>
+                                <span>+@((Model.NewCustomersThisMonth * 100.0 / Math.Max(Model.TotalCustomers, 1)).ToString("F0"))%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card kpi-card animate-in animate-delay-3">
+                <div class="d-flex align-items-start justify-content-between">
+                    <div class="d-flex align-items-start">
+                        <div class="stat-icon-circle me-3" style="background: #FFF7ED; color: #EA580C;">
+                            <i class="fa-regular fa-address-card"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label">Total Contacts</div>
+                            <div class="stat-value">@Model.TotalContacts</div>
+                            <div class="stat-change neutral">
+                                <i class="fa-solid fa-minus"></i>
+                                <span>@(Model.TotalCustomers > 0 ? (Model.TotalContacts * 1.0 / Model.TotalCustomers).ToString("F1") : "0") avg</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card kpi-card animate-in animate-delay-4">
+                <div class="d-flex align-items-start justify-content-between">
+                    <div class="d-flex align-items-start">
+                        <div class="stat-icon-circle me-3" style="background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white;">
+                            <i class="fa-solid fa-sack-dollar"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label">Pipeline Value</div>
+                            <div class="stat-value">$@Model.TotalPipelineValue.ToString("N0")</div>
+                            <div class="stat-change positive">
+                                <i class="fa-solid fa-arrow-up"></i>
+                                <span>Total</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4 g-4">
         <div class="col-lg-8">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0 fw-bold">Customer Acquisition Trend</h5>
+            <div class="dashboard-card animate-in animate-delay-2">
+                <div class="card-header-clean">
+                    <h5>Customer Acquisition Trend</h5>
+                    <small class="text-muted ms-auto">Last 6 months</small>
                 </div>
-                <div class="card-body">
-                    <canvas id="growthChart" style="min-height: 250px;"></canvas>
+                <div class="card-body p-4">
+                    <div class="chart-container">
+                        <canvas id="growthChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0 fw-bold">Market Share</h5>
+            <div class="dashboard-card animate-in animate-delay-3">
+                <div class="card-header-clean">
+                    <h5>Market Distribution</h5>
                 </div>
-                <div class="card-body d-flex flex-column justify-content-center">
-                    <canvas id="industryChart" style="max-height: 220px;"></canvas>
+                <div class="card-body p-4 d-flex justify-content-center align-items-center" style="height: 360px;">
+                    <canvas id="industryChart" style="max-height: 280px;"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row g-3">
+    <div class="row g-4">
+
         <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3 border-0">
-                    <h5 class="mb-0 fw-bold">Recent Activity</h5>
+            <div class="dashboard-card animate-in animate-delay-3">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <h5>Recent Activity</h5>
+                    <small class="text-muted">Last 30 days</small>
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
-                        @foreach (var note in Model.RecentActivities)
+                        @if (Model.RecentActivities.Any())
                         {
-                            <div class="list-group-item p-3 border-0 border-bottom">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1 fw-bold text-primary">@note.Customer.CompanyName</h6>
-                                        <p class="mb-1 text-dark small">@note.Content</p>
-                                        <small class="text-muted">
-                                            <i class="fa-regular fa-clock me-1"></i> @note.CreatedAt.ToString("MMM dd, hh:mm tt")
-                                        </small>
+                            @foreach (var note in Model.RecentActivities)
+                            {
+                                <div class="activity-feed-item">
+                                    <div class="d-flex">
+                                        <div class="activity-icon me-3">
+                                            <i class="fa-solid fa-note-sticky"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold" style="color: var(--primary-blue); font-size: 1rem;">
+                                                        @note.Customer.CompanyName
+                                                    </h6>
+                                                    <span class="activity-badge">Note</span>
+                                                </div>
+                                                <small class="text-muted" style="font-size: 0.75rem; white-space: nowrap;">
+                                                    @note.CreatedAt.ToString("MMM dd, hh:mm tt")
+                                                </small>
+                                            </div>
+                                            <p class="mb-0 text-dark" style="font-size: 0.9rem; line-height: 1.6;">
+                                                @note.Content
+                                            </p>
+                                        </div>
                                     </div>
-                                    <span class="badge bg-light text-muted fw-normal">Note</span>
                                 </div>
-                            </div>
+                            }
                         }
-                        @if (!Model.RecentActivities.Any())
+                        else
                         {
-                            <div class="p-5 text-center text-muted">
-                                <i class="fa-solid fa-ghost fa-2x mb-3"></i>
-                                <p>No recent activity found.</p>
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fa-regular fa-folder-open"></i>
+                                </div>
+                                <h6>No Recent Activity</h6>
+                                <p>Start adding notes and interactions to see your activity feed here.</p>
                             </div>
                         }
                     </div>
@@ -130,90 +221,56 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white py-3 border-0">
-                    <h5 class="mb-0 fw-bold">Industry Breakdown</h5>
+            <div class="dashboard-card animate-in animate-delay-4">
+                <div class="card-header-clean">
+                    <h5>Industry Breakdown</h5>
                 </div>
-                <div class="card-body">
-                    @foreach (var industry in Model.CustomersByIndustry)
-                    {
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-secondary small">@industry.Key</span>
-                            <span class="badge rounded-pill bg-primary px-3">@industry.Value</span>
-                        </div>
-                    }
+                <div class="card-body p-0">
+                    <div class="p-3">
+                        @if (Model.CustomersByIndustry.Any())
+                        {
+                            @foreach (var industry in Model.CustomersByIndustry)
+                            {
+                                <div class="industry-item">
+                                    <span class="industry-name">@industry.Key</span>
+                                    <span class="industry-badge">
+                                        @industry.Value
+                                    </span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fa-solid fa-chart-pie"></i>
+                                </div>
+                                <h6>No Industry Data</h6>
+                                <p>Add customers to see industry breakdown.</p>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
-        @* <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-circle p-3 me-3" style="background: #D1FAE5; color: #059669;">
-                        <i class="fa-solid fa-hand-holding-dollar fa-xl"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted small mb-1">Total Revenue Won</h6>
-                        <h3 class="fw-bold mb-0">$@Model.TotalRevenueWon.ToString("N0")</h3>
-                    </div>
-                </div>
-            </div>
-        </div> *@
+
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // --- 1. Growth Line Chart ---
-        const growthCtx = document.getElementById('growthChart').getContext('2d');
-        new Chart(growthCtx, {
-            type: 'line',
-            data: {
-                labels: @Html.Raw(Json.Serialize(Model.MonthlyGrowth.Keys)),
-                datasets: [{
-                    label: 'New Customers',
-                    data: @Html.Raw(Json.Serialize(Model.MonthlyGrowth.Values)),
-                    borderColor: '#0066CC',
-                    backgroundColor: 'rgba(0, 102, 204, 0.05)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#0066CC'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
+    <script src="~/js/dashboard.js" asp-append-version="true"></script>
 
-        // --- 2. Industry Doughnut Chart ---
-        const industryCtx = document.getElementById('industryChart').getContext('2d');
-        new Chart(industryCtx, {
-            type: 'doughnut',
-            data: {
-                labels: @Html.Raw(Json.Serialize(Model.CustomersByIndustry.Keys)),
-                datasets: [{
-                    data: @Html.Raw(Json.Serialize(Model.CustomersByIndustry.Values)),
-                    backgroundColor: ['#0066CC', '#00B4D8', '#10B981', '#F59E0B', '#EF4444', '#6B7280'],
-                    borderWidth: 0,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15, font: { size: 11 } } }
-                }
-            }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Retrieve data from Razor Model
+            const growthKeys = @Html.Raw(Json.Serialize(Model.MonthlyGrowth.Keys));
+            const growthValues = @Html.Raw(Json.Serialize(Model.MonthlyGrowth.Values));
+            const industryKeys = @Html.Raw(Json.Serialize(Model.CustomersByIndustry.Keys));
+            const industryValues = @Html.Raw(Json.Serialize(Model.CustomersByIndustry.Values));
+
+            // Initialize the charts using the function from dashboard.js
+            initDashboardCharts(growthKeys, growthValues, industryKeys, industryValues);
         });
     </script>
 }

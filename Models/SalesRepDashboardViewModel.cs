@@ -36,6 +36,7 @@ namespace CRM.Models
     // --- Helper Classes ---
     public class TaskItem
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public string Subtitle { get; set; }
         public string Type { get; set; } // "Call", "Email", "Meeting"

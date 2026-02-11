@@ -2,13 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using CRM.Data;   // Needed for AppDbContext
-using CRM.Models; // Needed for Models and LeadStatus Enum
-using System.Security.Claims;
+using CRM.Data;
+using CRM.Models;
 
 namespace CRM.Controllers
 {
-    [Authorize] // 🔒 Protects this page
+    [Authorize]
     public class SalesRepController : Controller
     {
         private readonly AppDbContext _context;
@@ -24,116 +23,76 @@ namespace CRM.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            // ---------------------------------------------------------
-            // 1. FETCH REAL DATA FROM DB
-            // ---------------------------------------------------------
+            // 1. DATA QUERIES
 
-            // A. Customers Query
             var myCustomersQuery = _context.Customers
                 .Where(c => c.SalesRepId == userId);
 
-            // B. Notes Query (for Tasks & Activities)
+            // FIX: Ensure we filter out deleted customers immediately
             var myNotesQuery = _context.Notes
                 .Include(n => n.Customer)
-                .Where(n => n.AuthorId == userId);
+                .Where(n => n.AuthorId == userId)
+                .Where(n => n.Customer.IsActive); // <--- KEEPS DELETED CUSTOMERS OUT
 
-            // C. Leads Query (for Pipeline)
             var myLeadsQuery = _context.Leads
                 .Where(l => l.SalesRepId == userId);
 
-            // ---------------------------------------------------------
-            // 2. CALCULATE METRICS
-            // ---------------------------------------------------------
-
-            // --- Customer Stats ---
+            // 2. METRICS (Same as before)
             var totalCustomers = await myCustomersQuery.CountAsync(c => c.IsActive);
+            var newThisMonth = await myCustomersQuery.CountAsync(c => c.CreatedAt.Month == DateTime.UtcNow.Month && c.CreatedAt.Year == DateTime.UtcNow.Year);
+            var totalContacts = await myCustomersQuery.SelectMany(c => c.Contacts).CountAsync();
 
-            var newThisMonth = await myCustomersQuery
-                .CountAsync(c => c.CreatedAt.Month == DateTime.UtcNow.Month &&
-                                 c.CreatedAt.Year == DateTime.UtcNow.Year);
-
-            var totalContacts = await myCustomersQuery
-                .SelectMany(c => c.Contacts)
-                .CountAsync();
-
-            // --- Pipeline Stats (FIXED: Using Enums) ---
-            // 1. Count deals by Status Enum
             var dealsProposal = await myLeadsQuery.CountAsync(l => l.Status == LeadStatus.Proposal);
             var dealsNegotiation = await myLeadsQuery.CountAsync(l => l.Status == LeadStatus.Negotiation);
             var dealsWon = await myLeadsQuery.CountAsync(l => l.Status == LeadStatus.Won);
+            var revenueWon = await myLeadsQuery.Where(l => l.Status == LeadStatus.Won).SumAsync(l => l.Value);
+            var pipelineValue = await myLeadsQuery.Where(l => l.Status == LeadStatus.Proposal || l.Status == LeadStatus.Negotiation || l.Status == LeadStatus.Qualification).SumAsync(l => l.Value);
 
-            // 2. Financials
-            // Revenue = Sum of "Won" deals
-            var revenueWon = await myLeadsQuery
-                .Where(l => l.Status == LeadStatus.Won)
-                .SumAsync(l => l.Value);
-
-            // Pipeline Value = Sum of active deals (Proposal + Negotiation + Qualification)
-            var pipelineValue = await myLeadsQuery
-                .Where(l => l.Status == LeadStatus.Proposal ||
-                            l.Status == LeadStatus.Negotiation ||
-                            l.Status == LeadStatus.Qualification)
-                .SumAsync(l => l.Value);
-
-
-            // ---------------------------------------------------------
-            // 3. FETCH CHARTS DATA
-            // ---------------------------------------------------------
-
-            // Industry Breakdown
+            // 3. CHARTS (Same as before)
             var industryData = await myCustomersQuery
+                .Where(c => c.IsActive) // Ensure charts ignore deleted
                 .GroupBy(c => c.Industry)
                 .Select(g => new { Industry = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(k => k.Industry ?? "Unspecified", v => v.Count);
 
-            // Monthly Growth (Last 6 Months)
             var sixMonthsAgo = DateTime.UtcNow.AddMonths(-5);
             var growthData = await myCustomersQuery
-                .Where(c => c.CreatedAt >= sixMonthsAgo)
+                .Where(c => c.IsActive && c.CreatedAt >= sixMonthsAgo)
                 .GroupBy(c => new { c.CreatedAt.Month, c.CreatedAt.Year })
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
-                .Select(g => new {
-                    Month = new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMM"),
-                    Count = g.Count()
-                })
+                .Select(g => new { Month = new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMM"), Count = g.Count() })
                 .ToListAsync();
-
             var monthlyGrowth = new Dictionary<string, int>();
             foreach (var item in growthData) monthlyGrowth[item.Month] = item.Count;
 
+            // 4. LISTS (FIXED)
 
-            // ---------------------------------------------------------
-            // 4. FETCH LISTS (Tasks, Leads, Activity)
-            // ---------------------------------------------------------
-
-            // "Priority Tasks" = Notes with ReminderDate >= Today
+            // Fix Priority Tasks: Filter Pending & Populate ID/Type
             var tasks = await myNotesQuery
-                .Where(n => n.ReminderDate != null && n.ReminderDate >= DateTime.UtcNow)
+                .Where(n => n.ReminderDate != null && n.ReminderDate >= DateTime.UtcNow.Date) // Future/Today tasks
+                .Where(n => !n.IsReminderDone) // Only Pending
                 .OrderBy(n => n.ReminderDate)
                 .Take(5)
                 .Select(n => new TaskItem
                 {
+                    Id = n.Id, // <--- Necessary for the button to work
                     Title = n.Title ?? "Follow Up",
-                    Subtitle = $"Customer: {n.Customer.CompanyName}",
-                    Type = "Call"
+                    Subtitle = n.Customer.CompanyName,
+                    // Simple Logic to determine icon type
+                    Type = (n.Title.ToLower().Contains("call") ? "Call" :
+                           (n.Title.ToLower().Contains("email") ? "Email" : "Meeting"))
                 })
                 .ToListAsync();
 
-            // "Hot Leads" = Active Leads (Not Won/Lost), ordered by newest
-            // FIXED: Using Enums for comparison
+            // Hot Leads
             var hotLeads = await myLeadsQuery
                 .Where(l => l.Status != LeadStatus.Won && l.Status != LeadStatus.Lost)
                 .OrderByDescending(l => l.CreatedAt)
                 .Take(5)
-                .Select(l => new LeadItem
-                {
-                    Name = l.Title ?? "New Opportunity",
-                    Company = l.Source ?? "Unknown",
-                    Score = 75 // Placeholder score
-                })
+                .Select(l => new LeadItem { Name = l.Title, Company = l.Source, Score = 75 })
                 .ToListAsync();
 
-            // "Recent Activity" = The last 5 notes
+            // Recent Activity
             var activities = await myNotesQuery
                 .OrderByDescending(n => n.CreatedAt)
                 .Take(5)
@@ -142,31 +101,21 @@ namespace CRM.Controllers
                     CustomerName = n.Customer.CompanyName,
                     Action = n.Content.Length > 50 ? n.Content.Substring(0, 50) + "..." : n.Content,
                     TimeAgo = GetTimeAgo(n.CreatedAt),
-                    Type = "Note"
+                    Type = n.Title.Contains("Call") ? "Call" : "Note"
                 })
                 .ToListAsync();
 
-
-            // ---------------------------------------------------------
-            // 5. BUILD VIEW MODEL
-            // ---------------------------------------------------------
+            // 5. BUILD MODEL
             var model = new SalesRepDashboardViewModel
             {
-                // KPI Stats
                 TotalCustomers = totalCustomers,
                 NewCustomersThisMonth = newThisMonth,
                 TotalContacts = totalContacts,
-
-                // Pipeline Financials (Now Real Data)
-                TotalSalesThisMonth = revenueWon, // Maps to "Revenue Won" card
-                TotalPipelineValue = pipelineValue, // Maps to "Pipeline Value" card
-
-                // Pipeline Counts (Now Real Data)
+                TotalSalesThisMonth = revenueWon,
+                TotalPipelineValue = pipelineValue,
                 DealsInProposal = dealsProposal,
                 DealsInNegotiation = dealsNegotiation,
                 DealsClosedWon = dealsWon,
-
-                // Charts & Lists
                 CustomersByIndustry = industryData,
                 MonthlyGrowth = monthlyGrowth,
                 TodaysTasks = tasks,
@@ -177,7 +126,6 @@ namespace CRM.Controllers
             return View(model);
         }
 
-        // Helper to format "2h ago", "5m ago"
         private static string GetTimeAgo(DateTime date)
         {
             var span = DateTime.UtcNow - date;
