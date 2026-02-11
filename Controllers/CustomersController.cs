@@ -1,129 +1,131 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using CRM.Data;
 using CRM.Models;
-using System.Security.Claims;
+using CRM.Services;
+using System.Text;
 
 namespace CRM.Controllers
 {
-    [Authorize] // 1. Locks this entire controller. You MUST be logged in.
+    [Authorize]
     public class CustomersController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly ICustomerService _customerService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public CustomersController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public CustomersController(ICustomerService customerService, UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            _customerService = customerService;
             _userManager = userManager;
         }
 
-        // --- 1. LIST VIEW (The Rolodex) ---
+        // --- 1. LIST VIEW ---
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
-
-            // Filter: Show only Active customers.
-            var query = _context.Customers.Where(c => c.IsActive);
-
-            // RBAC: If not Admin, filter by the logged-in user's ID.
-            if (!User.IsInRole("Admin"))
-            {
-                query = query.Where(c => c.SalesRepId == userId);
-            }
-
-            return View(await query.ToListAsync());
+            var customers = await _customerService.GetAllActiveAsync(userId, User.IsInRole("Admin"));
+            return View(customers);
         }
 
-        // --- 2. CREATE (GET & POST) ---
+        // --- 2. CREATE ---
         [HttpGet]
-        public IActionResult Create() => View();
+        public IActionResult Create()
+        {
+            return View(new Customer());
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Customer customer)
         {
-            // Ignore validation for SalesRepId (we set it manually below)
             ModelState.Remove("SalesRepId");
-
             if (ModelState.IsValid)
             {
-                // Auto-assign owner to current user
-                customer.SalesRepId = _userManager.GetUserId(User);
-                customer.IsActive = true;
-                customer.CreatedAt = DateTime.UtcNow;
-
-                _context.Add(customer);
-                await _context.SaveChangesAsync();
+                await _customerService.CreateAsync(customer, _userManager.GetUserId(User));
                 return RedirectToAction(nameof(Index));
             }
             return View(customer);
         }
 
-        // --- 3. DETAILS WORKSPACE (Rolodex + Memory) ---
-        public async Task<IActionResult> Details(int? id)
+        // --- 3. DETAILS WORKSPACE ---
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null) return NotFound();
-
-            var userId = _userManager.GetUserId(User);
-
-            // Eager Load Contacts and Notes so they appear on the page
-            var customer = await _context.Customers
-                .Include(c => c.Contacts)
-                .Include(c => c.Notes)
-                .ThenInclude(n => n.Author) // Get the name of the note writer
-                .FirstOrDefaultAsync(m => m.Id == id);
-
+            var customer = await _customerService.GetDetailsAsync(id);
             if (customer == null) return NotFound();
 
-            // Security Check: Prevent accessing others' data via URL
-            if (customer.SalesRepId != userId && !User.IsInRole("Admin"))
-            {
+            // Security Check
+            if (customer.SalesRepId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
                 return Forbid();
-            }
 
             return View(customer);
         }
 
-        // --- 4. ADD NOTE (The Memory) ---
+        // --- 4. EDIT ---
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var customer = await _customerService.GetDetailsAsync(id);
+            if (customer == null) return NotFound();
+
+            if (customer.SalesRepId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
+                return Forbid();
+
+            return View(customer);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Customer customer)
+        {
+            if (id != customer.Id) return NotFound();
+
+            ModelState.Remove("SalesRepId");
+            if (ModelState.IsValid)
+            {
+                await _customerService.UpdateAsync(id, customer);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(customer);
+        }
+
+        // --- 5. NOTES & INTERACTIONS ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddNote(int customerId, string title, string content, DateTime? reminderDate)
         {
-            if (string.IsNullOrWhiteSpace(content))
-                return RedirectToAction("Details", new { id = customerId });
-
-            var note = new Note
+            if (!string.IsNullOrWhiteSpace(content))
             {
-                CustomerId = customerId,
-                Title = title ?? "Interaction",
-                Content = content,
-                CreatedAt = DateTime.UtcNow,
-                ReminderDate = reminderDate,
-                AuthorId = _userManager.GetUserId(User)
-            };
-
-            _context.Notes.Add(note);
-            await _context.SaveChangesAsync();
-
+                await _customerService.AddNoteAsync(customerId, title, content, reminderDate, _userManager.GetUserId(User));
+            }
             return RedirectToAction("Details", new { id = customerId });
         }
 
-        // --- 5. SOFT DELETE ---
+        // --- 6. SOFT DELETE ---
         public async Task<IActionResult> Delete(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
-            var userId = _userManager.GetUserId(User);
-
-            // Only Owner or Admin can delete
-            if (customer != null && (customer.SalesRepId == userId || User.IsInRole("Admin")))
-            {
-                customer.IsActive = false; // Soft Delete
-                await _context.SaveChangesAsync();
-            }
+            await _customerService.SoftDeleteAsync(id, _userManager.GetUserId(User), User.IsInRole("Admin"));
             return RedirectToAction(nameof(Index));
+        }
+
+        // --- 7. ARCHIVE & RESTORE ---
+        public async Task<IActionResult> Archived()
+        {
+            var userId = _userManager.GetUserId(User);
+            var archived = await _customerService.GetAllArchivedAsync(userId, User.IsInRole("Admin"));
+            return View(archived);
+        }
+
+        public async Task<IActionResult> Restore(int id)
+        {
+            await _customerService.RestoreAsync(id, _userManager.GetUserId(User), User.IsInRole("Admin"));
+            return RedirectToAction(nameof(Index));
+        }
+
+        // --- 8. EXPORT ---
+        public async Task<IActionResult> Export()
+        {
+            var csv = await _customerService.GenerateCsvAsync(_userManager.GetUserId(User));
+            return File(Encoding.UTF8.GetBytes(csv), "text/csv", "MyCustomers.csv");
         }
     }
 }

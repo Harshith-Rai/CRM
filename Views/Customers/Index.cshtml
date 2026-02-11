@@ -2,69 +2,221 @@
 
 @{
     ViewData["Title"] = "My Customers";
-    Layout = "~/Views/Shared/_Layout_App.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid mt-4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="~/css/Customers/index.css" />
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-0" style="color: var(--mri-blue);">My Customers</h2>
-            <p class="text-muted mb-0">Manage your active accounts and leads.</p>
+
+<div class="bg-decoration blob-1"></div>
+<div class="bg-decoration blob-2"></div>
+
+<div class="container-fluid" style="padding: 0 20px; max-width: 1400px; margin: 0 auto;">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <h2>My Customers</h2>
+            <p>Manage your active accounts and leads</p>
         </div>
-        <a asp-action="Create" class="btn text-white" style="background-color: var(--light-green);">
-            <i class="fa-solid fa-plus"></i> Add New
-        </a>
-    </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4 py-3 text-uppercase small text-muted">Company</th>
-                        <th class="py-3 text-uppercase small text-muted">Industry</th>
-                        <th class="py-3 text-uppercase small text-muted">Contact</th>
-                        <th class="py-3 text-uppercase small text-muted text-end pe-4">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td class="ps-4 py-3">
-                                <div class="fw-bold text-dark">@item.CompanyName</div>
-                                <div class="small text-muted"><i class="fa-regular fa-clock me-1"></i> Added: @item.CreatedAt.ToShortDateString()</div>
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark border">@item.Industry</span>
-                            </td>
-                            <td>
-                                <div class="small"><i class="fa-solid fa-envelope text-muted me-2"></i> @(item.Email ?? "N/A")</div>
-                                <div class="small"><i class="fa-solid fa-phone text-muted me-2"></i> @(item.Phone ?? "N/A")</div>
-                            </td>
-                            <td class="text-end pe-4">
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary me-1">
-                                    Workspace
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirm('Are you sure you want to remove this customer?');">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                    @if (!Model.Any())
-                    {
-                        <tr>
-                            <td colspan="4" class="text-center py-5 text-muted">
-                                <i class="fa-regular fa-folder-open fa-2x mb-3"></i>
-                                <p>No customers found. Click "Add New" to get started.</p>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <div style="display: flex; gap: 10px;">
+            <a asp-action="Archived" class="btn btn-light" style="border: 1px solid #ccc; color: #666;">
+                <i class="fa-solid fa-trash-can"></i> Bin
+            </a>
+
+            <a asp-action="Create" class="btn-add-new">
+                <i class="fa-solid fa-plus"></i> Add New Customer
+            </a>
+            <a asp-action="Export" class="btn btn-light border me-2">
+                <i class="fa-solid fa-download"></i> Export CSV
+            </a>
         </div>
     </div>
 </div>
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h4>@Model.Count()</h4>
+                <p>Total Customers</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <div class="stat-content">
+                <h4>@Model.Count(c => c.CreatedAt >= DateTime.Now.AddDays(-30))</h4>
+                <p>Added This Month</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div class="stat-content">
+                <h4>@Model.Select(c => c.Industry).Distinct().Count()</h4>
+                <p>Industries</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="filter-bar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Search by company name, email, or phone..." />
+        </div>
+        <select class="filter-select" id="industryFilter">
+            <option value="">All Industries</option>
+            @foreach (var industry in Model.Select(c => c.Industry).Distinct().OrderBy(i => i))
+            {
+                <option value="@industry">@industry</option>
+            }
+        </select>
+        <select class="filter-select" id="sortFilter">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="name">Company Name</option>
+        </select>
+    </div>
+
+    <!-- Customers Grid -->
+    @if (Model.Any())
+    {
+        <div class="customers-grid" id="customersGrid">
+            @foreach (var item in Model)
+            {
+                <div class="customer-card" data-company="@item.CompanyName" data-industry="@item.Industry" data-date="@item.CreatedAt.Ticks" data-email="@item.Email" data-phone="@item.Phone">
+                    <div class="company-header">
+                        <div style="display: flex; align-items: flex-start; flex: 1;">
+                            <div class="company-avatar">
+                                @item.CompanyName.Substring(0, 1).ToUpper()
+                            </div>
+                            <div class="company-info">
+                                <div class="company-name">@item.CompanyName</div>
+                                <div class="company-date">
+                                    <i class="fa-regular fa-clock"></i>
+                                    Added @item.CreatedAt.ToString("MMM dd, yyyy")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="industry-badge">
+                        <i class="fa-solid fa-building me-2"></i>
+                        @item.Industry
+                    </div>
+
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <div class="contact-icon icon-email">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+                            <span class="contact-text">@(item.Email ?? "No email provided")</span>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon icon-phone">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <span class="contact-text">@(item.Phone ?? "No phone provided")</span>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn-workspace">
+                            <i class="fa-solid fa-arrow-right"></i>
+                            Open Workspace
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn-delete"
+                           onclick="return confirm('Are you sure you want to remove @item.CompanyName?');">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-regular fa-folder-open"></i>
+            </div>
+            <h3>No Customers Yet</h3>
+            <p>Start building your customer base by adding your first customer.</p>
+            <a asp-action="Create" class="btn-add-new">
+                <i class="fa-solid fa-plus"></i>
+                Add Your First Customer
+            </a>
+        </div>
+    }
+
+</div>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        filterCustomers();
+    });
+
+    // Industry filter
+    document.getElementById('industryFilter')?.addEventListener('change', function() {
+        filterCustomers();
+    });
+
+    // Sort filter
+    document.getElementById('sortFilter')?.addEventListener('change', function() {
+        sortCustomers(this.value);
+    });
+
+    function filterCustomers() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const selectedIndustry = document.getElementById('industryFilter').value;
+        const cards = document.querySelectorAll('.customer-card');
+
+        cards.forEach(card => {
+            const company = card.dataset.company.toLowerCase();
+            const industry = card.dataset.industry;
+            const email = (card.dataset.email || '').toLowerCase();
+            const phone = (card.dataset.phone || '').toLowerCase();
+
+            const matchesSearch = company.includes(searchTerm) ||
+                                email.includes(searchTerm) ||
+                                phone.includes(searchTerm);
+            const matchesIndustry = !selectedIndustry || industry === selectedIndustry;
+
+            if (matchesSearch && matchesIndustry) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function sortCustomers(sortType) {
+        const grid = document.getElementById('customersGrid');
+        const cards = Array.from(document.querySelectorAll('.customer-card'));
+
+        cards.sort((a, b) => {
+            if (sortType === 'newest') {
+                return b.dataset.date - a.dataset.date;
+            } else if (sortType === 'oldest') {
+                return a.dataset.date - b.dataset.date;
+            } else if (sortType === 'name') {
+                return a.dataset.company.localeCompare(b.dataset.company);
+            }
+        });
+
+        cards.forEach(card => grid.appendChild(card));
+    }
+</script>

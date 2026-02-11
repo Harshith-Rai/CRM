@@ -20,6 +20,7 @@ public class SalesRepDashboardViewModel
     public int DealsInProposal { get; set; }
     public int DealsInNegotiation { get; set; }
     public int DealsClosedWon { get; set; }
+    public List<ActivityItem> RecentActivities { get; set; } = new List<ActivityItem>();
 }
 
 public class TaskItem
@@ -34,4 +35,11 @@ public class LeadItem
     public string Name { get; set; }
     public string Company { get; set; }
     public int Score { get; set; } // 0-100
+}
+public class ActivityItem
+{
+    public string CustomerName { get; set; }
+    public string Action { get; set; } // e.g., "Added a note", "Updated status"
+    public string TimeAgo { get; set; } // e.g., "2h ago"
+    public string Type { get; set; } // "Note", "Call", "Status"
 }

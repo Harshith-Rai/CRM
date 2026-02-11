@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using CRM.Models
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -16,25 +20,29 @@
             --medium-blue: #187ABF;
             --white: #ffffff;
             --bg-gray: #F1F5F9;
+            --sidebar-width: 250px;
         }
 
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-gray);
-            display: flex; /* Critical: Creates the side-by-side layout */
+            display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
         /* --- Sidebar --- */
         .sidebar {
-            width: 250px;
+            width: var(--sidebar-width);
             background-color: var(--mri-blue);
             color: var(--white);
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1100;
         }
 
         .brand {
@@ -44,6 +52,9 @@
             color: var(--light-blue);
             border-bottom: 1px solid rgba(255,255,255,0.1);
             text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .menu {
@@ -72,6 +83,43 @@
                 margin-right: 10px;
             }
 
+        /* Mobile toggle button */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1200;
+            background: var(--mri-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-close {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1050;
+        }
+
         /* --- Content Area --- */
         .main-wrapper {
             flex: 1;
@@ -86,6 +134,72 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             z-index: 1000;
         }
+
+        /* --- Mobile Responsiveness --- */
+        @@media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                z-index: 1100;
+            }
+
+                .sidebar.active {
+                    transform: translateX(0);
+                }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .sidebar-close {
+                display: block;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .main-wrapper {
+                width: 100%;
+            }
+
+            .app-navbar .container-fluid {
+                padding-left: 70px !important; /* Make room for toggle button */
+            }
+
+            .navbar-search {
+                margin: 10px 0 !important;
+                max-width: 100% !important;
+            }
+
+            .navbar-brand {
+                font-size: 0.9rem !important;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .brand {
+                font-size: 1.2rem;
+                padding: 15px;
+            }
+
+            .menu-item {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            main.p-4 {
+                padding: 1rem !important;
+            }
+        }
+
+        /* Smooth scrolling for main content */
+        .main-wrapper {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body>
@@ -97,19 +211,48 @@
         var currentAction = routeValues["action"]?.ToString();
         var isAuthPage = currentController?.ToLowerInvariant() == "account" &&
         (currentAction?.ToLowerInvariant() == "login" || currentAction?.ToLowerInvariant() == "register");
+
+        // Fetch User Data for Display
+        ApplicationUser currentUser = null;
+        if (User.Identity.IsAuthenticated)
+        {
+            currentUser = await UserManager.GetUserAsync(User);
+        }
     }
 
     @if (!isAuthPage)
     {
-        <div class="sidebar">
-            <a href="/" class="brand">CRM Portal</a>
+        <!-- Mobile toggle button -->
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <div class="sidebar" id="sidebar">
+            <a href="/" class="brand">
+                <span>CRM Portal</span>
+                <button class="sidebar-close" id="sidebarClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </a>
             <div class="menu">
-                <a href="@Url.Action("Index", "SalesRep")" class="menu-item @(currentController == "SalesRep" ? "active" : "")">
+                <a href="@Url.Action("Index", "Home")" class="menu-item @(currentController == "Home" ? "active" : "")">
                     <i class="fa-solid fa-gauge-high"></i> Dashboard
                 </a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-address-book"></i> My Leads</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-money-bill-trend-up"></i> Pipeline</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-calendar-check"></i> Tasks</a>
+
+                <a href="@Url.Action("Index", "Customers")" class="menu-item @(currentController == "Customers" ? "active" : "")">
+                    <i class="fa-solid fa-address-book"></i> My Customers
+                </a>
+
+                <a href="@Url.Action("Index", "Leads")" class="menu-item @(currentController == "Leads" ? "active" : "")">
+                    <i class="fa-solid fa-money-bill-trend-up"></i> Sales Pipeline
+                </a>
+
+                <a href="@Url.Action("Index", "Tasks")" class="menu-item @(currentController == "Tasks" ? "active" : "")">
+                    <i class="fa-solid fa-calendar-check"></i> My Tasks
+                </a>
             </div>
         </div>
     }
@@ -119,8 +262,9 @@
         {
             <nav class="navbar navbar-expand-lg app-navbar sticky-top">
                 <div class="container-fluid px-4">
+
                     <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index", "Home")" style="color: var(--mri-blue); font-weight: 700;">
-                        Hello User
+                        Hello, @(currentUser?.FullName ?? User.Identity?.Name ?? "Guest")
                     </a>
 
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
@@ -141,6 +285,10 @@
                                     <i class="fas fa-user-circle fa-2x" style="color: var(--mri-blue);"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li style="padding: 0 16px; font-size: 0.85rem; color: #64748b; margin-bottom: 8px;">
+                                        Logged in as <br><strong>@(User.Identity?.Name)</strong>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign out</a></li>
                                 </ul>
                             </li>
@@ -158,6 +306,58 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Mobile sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            function openSidebar() {
+                sidebar.classList.add('active');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', openSidebar);
+            }
+
+            if (sidebarClose) {
+                sidebarClose.addEventListener('click', closeSidebar);
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', closeSidebar);
+            }
+
+            // Close sidebar when clicking on menu items on mobile
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        closeSidebar();
+                    }
+                });
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

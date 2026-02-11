@@ -1,0 +1,77 @@
+﻿@model IEnumerable<CRM.Models.Note>
+
+@{
+    ViewData["Title"] = "My Tasks";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold" style="color: var(--mri-blue);">
+                <i class="fa-solid fa-calendar-check me-2"></i> My Tasks
+            </h2>
+            <p class="text-muted">Follow-ups and reminders scheduled for you.</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3">Due Date</th>
+                        <th>Task / Note</th>
+                        <th>Related Customer</th>
+                        <th class="text-end pe-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        // Logic to color-code dates
+                        var isToday = item.ReminderDate.Value.Date == DateTime.UtcNow.Date;
+                        var dateClass = isToday ? "text-danger fw-bold" : "text-dark";
+                        var badge = isToday ? "<span class='badge bg-danger ms-2'>Today</span>" : "";
+
+                        <tr>
+                            <td class="ps-4 py-3 @dateClass">
+                                @item.ReminderDate.Value.ToString("MMM dd, yyyy")
+                                @Html.Raw(badge)
+                            </td>
+                            <td>
+                                <div class="fw-bold">@item.Title</div>
+                                <div class="small text-muted text-truncate" style="max-width: 300px;">
+                                    @item.Content
+                                </div>
+                            </td>
+                            <td>
+                                @if (item.Customer != null)
+                                {
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="fa-solid fa-building me-1"></i> @item.Customer.CompanyName
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end pe-4">
+                                <a asp-controller="Customers" asp-action="Details" asp-route-id="@item.CustomerId"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fa-solid fa-arrow-right"></i> Go to Customer
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-mug-hot fa-2x mb-3"></i>
+                                <p>No upcoming tasks. You are all caught up!</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

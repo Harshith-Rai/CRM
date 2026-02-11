@@ -21,6 +21,7 @@ namespace CRM.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Note> Notes { get; set; }
+        public DbSet<Lead> Leads { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

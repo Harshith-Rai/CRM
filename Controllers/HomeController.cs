@@ -1,26 +1,26 @@
-using System.Diagnostics;
 using CRM.Models;
-using Microsoft.AspNetCore.Authorization;
+using CRM.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CRM.Controllers
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly IHomeService _homeService; // Only ask for the Service
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public HomeController(IHomeService homeService, UserManager<ApplicationUser> userManager)
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        _homeService = homeService;
+        _userManager = userManager;
+    }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+    public async Task<IActionResult> Index()
+    {
+        var userId = _userManager.GetUserId(User);
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        // One line of code to get everything!
+        var model = await _homeService.GetDashboardDataAsync(userId);
+
+        return View(model);
     }
 }
