@@ -88,19 +88,27 @@ namespace CRM.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var customer = await _context.Customers
+                .Include(c => c.SalesRep)
                 .FirstOrDefaultAsync(c => c.Id == id && c.IsActive);
 
             if (customer == null) return NotFound();
 
-            // FIX 4: Allow "Sales Manager" to edit
+            // Check access: Owner, Admin, or Sales Manager
             bool hasAccess = customer.SalesRepId == _userManager.GetUserId(User) ||
-                             User.IsInRole("Admin") ||
-                             User.IsInRole("Sales Manager");
-
+                             User.IsInRole("Admin") || User.IsInRole("Sales Manager");
             if (!hasAccess) return Forbid();
+
+            // Only Admins need the dropdown list
+            if (User.IsInRole("Admin"))
+            {
+                var salesExecutives = await _userManager.GetUsersInRoleAsync("SalesExecutive");
+                ViewBag.SalesExecutives = salesExecutives.OrderBy(u => u.FullName).ToList();
+            }
 
             return View(customer);
         }
+
+        // CustomersController.cs
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -108,14 +116,21 @@ namespace CRM.Controllers
         {
             if (id != customer.Id) return NotFound();
 
-            // Prevent Reps from changing the Owner if they hack the form
-            ModelState.Remove("SalesRepId");
+            ModelState.Remove("SalesRepId"); // Prevents validation errors for read-only fields
 
             if (ModelState.IsValid)
             {
                 await _customerService.UpdateAsync(id, customer);
                 return RedirectToAction(nameof(Details), new { id = customer.Id });
             }
+
+            // Re-populate list to prevent 'Value cannot be null' error on reload
+            if (User.IsInRole("Admin"))
+            {
+                var salesExecutives = await _userManager.GetUsersInRoleAsync("SalesExecutive");
+                ViewBag.SalesExecutives = salesExecutives.OrderBy(u => u.FullName).ToList();
+            }
+
             return View(customer);
         }
 
