@@ -37,34 +37,25 @@
 
     @if (!isAuthPage)
     {
-        <!-- Mobile toggle button -->
-        <button class="sidebar-toggle" id="sidebarToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-
-        <!-- Overlay for mobile -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <div class="mobile-top-bar d-lg-none">
+            <span>CRM Portal</span>
+            <button id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
 
         <div class="sidebar" id="sidebar">
-            <a href="/" class="brand">
+            <a href="/" class="brand d-none d-lg-flex">
                 <span>CRM Portal</span>
-                <button class="sidebar-close" id="sidebarClose">
-                    <i class="fas fa-times"></i>
-                </button>
             </a>
+
             <div class="menu">
                 <a href="@Url.Action("Index", "Home")" class="menu-item @(currentController == "Home" ? "active" : "")">
                     <i class="fa-solid fa-gauge-high"></i> Dashboard
                 </a>
-
                 <a href="@Url.Action("Index", "Customers")" class="menu-item @(currentController == "Customers" ? "active" : "")">
                     <i class="fa-solid fa-address-book"></i> My Customers
                 </a>
-
-                @* <a href="@Url.Action("Index", "Leads")" class="menu-item @(currentController == "Leads" ? "active" : "")">
-                    <i class="fa-solid fa-money-bill-trend-up"></i> Sales Pipeline
-                </a> *@
-
                 <a href="@Url.Action("Index", "Tasks")" class="menu-item @(currentController == "Tasks" ? "active" : "")">
                     <i class="fa-solid fa-calendar-check"></i> My Tasks
                 </a>
@@ -76,8 +67,40 @@
                     </a>
                 }
             </div>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-profile-box d-flex align-items-center gap-2">
+                    <i class="fas fa-user-circle fa-2x" style="color: var(--light-blue);"></i>
+                    <div style="font-size: 0.85rem; line-height: 1.3;">
+                        <div style="font-weight: 600; color: white;">@(currentUser?.FullName ?? User.Identity?.Name)</div>
+                        <div style="color: var(--light-blue); font-size: 0.75rem;">@(currentUser?.Email ?? "user@example.com")</div>
+                    </div>
+                </div>
+            </div>
         </div>
     }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', function() {
+                    // Toggles the slide-down effect
+                    sidebar.classList.toggle('mobile-active');
+                });
+            }
+
+            // Close menu when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                const isClickInside = sidebar.contains(event.target) || mobileToggle.contains(event.target);
+                if (!isClickInside && sidebar.classList.contains('mobile-active')) {
+                    sidebar.classList.remove('mobile-active');
+                }
+            });
+        });
+    </script>
 
     <div class="main-wrapper">
         @if (!isAuthPage)
