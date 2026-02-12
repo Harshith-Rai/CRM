@@ -81,6 +81,7 @@ namespace CRM.Controllers
             return RedirectToAction("index", "Home");
         }
 
+        [HttpPost]
         public ActionResult Logout()
         {
             Response.Cookies.Delete("cookie");

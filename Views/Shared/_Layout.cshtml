@@ -106,8 +106,8 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
                             <li>
-                                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                                    <button type="submit" class="dropdown-item text-danger">
+                                <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
+                                    <button type="submit" class="dropdown-item text-danger" style="cursor: pointer;">
                                         <i class="fa-solid fa-right-from-bracket me-2"></i>Sign out
                                     </button>
                                 </form>
@@ -150,7 +150,7 @@
 
             if (overlay) overlay.addEventListener('click', closeSidebar);
 
-            // Close on menu item click (Mobile)
+
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.addEventListener('click', function() {
                     if (window.innerWidth <= 991) closeSidebar();
