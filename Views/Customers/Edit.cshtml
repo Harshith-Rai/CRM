@@ -127,6 +127,28 @@
                             </button>
                         </div>
                         }
+                    else
+                    {
+                        <div class="protected-zone p-3 rounded-3 border border-secondary border-opacity-10 bg-light">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px;">
+                                    <i class="fa-solid fa-shield-halved" style="font-size: 0.7rem;"></i>
+                                </div>
+                                <h6 class="text-secondary fw-bold small text-uppercase mb-0">Record Protected</h6>
+                            </div>
+
+                            <p class="small text-muted mb-0" style="line-height: 1.4;">
+                                Archiving is restricted to Administrators to ensure data integrity.
+                            </p>
+
+                            <div class="mt-2 pt-2 border-top border-secondary border-opacity-10">
+                                <a href="mailto:admin@yourcompany.com?subject=Request to Archive Customer: @Model.CompanyName&body=Please archive customer ID #@Model.Id"
+                                   class="text-decoration-none small fw-bold" style="color: #044D66; font-size: 0.75rem;">
+                                    <i class="fa-regular fa-paper-plane me-1"></i> Request Removal
+                                </a>
+                            </div>
+                        </div>
+                    }
 
                 </div>
             </div>
