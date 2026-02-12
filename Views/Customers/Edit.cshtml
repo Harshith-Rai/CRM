@@ -5,76 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<style>
-    /* ... (Keep your existing styles) ... */
-    .crm-header-bar {
-        background: #fff;
-        border-bottom: 1px solid #e2e8f0;
-        padding: 20px 32px;
-        margin: -24px -24px 30px -24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-
-    .form-pane {
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 30px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        margin-bottom: 24px;
-    }
-
-    .pane-title {
-        font-family: 'Outfit', sans-serif;
-        font-weight: 700;
-        color: #044D66;
-        border-bottom: 2px solid #f1f5f9;
-        padding-bottom: 12px;
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 1.1rem;
-    }
-
-    .form-label-top {
-        font-weight: 700;
-        font-size: 0.75rem;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 8px;
-    }
-
-    .input-group-text {
-        background-color: #f8fafc;
-        border-color: #e2e8f0;
-        color: #64748b;
-    }
-
-    .metadata-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px dashed #e2e8f0;
-        font-size: 0.9rem;
-    }
-
-    .metadata-label {
-        color: #64748b;
-    }
-
-    .metadata-value {
-        font-weight: 600;
-        color: #334155;
-    }
-</style>
+<link rel="stylesheet" href="~/css/Customers/Edit.css"/>
 
 <div class="crm-header-bar">
     <div class="d-flex align-items-center gap-3">
