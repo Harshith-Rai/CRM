@@ -17,7 +17,6 @@ namespace CRM.Services
         // --- 1. GET ALL (Active Only) ---
         public async Task<List<Customer>> GetAllCustomersAsync(string userId, bool isAdmin)
         {
-            // FIX: Restore the IsActive check so Archived customers don't appear here
             var query = _context.Customers.Where(c => c.IsActive);
 
             if (!isAdmin)
@@ -34,24 +33,24 @@ namespace CRM.Services
             customer.SalesRepId = userId;
             customer.IsActive = true;
             customer.CreatedAt = DateTime.UtcNow;
+            // UpdatedAt is null on creation
             _context.Add(customer);
             await _context.SaveChangesAsync();
         }
 
-        // --- 3. GET DETAILS (With Contacts & Notes) ---
+        // --- 3. GET DETAILS ---
         public async Task<Customer> GetDetailsAsync(int id)
         {
             return await _context.Customers
-                .Include(c => c.Contacts) // Load Contacts
-                .Include(c => c.Notes)    // Load Notes
-                    .ThenInclude(n => n.Author) // Load the User who wrote the note
+                .Include(c => c.Contacts)
+                .Include(c => c.Notes)
+                    .ThenInclude(n => n.Author)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        // --- 4. ADD NOTE (New Feature) ---
+        // --- 4. ADD NOTE ---
         public async Task AddNoteAsync(int customerId, string title, string content, DateTime? reminderDate, string userId)
         {
-            // Ensure proper UTC handling for PostgreSQL
             if (reminderDate.HasValue)
                 reminderDate = DateTime.SpecifyKind(reminderDate.Value, DateTimeKind.Utc);
 
@@ -66,19 +65,37 @@ namespace CRM.Services
             };
 
             _context.Notes.Add(note);
+
+            // Optional: Update the Customer's UpdatedAt when a note is added
+            var customer = await _context.Customers.FindAsync(customerId);
+            if (customer != null)
+            {
+                customer.UpdatedAt = DateTime.UtcNow;
+            }
+
             await _context.SaveChangesAsync();
         }
 
-        // --- 5. UPDATE ---
+        // --- 5. UPDATE (The Key Change) ---
         public async Task UpdateAsync(int id, Customer customer)
         {
-            var existing = await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+            // 1. Fetch the existing record (Tracked)
+            var existing = await _context.Customers.FindAsync(id);
+
             if (existing != null)
             {
-                customer.CreatedAt = existing.CreatedAt;
-                customer.SalesRepId = existing.SalesRepId;
-                customer.IsActive = existing.IsActive;
-                _context.Update(customer);
+                // 2. Map editable fields
+                existing.CompanyName = customer.CompanyName;
+                existing.Industry = customer.Industry;
+                existing.Email = customer.Email;
+                existing.Phone = customer.Phone;
+                existing.Address = customer.Address;
+
+                // 3. SET LAST EDITED DATE
+                // Ensure your Customer model has: public DateTime? UpdatedAt { get; set; }
+                existing.UpdatedAt = DateTime.UtcNow;
+
+                // 4. Save (EF Core detects changes automatically)
                 await _context.SaveChangesAsync();
             }
         }
@@ -89,10 +106,12 @@ namespace CRM.Services
             var customer = await _context.Customers.FindAsync(id);
             if (customer != null && (customer.SalesRepId == userId || isAdmin))
             {
-                customer.IsActive = false; // Soft delete
+                customer.IsActive = false;
+                customer.UpdatedAt = DateTime.UtcNow; // Track when it was archived
                 await _context.SaveChangesAsync();
             }
         }
+       
 
         // --- 7. RESTORE ---
         public async Task RestoreAsync(int id, string userId, bool isAdmin)
@@ -100,7 +119,8 @@ namespace CRM.Services
             var customer = await _context.Customers.FindAsync(id);
             if (customer != null && (customer.SalesRepId == userId || isAdmin))
             {
-                customer.IsActive = true; // Set back to active
+                customer.IsActive = true;
+                customer.UpdatedAt = DateTime.UtcNow; // Track when it was restored
                 await _context.SaveChangesAsync();
             }
         }
@@ -108,7 +128,7 @@ namespace CRM.Services
         // --- 8. GET ARCHIVED ---
         public async Task<List<Customer>> GetAllArchivedAsync(string userId, bool isAdmin)
         {
-            var query = _context.Customers.Where(c => !c.IsActive); // Only inactive
+            var query = _context.Customers.Where(c => !c.IsActive);
             if (!isAdmin) query = query.Where(c => c.SalesRepId == userId);
             return await query.ToListAsync();
         }
@@ -129,7 +149,7 @@ namespace CRM.Services
             return builder.ToString();
         }
 
-        //Note-Management
+        // --- 10. NOTE MANAGEMENT ---
         public async Task<Note> GetNoteAsync(int id)
         {
             return await _context.Notes.FindAsync(id);
@@ -154,7 +174,6 @@ namespace CRM.Services
             {
                 _context.Notes.Remove(note);
                 await _context.SaveChangesAsync();
-
             }
         }
     }
