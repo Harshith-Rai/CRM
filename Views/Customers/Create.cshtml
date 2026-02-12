@@ -111,7 +111,7 @@
                         <div class="col-md-6">
                             <label class="form-label-top">Expected Annual Value</label>
                             <div class="input-group">
-                                <span class="input-group-text">$</span>
+                                <span class="input-group-text">₹</span>
                                 <input type="number" class="form-control" placeholder="0.00" />
                             </div>
                         </div>
@@ -151,29 +151,26 @@
                     <span class="pane-title"><i class="fa-solid fa-user-shield"></i> Administration</span>
 
                     <div class="mb-4 text-center py-4 bg-light rounded-3">
+                        @{
+                            var userName = User.Identity?.Name ?? "User";
+                            var firstLetter = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
+                        }
                         <div class="avatar-circle bg-primary text-white mx-auto d-flex align-items-center justify-content-center mb-3" style="width:64px; height:64px; border-radius: 50%; font-size: 1.5rem;">
-                            @{
-                                var initial = "U"; // Default 'U' for User
-                                if (User.Identity?.Name != null && User.Identity.Name.Length > 0)
-                                {
-                                    initial = User.Identity.Name.Substring(0, 1).ToUpper();
-                                }
-                            }
-                            @initial
+                            @firstLetter
                         </div>
-                        <h6 class="fw-bold mb-0">@User.Identity.Name</h6>
+                        <h6 class="fw-bold mb-0">@userName</h6>
                         <small class="text-muted">Account Manager</small>
                     </div>
 
                     <div class="sidebar-widget mb-4">
                         <h6 class="fw-bold" style="color: #0369a1;"><i class="fa-solid fa-circle-info me-2"></i>Dashboard Insight</h6>
-                        <p class="small text-muted mb-0">Providing an accurate Industry vertical helps the system generate better lead conversion metrics for your personal performance charts.</p>
+                        <p class="small text-muted mb-0">Providing an accurate Industry vertical helps generate better analytics for your performance charts.</p>
                     </div>
 
-                    <div class="p-3 border rounded-3 bg-white">
+                    <div class="p-3 border rounded-3 bg-white shadow-sm">
                         <div class="form-check form-switch">
-                            <input class="form-check-test-input form-check-input" type="checkbox" checked disabled>
-                            <label class="form-check-label small fw-bold text-muted">Active Prospect</label>
+                            <input class="form-check-input" type="checkbox" id="activeProspect" checked disabled>
+                            <label class="form-check-label small fw-bold text-muted" for="activeProspect">Active Prospect</label>
                         </div>
                     </div>
                 </div>

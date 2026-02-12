@@ -1,96 +1,81 @@
 ﻿function initDashboardCharts(growthKeys, growthValues, industryKeys, industryValues) {
-    // --- 1. Enhanced Growth Line Chart Configuration ---
+
+    // --- 1. Customer Acquisition Trend (Area Chart) ---
     const growthCanvas = document.getElementById('growthChart');
     if (growthCanvas) {
-        const growthCtx = growthCanvas.getContext('2d');
+        const ctx = growthCanvas.getContext('2d');
 
-        // Create a more vibrant gradient
-        const gradient = growthCtx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(0, 102, 204, 0.3)');
-        gradient.addColorStop(0.5, 'rgba(0, 102, 204, 0.15)');
-        gradient.addColorStop(1, 'rgba(0, 102, 204, 0.0)');
+        // Create a rich gradient (Blue fading to transparent)
+        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, "rgba(14, 165, 233, 0.4)"); // Sky Blue
+        gradient.addColorStop(1, "rgba(14, 165, 233, 0.0)"); // Transparent
 
-        new Chart(growthCtx, {
+        new Chart(ctx, {
             type: 'line',
             data: {
                 labels: growthKeys,
                 datasets: [{
                     label: 'New Customers',
                     data: growthValues,
-                    borderColor: '#0066CC',
-                    backgroundColor: gradient,
+                    borderColor: '#0284C7', // Solid Blue
                     borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 6,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#0066CC',
-                    pointBorderWidth: 3,
-                    pointHoverRadius: 8,
-                    pointHoverBorderWidth: 4
+                    backgroundColor: gradient,
+                    fill: true, // Fills the area (makes it look less empty)
+                    tension: 0.4, // Smooth curves
+                    pointRadius: 5,
+                    pointBackgroundColor: '#FFFFFF',
+                    pointBorderColor: '#0284C7',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 7
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#0F172A',
-                        padding: 14,
-                        cornerRadius: 10,
+                        backgroundColor: '#1E293B',
+                        padding: 12,
+                        titleFont: { size: 13 },
+                        bodyFont: { size: 14, weight: 'bold' },
                         displayColors: false,
-                        titleFont: { size: 13, weight: '700', family: "'Plus Jakarta Sans', sans-serif" },
-                        bodyFont: { size: 16, weight: '700', family: "'Plus Jakarta Sans', sans-serif" },
-                        titleColor: '#94A3B8',
-                        bodyColor: '#ffffff',
-                        caretPadding: 10
+                        callbacks: {
+                            label: (context) => ` ${context.parsed.y} Customers Acquired`
+                        }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: {
-                            color: '#f1f5f9',
-                            borderDash: [5, 5],
-                            drawBorder: false
-                        },
-                        ticks: {
-                            stepSize: 1,
-                            font: { size: 12, weight: '600' },
-                            color: '#64748B',
-                            padding: 10
-                        },
-                        border: { display: false }
+                        suggestedMax: 5, // Forces the chart to have height even if data is 0 or 1
+                        grid: { borderDash: [5, 5], color: '#E2E8F0' },
+                        ticks: { stepSize: 1, color: '#64748B' }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: {
-                            font: { size: 12, weight: '600' },
-                            color: '#64748B',
-                            padding: 10
-                        },
-                        border: { display: false }
+                        ticks: { color: '#64748B', font: { weight: '600' } }
                     }
                 }
             }
         });
     }
 
-    // --- 2. Enhanced Industry Doughnut Chart ---
+    // --- 2. Market Distribution (Doughnut) ---
     const industryCanvas = document.getElementById('industryChart');
     if (industryCanvas) {
-        const industryCtx = industryCanvas.getContext('2d');
-        new Chart(industryCtx, {
+        const ctxInd = industryCanvas.getContext('2d');
+
+        // Calculate total for percentages
+        const total = industryValues.reduce((a, b) => a + b, 0);
+
+        new Chart(ctxInd, {
             type: 'doughnut',
             data: {
                 labels: industryKeys,
                 datasets: [{
                     data: industryValues,
+                    // UPDATED: Professional Dark Blue Palette
                     backgroundColor: [
                         '#0066CC',
                         '#00B4D8',
@@ -101,37 +86,32 @@
                         '#EC4899',
                         '#6366F1'
                     ],
-                    borderWidth: 4,
                     borderColor: '#ffffff',
-                    hoverOffset: 8,
-                    hoverBorderWidth: 5
+                    borderWidth: 2,
+                    hoverOffset: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '70%',
+                cutout: '70%', // Slightly thicker ring for better visibility
                 plugins: {
                     legend: {
                         position: 'bottom',
                         labels: {
                             usePointStyle: true,
-                            padding: 16,
-                            font: {
-                                size: 12,
-                                family: "'DM Sans', sans-serif",
-                                weight: '600'
-                            },
-                            color: '#475569',
+                            padding: 20,
+                            font: { size: 12, family: "'Plus Jakarta Sans', sans-serif" },
+                            color: '#334155',
+                            // Custom Label Generator: Adds Percentage to Legend
                             generateLabels: function (chart) {
                                 const data = chart.data;
                                 if (data.labels.length && data.datasets.length) {
                                     return data.labels.map((label, i) => {
                                         const value = data.datasets[0].data[i];
-                                        const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) + '%' : '0%';
                                         return {
-                                            text: `${label} (${percentage}%)`,
+                                            text: `${label} (${percentage})`,
                                             fillStyle: data.datasets[0].backgroundColor[i],
                                             hidden: false,
                                             index: i
@@ -145,17 +125,10 @@
                     tooltip: {
                         backgroundColor: '#0F172A',
                         padding: 12,
-                        cornerRadius: 8,
-                        displayColors: true,
-                        titleFont: { size: 13, weight: '700' },
-                        bodyFont: { size: 14, weight: '700' },
+                        bodyFont: { weight: 'bold' },
                         callbacks: {
                             label: function (context) {
-                                const label = context.label || '';
-                                const value = context.parsed;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return `${label}: ${value} (${percentage}%)`;
+                                return ` ${context.label}: ${context.parsed} customers`;
                             }
                         }
                     }
