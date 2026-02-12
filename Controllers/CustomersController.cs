@@ -32,22 +32,27 @@ namespace CRM.Controllers
 
         // --- 2. CREATE ---
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View(new Customer());
+            var salesExecutives = await _customerService.GetSalesExecutivesAsync();
+            var viewModel = new CreateCustomerViewModel
+            {
+                Customer = new Customer(),
+                SalesExecutives = salesExecutives
+            };
+            return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Customer customer)
+        public async Task<IActionResult> Create(CreateCustomerViewModel viewModel)
         {
-            ModelState.Remove("SalesRepId");
-            if (ModelState.IsValid)
-            {
-                await _customerService.CreateAsync(customer, _userManager.GetUserId(User));
-                return RedirectToAction(nameof(Index));
-            }
-            return View(customer);
+
+            viewModel.Customer.SalesRepId = viewModel.SelectedSalesExecutiveId ?? "";
+
+            await _customerService.CreateAsync(viewModel.Customer);
+
+            return RedirectToAction(nameof(Index));
         }
 
         // --- 3. DETAILS WORKSPACE ---
