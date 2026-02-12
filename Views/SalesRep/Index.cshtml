@@ -1,387 +1,282 @@
 ﻿@model CRM.Models.SalesRepDashboardViewModel
 
 @{
-    ViewData["Title"] = "Home Page";
-    // Layout = "~/Views/Shared/_Layout_App.cshtml";
-	// Layout = null;
+    ViewData["Title"] = "Sales Dashboard";
 }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 
 <style>
-    /* --- MRI Theme Variables --- */
-    :root {
-        --mri-blue: #044D66;
-        --medium-blue: #187ABF;
-        --bright-blue: #179AD7;
-        --light-blue: #C2E6F2;
-        --light-green: #00B188;
-        --orange: #FAA41C;
-        --red-orange: #F36C3C;
-        --white: #ffffff;
-        --text-dark: #1e293b;
-        --text-light: #64748b;
-    }
-
-    body {
-        font-family: 'DM Sans', sans-serif;
-        background-color: #F8FAFC; /* Light gray background */
-        color: var(--text-dark);
-    }
-
-    h1, h2, h3, h4 {
-        font-family: 'Outfit', sans-serif;
-    }
-
-    /* --- Background Decorations (Matches Login) --- */
-    .bg-decoration {
-        position: fixed;
-        border-radius: 50%;
-        filter: blur(80px);
-        z-index: -1;
-        opacity: 0.6;
-    }
-
-    .blob-1 {
-        top: -10%;
-        right: -5%;
-        width: 400px;
-        height: 400px;
-        background: rgba(194, 230, 242, 0.4);
-    }
-    /* Light Blue */
-    .blob-2 {
-        bottom: -10%;
-        left: -5%;
-        width: 300px;
-        height: 300px;
-        background: rgba(24, 122, 191, 0.1);
-    }
-    /* Medium Blue */
-
-    /* --- Layout Grid --- */
-    .dashboard-container {
-        padding: 0 10px;
-        display: grid;
-        grid-template-columns: 2.5fr 1fr;
-        gap: 24px;
-    }
-
-    /* --- Cards (Based on Login Card) --- */
-    .mri-card {
-        background: var(--white);
-        border-radius: 20px;
-        padding: 24px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* Soft subtle shadow */
-        border: 1px solid rgba(255,255,255,0.5);
-        margin-bottom: 24px;
-        transition: transform 0.2s ease;
-    }
-
-        .mri-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-        }
-
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .card-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--mri-blue);
-        margin: 0;
-    }
-
-    /* --- Hero / Target Section --- */
-    .hero-card {
-        background: linear-gradient(135deg, var(--mri-blue), var(--medium-blue));
-        color: var(--white);
+    /* --- Sales Rep Specific Overrides --- */
+    .hero-goal-card {
+        background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 32px;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+        margin-bottom: 24px;
     }
 
-        /* Decorative line from login brand section */
-        .hero-card::after {
+        /* Abstract decoration for the hero card */
+        .hero-goal-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 150px;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05));
-            transform: skewX(-20deg);
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
-    .hero-stat {
+    .goal-stat-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        opacity: 0.7;
+        margin-bottom: 8px;
+    }
+
+    .goal-stat-value {
+        font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 3.5rem;
         font-weight: 700;
         line-height: 1;
-        margin-bottom: 10px;
-        font-family: 'Outfit', sans-serif;
+        margin-bottom: 4px;
     }
 
-    .progress-track {
-        background: rgba(255,255,255,0.15);
-        height: 8px;
-        border-radius: 4px;
-        margin-top: 20px;
-        overflow: hidden;
+    .progress-container {
+        background: rgba(255, 255, 255, 0.1);
+        height: 10px;
+        border-radius: 5px;
+        margin: 24px 0;
+        position: relative;
     }
 
-    .progress-fill {
-        background: var(--light-green);
+    .progress-bar-fill {
+        background: #38BDF8; /* Sky Blue */
         height: 100%;
-        border-radius: 4px;
-        transition: width 1s ease;
+        border-radius: 5px;
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+        transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* --- Task List Styles --- */
-    .task-item {
-        display: flex;
-        align-items: center;
-        padding: 16px 0;
-        border-bottom: 1px solid #F1F5F9;
-    }
-
-        .task-item:last-child {
-            border-bottom: none;
-        }
-
-    .task-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
+    /* Task Table Polish */
+    .task-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 16px;
-        font-size: 1.2rem;
-    }
-
-    .icon-call {
-        background: #E0F2FE;
-        color: var(--medium-blue);
-    }
-
-    .icon-email {
-        background: #FFEDD5;
-        color: var(--orange);
-    }
-
-    .icon-meeting {
-        background: #DCFCE7;
-        color: var(--light-green);
-    }
-
-    .task-details h4 {
-        margin: 0 0 4px 0;
         font-size: 1rem;
-        color: var(--text-dark);
     }
 
-    .task-details p {
-        margin: 0;
-        font-size: 0.85rem;
-        color: var(--text-light);
+    .task-call {
+        background: #E0F2FE;
+        color: #0284C7;
     }
 
-    .btn-action {
-        margin-left: auto;
-        padding: 8px 16px;
-        background: var(--light-green);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-family: 'DM Sans', sans-serif;
-        cursor: pointer;
-        transition: opacity 0.2s;
+    .task-email {
+        background: #FFEDD5;
+        color: #EA580C;
     }
 
-        .btn-action:hover {
-            opacity: 0.9;
-        }
-
-    /* --- Sidebar Widgets --- */
-    .lead-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px dashed #E2E8F0;
-    }
-
-        .lead-row:last-child {
-            border-bottom: none;
-        }
-
-    .score-badge {
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 700;
-    }
-
-    .hot {
-        background: #FEF2F2;
-        color: var(--red-orange);
-    }
-
-    .warm {
-        background: #FFF7ED;
-        color: var(--orange);
-    }
-
-    .pipeline-stat {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 12px;
-        color: var(--text-light);
-    }
-
-    .stat-value {
-        font-weight: 700;
-        color: var(--mri-blue);
+    .task-meeting {
+        background: #DCFCE7;
+        color: #16A34A;
     }
 </style>
 
-<div class="bg-decoration blob-1"></div>
-<div class="bg-decoration blob-2"></div>
+<div class="container-fluid p-4">
 
-<div style="margin-bottom: 30px;">
-    <h1 style="color: var(--mri-blue); font-weight: 700; margin-bottom: 5px;">Welcome Back</h1>
-    <p style="color: var(--text-light); margin: 0;">Here is your daily briefing and performance overview.</p>
-</div>
-
-<div class="dashboard-container">
-
-    <div class="main-content">
-
-        <div class="mri-card hero-card">
-            <div style="position: relative; z-index: 2;">
-                <div class="card-header">
-                    <span style="opacity: 0.9; font-weight: 500;">Current Performance</span>
-                    <span style="background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
-                        @Model.TargetProgressPercentage% of Goal
-                    </span>
-                </div>
-
-                <div class="hero-stat">$@Model.TotalSalesThisMonth.ToString("N0")</div>
-                <div style="opacity: 0.8; font-size: 0.95rem;">Revenue Closed This Month</div>
-
-                <div class="progress-track">
-                    <div class="progress-fill" style="width: @Model.TargetProgressPercentage%"></div>
-                </div>
-                <div style="text-align: right; margin-top: 8px; font-size: 0.8rem; opacity: 0.8;">
-                    Target: $@Model.MonthlyTarget.ToString("N0")
-                </div>
-            </div>
+    <div class="d-flex justify-content-between align-items-end mb-4 animate-in">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif;">
+                Overview
+            </h2>
+            <p class="text-muted mb-0">Track your performance and daily priorities.</p>
         </div>
-
-        <div class="mri-card">
-            <div class="card-header">
-                <h3 class="card-title">Priority Tasks</h3>
-                <a href="#" style="color: var(--bright-blue); text-decoration: none; font-weight: 600; font-size: 0.9rem;">View All</a>
-            </div>
-
-            @foreach (var task in Model.TodaysTasks)
-            {
-                <div class="task-item">
-                    <div class="task-icon @(task.Type == "Call" ? "icon-call" : task.Type == "Email" ? "icon-email" : "icon-meeting")">
-                        <i class="fa-solid @(task.Type == "Call" ? "fa-phone" : task.Type == "Email" ? "fa-envelope" : "fa-users")"></i>
-                    </div>
-                    <div class="task-details">
-                        <h4>@task.Title</h4>
-                        <p>@task.Subtitle</p>
-                    </div>
-                    <button class="btn-action">Done</button>
-                </div>
-            }
-
-            @if (!Model.TodaysTasks.Any())
-            {
-                <p style="text-align: center; color: var(--text-light); padding: 20px;">No pending tasks for today.</p>
-            }
+        <div>
+            <span class="badge bg-white text-secondary border px-3 py-2 rounded-pill shadow-sm">
+                <i class="fa-regular fa-calendar me-2"></i> @DateTime.Now.ToString("MMMM dd, yyyy")
+            </span>
         </div>
     </div>
 
-    <div class="side-content">
+    <div class="row g-4">
 
-        <div class="mri-card">
-            <div class="card-header">
-                <h3 class="card-title">🔥 Hot Leads</h3>
-            </div>
-            <div class="mri-card">
-                <div class="card-header">
-                    <h3 class="card-title">Recent Activity</h3>
-                </div>
+        <div class="col-lg-8">
 
-                <div class="activity-feed">
-                    @foreach (var activity in Model.RecentActivities)
-                    {
-                        <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start;">
-                            <div style="
-                        width: 32px; height: 32px; border-radius: 50%;
-                        background: @(activity.Type == "Call" ? "#E0F2FE" : activity.Type == "Status" ? "#DCFCE7" : "#F1F5F9");
-                        color: @(activity.Type == "Call" ? "#187ABF" : activity.Type == "Status" ? "#00B188" : "#64748b");
-                        display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
-                                <i class="fa-solid @(activity.Type == "Call" ? "fa-phone" : activity.Type == "Status" ? "fa-arrows-rotate" : "fa-user-plus")"></i>
-                            </div>
-
-                            <div>
-                                <div style="font-size: 0.9rem; font-weight: 500; color: var(--text-dark);">
-                                    @activity.CustomerName
-                                </div>
-                                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 2px;">
-                                    @activity.Action
-                                </div>
-                                <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 4px;">
-                                    @activity.TimeAgo
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
-            @foreach (var lead in Model.HotLeads)
-            {
-                <div class="lead-row">
+            <div class="hero-goal-card animate-in animate-delay-1">
+                <div class="d-flex justify-content-between align-items-start position-relative">
                     <div>
-                        <div style="font-weight: 600; color: var(--mri-blue);">@lead.Name</div>
-                        <div style="font-size: 0.8rem; color: var(--text-light);">@lead.Company</div>
+                        <div class="goal-stat-label">Revenue Closed This Month</div>
+                        <div class="d-flex align-items-baseline gap-2">
+                            <div class="goal-stat-value">$@Model.TotalSalesThisMonth.ToString("N0")</div>
+                            <span class="text-white-50 fs-5">/ $@Model.MonthlyTarget.ToString("N0")</span>
+                        </div>
                     </div>
-                    <div class="score-badge hot">@lead.Score% Match</div>
+                    <div class="text-end">
+                        <div class="badge bg-white text-dark px-3 py-2 rounded-pill fw-bold shadow-sm">
+                            <i class="fa-solid fa-bullseye me-2 text-primary"></i>
+                            @Model.TargetProgressPercentage% Achieved
+                        </div>
+                    </div>
                 </div>
-            }
+
+                <div class="progress-container">
+                    <div class="progress-bar-fill" style="width: @Math.Min(Model.TargetProgressPercentage, 100)%"></div>
+                </div>
+
+                <div class="d-flex justify-content-between text-white-50 small fw-medium">
+                    <span><i class="fa-solid fa-play me-2"></i>Start of Month</span>
+                    <span>Target Goal<i class="fa-solid fa-flag-checkered ms-2"></i></span>
+                </div>
+            </div>
+
+            <div class="dashboard-card animate-in animate-delay-2">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Priority Tasks</h5>
+                    <a asp-controller="Tasks" asp-action="Index" class="btn btn-sm btn-light text-muted fw-bold">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4 border-0 text-muted small text-uppercase fw-bold">Task Details</th>
+                                    <th class="border-0 text-muted small text-uppercase fw-bold">Type</th>
+                                    <th class="text-end pe-4 border-0 text-muted small text-uppercase fw-bold">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.TodaysTasks.Any())
+                                {
+                                    @foreach (var task in Model.TodaysTasks)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="task-icon-box me-3 @(task.Type == "Call" ? "task-call" : task.Type == "Email" ? "task-email" : "task-meeting")">
+                                                        <i class="fa-solid @(task.Type == "Call" ? "fa-phone" : task.Type == "Email" ? "fa-envelope" : "fa-users")"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark">@task.Title</div>
+                                                        <div class="small text-muted">@task.Subtitle</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark border">@task.Type</span>
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <button onclick="markTaskDone(this, @task.Id)"
+                                                        class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold transition-btn">
+                                                    <i class="fa-solid fa-check me-1"></i> Done
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center py-5">
+                                            <div class="text-muted opacity-50 mb-2">
+                                                <i class="fa-solid fa-clipboard-check fa-2x"></i>
+                                            </div>
+                                            <p class="text-muted fw-medium mb-0">No pending tasks for today!</p>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="mri-card">
-            <div class="card-header">
-                <h3 class="card-title">Pipeline</h3>
-            </div>
-
-            <div class="pipeline-stat">
-                <span>Proposal Sent</span>
-                <span class="stat-value">@Model.DealsInProposal</span>
-            </div>
-            <div class="pipeline-stat">
-                <span>Negotiation</span>
-                <span class="stat-value">@Model.DealsInNegotiation</span>
-            </div>
-            <div style="border-top: 1px solid #F1F5F9; margin: 10px 0;"></div>
-            <div class="pipeline-stat">
-                <span style="color: var(--light-green); font-weight: 600;">Closed Won</span>
-                <span class="stat-value" style="color: var(--light-green);">@Model.DealsClosedWon</span>
+        <div class="col-lg-4">
+            <div class="dashboard-card h-100 animate-in animate-delay-3">
+                <div class="card-header-clean">
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @if (Model.RecentActivities.Any())
+                        {
+                            @foreach (var activity in Model.RecentActivities)
+                            {
+                                <div class="activity-feed-item">
+                                    <div class="d-flex">
+                                        <div class="activity-icon me-3">
+                                            <i class="fa-solid @(activity.Type == "Call" ? "fa-phone" : activity.Type == "Status" ? "fa-arrows-rotate" : "fa-user-plus")"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.95rem;">@activity.CustomerName</h6>
+                                                <small class="text-muted" style="font-size: 0.75rem;">@activity.TimeAgo</small>
+                                            </div>
+                                            <p class="mb-0 text-muted small">@activity.Action</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="p-4 text-center text-muted">
+                                <small>No recent activity recorded.</small>
+                            </div>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function markTaskDone(button, taskId) {
+            // 1. Visual Feedback (Immediate)
+            var row = button.closest('tr');
+            button.disabled = true;
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            // 2. Send Request
+            fetch('/Tasks/MarkDoneAjax?id=' + taskId, {
+                method: 'POST',
+                headers: {
+                    // This creates a header for CSRF protection if your app requires it
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 3. Success: Fade out and remove the row
+                    row.style.transition = "all 0.5s";
+                    row.style.opacity = "0";
+                    row.style.transform = "translateX(20px)";
+                    setTimeout(() => row.remove(), 500);
+                } else {
+                    // Revert if error
+                    alert("Error updating task.");
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa-solid fa-check me-1"></i> Done';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                button.disabled = false;
+            });
+        }
+    </script>
+}

@@ -3,15 +3,33 @@
 @{
     ViewData["Title"] = "My Tasks";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Get current filter from Controller to highlight the correct button
+    var currentFilter = ViewData["CurrentFilter"] as string ?? "all";
 }
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
         <div>
             <h2 class="fw-bold" style="color: var(--mri-blue);">
                 <i class="fa-solid fa-calendar-check me-2"></i> My Tasks
             </h2>
-            <p class="text-muted">Follow-ups and reminders scheduled for you.</p>
+            <p class="text-muted mb-0">Follow-ups and reminders scheduled for you.</p>
+        </div>
+
+        <div class="btn-group shadow-sm" role="group">
+            <a asp-action="Index" asp-route-filter="all"
+               class="btn btn-outline-secondary @(currentFilter == "all" ? "active" : "")">
+                All
+            </a>
+            <a asp-action="Index" asp-route-filter="pending"
+               class="btn btn-outline-secondary @(currentFilter == "pending" ? "active" : "")">
+                Pending
+            </a>
+            <a asp-action="Index" asp-route-filter="completed"
+               class="btn btn-outline-secondary @(currentFilter == "completed" ? "active" : "")">
+                Completed
+            </a>
         </div>
     </div>
 
@@ -23,24 +41,27 @@
                         <th class="ps-4 py-3">Due Date</th>
                         <th>Task / Note</th>
                         <th>Related Customer</th>
+                        <th class="text-center" style="width: 150px;">State</th>
                         <th class="text-end pe-4">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        // Logic to color-code dates
                         var isToday = item.ReminderDate.Value.Date == DateTime.UtcNow.Date;
-                        var dateClass = isToday ? "text-danger fw-bold" : "text-dark";
-                        var badge = isToday ? "<span class='badge bg-danger ms-2'>Today</span>" : "";
+                        var dateClass = (isToday && !item.IsReminderDone) ? "text-danger fw-bold" : "text-dark";
+                        var textDecoration = item.IsReminderDone ? "text-decoration-line-through text-muted" : "fw-bold";
 
                         <tr>
                             <td class="ps-4 py-3 @dateClass">
                                 @item.ReminderDate.Value.ToString("MMM dd, yyyy")
-                                @Html.Raw(badge)
+                                @if (isToday && !item.IsReminderDone)
+                                {
+                                    <span class='badge bg-danger ms-2'>Today</span>
+                                }
                             </td>
                             <td>
-                                <div class="fw-bold">@item.Title</div>
+                                <div class="@textDecoration">@item.Title</div>
                                 <div class="small text-muted text-truncate" style="max-width: 300px;">
                                     @item.Content
                                 </div>
@@ -53,10 +74,28 @@
                                     </span>
                                 }
                             </td>
+                            <td class="text-center">
+                                <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post">
+                                    @if (item.IsReminderDone)
+                                    {
+                                        <button type="submit" class="btn badge rounded-pill bg-success-subtle text-success border border-success"
+                                                title="Mark as Pending">
+                                            <i class="fa-solid fa-check me-1"></i> Completed
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning"
+                                                title="Mark as Completed">
+                                            <i class="fa-regular fa-clock me-1"></i> Pending
+                                        </button>
+                                    }
+                                </form>
+                            </td>
                             <td class="text-end pe-4">
                                 <a asp-controller="Customers" asp-action="Details" asp-route-id="@item.CustomerId"
                                    class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-arrow-right"></i> Go to Customer
+                                    <i class="fa-solid fa-arrow-right"></i> View
                                 </a>
                             </td>
                         </tr>
@@ -64,9 +103,9 @@
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="4" class="text-center py-5 text-muted">
+                            <td colspan="5" class="text-center py-5 text-muted">
                                 <i class="fa-solid fa-mug-hot fa-2x mb-3"></i>
-                                <p>No upcoming tasks. You are all caught up!</p>
+                                <p>No tasks found for this filter.</p>
                             </td>
                         </tr>
                     }

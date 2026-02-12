@@ -16,7 +16,7 @@ namespace CRM.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ReminderDate { get; set; } // Optional Reminder
-
+        public bool IsReminderDone { get; set; } = false;
         // Foreign Keys
         public int CustomerId { get; set; }
         [ForeignKey("CustomerId")]

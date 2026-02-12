@@ -83,14 +83,16 @@ namespace CRM.Controllers
             if (id != customer.Id) return NotFound();
 
             ModelState.Remove("SalesRepId");
+
             if (ModelState.IsValid)
             {
                 await _customerService.UpdateAsync(id, customer);
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction(nameof(Details), new { id = customer.Id });
             }
+
             return View(customer);
         }
-
         // --- 5. NOTES & INTERACTIONS ---
         [HttpPost]
         [ValidateAntiForgeryToken]

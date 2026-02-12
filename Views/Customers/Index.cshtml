@@ -5,187 +5,101 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="~/css/Customers/index.css" />
-
-<!-- Animated Background Decorations -->
-<div class="bg-decoration blob-1"></div>
-<div class="bg-decoration blob-2"></div>
-
+<link rel="stylesheet" href="~/css/Customers/index.css" asp-append-version="true" />
 <div class="main-container">
 
-    <!-- Enhanced Page Header with Gradient -->
     <div class="page-header">
-        <div class="row align-items-center">
-            <div class="col-lg-7 col-md-6 mb-3 mb-md-0">
-                <div class="header-content">
-                    <h2><i class="fa-solid fa-users me-2"></i>My Customers</h2>
-                    <p>Manage your active accounts and business relationships</p>
-                </div>
-            </div>
-            <div class="col-lg-5 col-md-6">
-                <div class="header-actions justify-content-md-end">
-                    <a asp-action="Archived" class="btn btn-outline-custom">
-                        <i class="fa-solid fa-archive"></i>
-                        <span class="d-none d-sm-inline">Archived</span>
-                    </a>
-                    <a asp-action="Export" class="btn btn-light-custom">
-                        <i class="fa-solid fa-download"></i>
-                        <span class="d-none d-sm-inline">Export</span>
-                    </a>
-                    <a asp-action="Create" class="btn btn-primary-custom">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Add Customer</span>
-                    </a>
-                </div>
-            </div>
+        <div class="header-title">
+            <h2>Customer Management</h2>
+            <p>View, filter, and manage your organization's accounts.</p>
+        </div>
+        <div class="header-actions">
+            <a asp-action="Archived" class="btn-action btn-outline">
+                <i class="fa-solid fa-archive"></i> Archived
+            </a>
+            <a asp-action="Export" class="btn-action btn-outline">
+                <i class="fa-solid fa-download"></i> Export
+            </a>
+            <a asp-action="Create" class="btn-action btn-primary">
+                <i class="fa-solid fa-plus"></i> New Customer
+            </a>
         </div>
     </div>
 
-    <!-- Stats Bar with Bootstrap Grid -->
     <div class="stats-bar">
-        <div class="row g-3 g-lg-4">
-            <div class="col-12 col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon blue">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h4>@Model.Count()</h4>
-                        <p>Total Customers</p>
-                    </div>
-                </div>
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-info">
+                <h4>@Model.Count()</h4>
+                <p>Total Customers</p>
             </div>
-            <div class="col-12 col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon green">
-                        <i class="fa-solid fa-user-plus"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h4>@Model.Count(c => c.CreatedAt >= DateTime.Now.AddDays(-30))</h4>
-                        <p>Added This Month</p>
-                    </div>
-                </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-user-plus"></i></div>
+            <div class="stat-info">
+                <h4>@Model.Count(c => c.CreatedAt >= DateTime.Now.AddDays(-30))</h4>
+                <p>New This Month</p>
             </div>
-            <div class="col-12 col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon orange">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h4>@Model.Select(c => c.Industry).Distinct().Count()</h4>
-                        <p>Industries</p>
-                    </div>
-                </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="fa-solid fa-briefcase"></i></div>
+            <div class="stat-info">
+                <h4>@Model.Select(c => c.Industry).Distinct().Count()</h4>
+                <p>Industries</p>
             </div>
         </div>
     </div>
 
-    <!-- Enhanced Search and Filter Bar with Status and Location -->
-    <div class="filter-bar">
-        <div class="row g-3">
-            <!-- Search Section -->
-            <div class="col-12">
-                <label class="filter-section-title">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    Search
-                </label>
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text"
-                           id="searchInput"
-                           class="form-control"
-                           placeholder="Search by name, email, company, or phone..."
-                           aria-label="Search customers" />
-                </div>
+    <div class="toolbar">
+        <div class="toolbar-row">
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search accounts, emails, or IDs..." />
             </div>
+
+            <select class="form-select" id="industryFilter" style="width: auto;">
+                <option value="">All Industries</option>
+                @foreach (var industry in Model.Select(c => c.Industry).Distinct().OrderBy(i => i))
+                {
+                    <option value="@industry">@industry</option>
+                }
+            </select>
+
+            <select class="form-select" id="statusFilter" style="width: auto;">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+
+            <select class="form-select" id="locationFilter" style="width: auto;">
+                <option value="">All Locations</option>
+                @foreach (var location in Model.Where(c => !string.IsNullOrEmpty(c.Address))
+                                .Select(c => c.Address.Split(',').LastOrDefault()?.Trim())
+                                .Where(l => !string.IsNullOrEmpty(l)).Distinct().OrderBy(l => l))
+                {
+                    <option value="@location">@location</option>
+                }
+            </select>
+
+            <button class="btn-action btn-outline" id="resetFilters" title="Reset">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
         </div>
 
-        <div class="row g-3 mt-2">
-            <!-- Filter Section -->
-            <div class="col-12">
-                <label class="filter-section-title">
-                    <i class="fa-solid fa-filter"></i>
-                    Filters
-                </label>
-            </div>
-
-            <!-- Industry Filter -->
-            <div class="col-12 col-sm-6 col-lg-3">
-                <div style="position: relative;">
-                    <select class="filter-select form-select" id="industryFilter" aria-label="Filter by industry">
-                        <option value="">All Industries</option>
-                        @foreach (var industry in Model.Select(c => c.Industry).Distinct().OrderBy(i => i))
-                        {
-                            <option value="@industry">@industry</option>
-                        }
-                    </select>
-                </div>
-            </div>
-
-            <!-- Status Filter (NEW) -->
-            <div class="col-12 col-sm-6 col-lg-3">
-                <div style="position: relative;">
-                    <select class="filter-select form-select" id="statusFilter" aria-label="Filter by status">
-                        <option value="">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Location Filter (NEW) -->
-            <div class="col-12 col-sm-6 col-lg-3">
-                <div style="position: relative;">
-                    <select class="filter-select form-select" id="locationFilter" aria-label="Filter by location">
-                        <option value="">All Locations</option>
-                        @foreach (var location in Model.Where(c => !string.IsNullOrEmpty(c.Address))
-                                                .Select(c => c.Address.Split(',').LastOrDefault()?.Trim())
-                                                .Where(l => !string.IsNullOrEmpty(l))
-                                                .Distinct()
-                                                .OrderBy(l => l))
-                        {
-                            <option value="@location">@location</option>
-                        }
-                    </select>
-                </div>
-            </div>
-
-            <!-- Sort Filter -->
-            <div class="col-12 col-sm-6 col-lg-2">
-                <select class="filter-select form-select" id="sortFilter" aria-label="Sort customers">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="name">Company Name</option>
-                    <option value="status">Status</option>
-                </select>
-            </div>
-
-            <!-- Reset Button -->
-            <div class="col-12 col-lg-1">
-                <button class="btn btn-light-custom w-100" id="resetFilters" title="Reset all filters">
-                    <i class="fa-solid fa-rotate-right"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Active Filters Display -->
-        <div id="activeFiltersContainer" class="active-filters-container" style="display: none;">
-            <span class="active-filters-label">Active Filters:</span>
-            <div id="activeFiltersChips"></div>
+        <div id="activeFiltersContainer" class="active-filters" style="display: none;">
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); align-self: center;">Active Filters:</span>
+            <div id="activeFiltersChips" style="display:contents"></div>
         </div>
     </div>
 
-    <!-- Customers Grid with Bootstrap -->
     @if (Model.Any())
     {
-        <div class="row g-3 g-lg-4" id="customersGrid">
+        <div class="customer-grid" id="customersGrid">
             @foreach (var item in Model)
             {
-                <div class="col-12 col-md-6 col-xl-4"
+                <div class="customer-card-wrapper"
                      data-company="@item.CompanyName"
                      data-industry="@item.Industry"
                      data-date="@item.CreatedAt.Ticks"
@@ -193,77 +107,46 @@
                      data-phone="@item.Phone"
                      data-status="@(item.IsActive ? "active" : "inactive")"
                      data-location="@(item.Address?.Split(',').LastOrDefault()?.Trim() ?? "")">
+
                     <div class="customer-card">
-                        <!-- Company Header -->
-                        <div class="company-header">
-                            <div class="company-avatar">
+                        <div class="card-top">
+                            <div class="company-logo">
                                 @item.CompanyName.Substring(0, 1).ToUpper()
                             </div>
-                            <div class="company-info">
-                                <div class="company-name">@item.CompanyName</div>
-                                <div class="company-date">
-                                    <i class="fa-regular fa-calendar"></i>
-                                    @item.CreatedAt.ToString("MMM dd, yyyy")
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Industry and Status Badges -->
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-                            <div class="industry-badge">
-                                <i class="fa-solid fa-building me-2"></i>
-                                @item.Industry
-                            </div>
-                            <div class="status-badge @(item.IsActive ? "active" : "inactive")">
-                                <i class="fa-solid fa-circle"></i>
+                            <span class="status-badge @(item.IsActive ? "active" : "inactive")">
                                 @(item.IsActive ? "Active" : "Inactive")
-                            </div>
+                            </span>
                         </div>
 
-                        <!-- Location (if available) -->
-                        @if (!string.IsNullOrEmpty(item.Address))
-                        {
-                            <div class="location-text">
-                                <i class="fa-solid fa-location-dot"></i>
-                                <span>@item.Address</span>
-                            </div>
-                        }
-
-                        <!-- Contact Information -->
-                        <div class="contact-info">
-                            <div class="contact-item">
-                                <div class="contact-icon icon-email">
-                                    <i class="fa-solid fa-envelope"></i>
-                                </div>
-                                <span class="contact-text" title="@(item.Email ?? "No email provided")">
-                                    @(item.Email ?? "No email provided")
-                                </span>
-                            </div>
-                            <div class="contact-item">
-                                <div class="contact-icon icon-phone">
-                                    <i class="fa-solid fa-phone"></i>
-                                </div>
-                                <span class="contact-text" title="@(item.Phone ?? "No phone provided")">
-                                    @(item.Phone ?? "No phone provided")
-                                </span>
-                            </div>
+                        <div class="company-name">@item.CompanyName</div>
+                        <div class="industry-text">
+                            <i class="fa-solid fa-building"></i> @item.Industry
                         </div>
 
-                        <!-- Card Actions -->
+                        <div class="card-details">
+                            <div class="detail-row">
+                                <i class="fa-regular fa-envelope"></i>
+                                <span title="@item.Email">@(item.Email ?? "N/A")</span>
+                            </div>
+                            <div class="detail-row">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>@(item.Phone ?? "N/A")</span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(item.Address))
+                            {
+                                <div class="detail-row">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span class="text-truncate">@item.Address</span>
+                                </div>
+                            }
+                        </div>
+
                         <div class="card-actions">
-                            <a asp-action="Details"
-                               asp-route-id="@item.Id"
-                               class="btn-workspace"
-                               title="Open @item.CompanyName workspace">
-                                <i class="fa-solid fa-arrow-right"></i>
-                                Open Workspace
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn-sm-action primary">
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i> Open
                             </a>
-                            <a asp-action="Delete"
-                               asp-route-id="@item.Id"
-                               class="btn-delete"
-                               onclick="return confirm('Are you sure you want to remove @item.CompanyName?');"
-                               title="Delete @item.CompanyName">
-                                <i class="fa-solid fa-trash"></i>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn-sm-action danger" onclick="return confirm('Remove this customer?');">
+                                <i class="fa-regular fa-trash-can"></i>
                             </a>
                         </div>
                     </div>
@@ -271,29 +154,25 @@
             }
         </div>
 
-        <!-- Results Counter -->
         <div class="mt-4 text-center">
-            <p class="text-muted" id="resultsCounter">
-                Showing <strong id="visibleCount">@Model.Count()</strong> of <strong>@Model.Count()</strong> customers
-            </p>
+            <small class="text-muted" id="resultsCounter">
+                Showing <strong id="visibleCount">@Model.Count()</strong> results
+            </small>
         </div>
     }
     else
     {
-        <!-- Empty State -->
         <div class="empty-state">
-            <div class="empty-state-icon">
+            <div style="color: var(--text-muted); font-size: 2rem; margin-bottom: 16px;">
                 <i class="fa-regular fa-folder-open"></i>
             </div>
-            <h3>No Customers Yet</h3>
-            <p>Start building your customer base by adding your first customer.</p>
-            <a asp-action="Create" class="btn btn-primary-custom">
-                <i class="fa-solid fa-plus"></i>
-                Add Your First Customer
+            <h4 style="margin:0 0 8px 0; color: var(--text-main);">No Customers Found</h4>
+            <p style="color: var(--text-muted); margin-bottom: 24px;">Get started by adding your first account to the CRM.</p>
+            <a asp-action="Create" class="btn-action btn-primary">
+                <i class="fa-solid fa-plus"></i> Add Customer
             </a>
         </div>
     }
-
 </div>
 
 @section Scripts {
@@ -303,7 +182,6 @@
         const industryFilter = document.getElementById('industryFilter');
         const statusFilter = document.getElementById('statusFilter');
         const locationFilter = document.getElementById('locationFilter');
-        const sortFilter = document.getElementById('sortFilter');
         const resetButton = document.getElementById('resetFilters');
         const customersGrid = document.getElementById('customersGrid');
         const visibleCountElement = document.getElementById('visibleCount');
@@ -319,34 +197,29 @@
             }, 300);
         });
 
-        // Industry filter
+        // Filters
         industryFilter?.addEventListener('change', filterCustomers);
         statusFilter?.addEventListener('change', filterCustomers);
         locationFilter?.addEventListener('change', filterCustomers);
 
-        // Sort filter
-        sortFilter?.addEventListener('change', function() {
-            sortCustomers(this.value);
-        });
-
-        // Reset filters
+        // Reset
         resetButton?.addEventListener('click', function() {
             searchInput.value = '';
             industryFilter.value = '';
             statusFilter.value = '';
             locationFilter.value = '';
-            sortFilter.value = 'newest';
             filterCustomers();
-            sortCustomers('newest');
         });
 
-        // Filter customers function
+        // Filter Function
         function filterCustomers() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             const selectedIndustry = industryFilter.value;
             const selectedStatus = statusFilter.value;
             const selectedLocation = locationFilter.value;
-            const cards = document.querySelectorAll('#customersGrid > div[data-company]');
+
+            // Note: Updated selector class to match new HTML structure
+            const cards = document.querySelectorAll('.customer-card-wrapper');
             let visibleCount = 0;
 
             cards.forEach(cardWrapper => {
@@ -374,43 +247,28 @@
                 }
             });
 
-            // Update visible count
             if (visibleCountElement) {
                 visibleCountElement.textContent = visibleCount;
             }
 
-            // Update active filters display
             updateActiveFilters();
-
-            // Show "no results" message if needed
-            showNoResultsMessage(visibleCount === 0);
         }
 
-        // Update active filters chips
+        // Update Chips
         function updateActiveFilters() {
             const activeFilters = [];
 
-            if (searchInput.value) {
-                activeFilters.push({ type: 'search', label: `Search: "${searchInput.value}"`, value: searchInput.value });
-            }
-            if (industryFilter.value) {
-                activeFilters.push({ type: 'industry', label: `Industry: ${industryFilter.value}`, value: industryFilter.value });
-            }
-            if (statusFilter.value) {
-                activeFilters.push({ type: 'status', label: `Status: ${statusFilter.value}`, value: statusFilter.value });
-            }
-            if (locationFilter.value) {
-                activeFilters.push({ type: 'location', label: `Location: ${locationFilter.value}`, value: locationFilter.value });
-            }
+            if (searchInput.value) activeFilters.push({ type: 'search', label: `Search: "${searchInput.value}"` });
+            if (industryFilter.value) activeFilters.push({ type: 'industry', label: industryFilter.value });
+            if (statusFilter.value) activeFilters.push({ type: 'status', label: statusFilter.options[statusFilter.selectedIndex].text });
+            if (locationFilter.value) activeFilters.push({ type: 'location', label: locationFilter.value });
 
             if (activeFilters.length > 0) {
                 activeFiltersContainer.style.display = 'flex';
                 activeFiltersChips.innerHTML = activeFilters.map(filter => `
-                    <div class="filter-chip">
+                    <div class="filter-tag">
                         <span>${filter.label}</span>
-                        <span class="remove-chip" onclick="removeFilter('${filter.type}')">
-                            <i class="fa-solid fa-xmark"></i>
-                        </span>
+                        <i class="fa-solid fa-xmark" onclick="removeFilter('${filter.type}')"></i>
                     </div>
                 `).join('');
             } else {
@@ -418,111 +276,12 @@
             }
         }
 
-        // Remove individual filter
-        window.removeFilter = function(filterType) {
-            switch(filterType) {
-                case 'search':
-                    searchInput.value = '';
-                    break;
-                case 'industry':
-                    industryFilter.value = '';
-                    break;
-                case 'status':
-                    statusFilter.value = '';
-                    break;
-                case 'location':
-                    locationFilter.value = '';
-                    break;
-            }
+        window.removeFilter = function(type) {
+            if (type === 'search') searchInput.value = '';
+            if (type === 'industry') industryFilter.value = '';
+            if (type === 'status') statusFilter.value = '';
+            if (type === 'location') locationFilter.value = '';
             filterCustomers();
         };
-
-        // Sort customers function
-        function sortCustomers(sortType) {
-            if (!customersGrid) return;
-
-            const cards = Array.from(customersGrid.children);
-
-            cards.sort((a, b) => {
-                if (sortType === 'newest') {
-                    return b.dataset.date - a.dataset.date;
-                } else if (sortType === 'oldest') {
-                    return a.dataset.date - b.dataset.date;
-                } else if (sortType === 'name') {
-                    return a.dataset.company.localeCompare(b.dataset.company);
-                } else if (sortType === 'status') {
-                    return a.dataset.status.localeCompare(b.dataset.status);
-                }
-                return 0;
-            });
-
-            // Re-append sorted cards
-            cards.forEach(card => customersGrid.appendChild(card));
-        }
-
-        // Show no results message
-        function showNoResultsMessage(show) {
-            let noResultsDiv = document.getElementById('noResultsMessage');
-
-            if (show && !noResultsDiv) {
-                noResultsDiv = document.createElement('div');
-                noResultsDiv.id = 'noResultsMessage';
-                noResultsDiv.className = 'col-12';
-                noResultsDiv.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </div>
-                        <h3>No Customers Found</h3>
-                        <p>Try adjusting your search or filter criteria.</p>
-                        <button class="btn btn-primary-custom" onclick="document.getElementById('resetFilters').click();">
-                            <i class="fa-solid fa-rotate-right"></i>
-                            Clear Filters
-                        </button>
-                    </div>
-                `;
-                customersGrid.appendChild(noResultsDiv);
-            } else if (!show && noResultsDiv) {
-                noResultsDiv.remove();
-            }
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Apply any stored filters from localStorage if needed
-            const storedSort = localStorage.getItem('customerSort');
-            if (storedSort && sortFilter) {
-                sortFilter.value = storedSort;
-                sortCustomers(storedSort);
-            }
-
-            // Save sort preference
-            sortFilter?.addEventListener('change', function() {
-                localStorage.setItem('customerSort', this.value);
-            });
-
-            // Add keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                // Ctrl/Cmd + K to focus search
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                    e.preventDefault();
-                    searchInput?.focus();
-                }
-                // Escape to clear search
-                if (e.key === 'Escape' && document.activeElement === searchInput) {
-                    searchInput.value = '';
-                    filterCustomers();
-                }
-            });
-
-            // Initialize active filters display
-            updateActiveFilters();
-        });
-
-        // Add smooth scroll to top when filtering (optional)
-        function scrollToGrid() {
-            const gridPosition = customersGrid?.getBoundingClientRect().top + window.pageYOffset - 100;
-            window.scrollTo({ top: gridPosition, behavior: 'smooth' });
-        }
     </script>
 }

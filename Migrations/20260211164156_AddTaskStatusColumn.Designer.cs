@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CRM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260211040832_initial")]
-    partial class initial
+    [Migration("20260211164156_AddTaskStatusColumn")]
+    partial class AddTaskStatusColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -233,6 +233,9 @@ namespace CRM.Migrations
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("IsReminderDone")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("ReminderDate")
                         .HasColumnType("timestamp with time zone");
