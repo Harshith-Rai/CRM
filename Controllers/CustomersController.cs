@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using CRM.Data;
 using CRM.Models;
 using CRM.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 namespace CRM.Controllers
@@ -12,21 +14,20 @@ namespace CRM.Controllers
     {
         private readonly ICustomerService _customerService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly AppDbContext _context;
 
-        public CustomersController(ICustomerService customerService, UserManager<ApplicationUser> userManager)
+        public CustomersController(ICustomerService customerService, UserManager<ApplicationUser> userManager, AppDbContext context)
         {
             _customerService = customerService;
             _userManager = userManager;
+            _context = context;
         }
 
         // --- 1. LIST VIEW ---
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
-
-            // Call the new method that returns BOTH Active and Inactive
             var customers = await _customerService.GetAllCustomersAsync(userId, User.IsInRole("Admin"));
-
             return View(customers);
         }
 
@@ -61,18 +62,21 @@ namespace CRM.Controllers
             var customer = await _customerService.GetDetailsAsync(id);
             if (customer == null) return NotFound();
 
-            // Security Check
             if (customer.SalesRepId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
                 return Forbid();
 
             return View(customer);
         }
 
-        // --- 4. EDIT ---
+        // --- 4. EDIT (Strictly Active Only) ---
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var customer = await _customerService.GetDetailsAsync(id);
+            // SECURITY: If customer is Archived (IsActive == false), return NotFound.
+            // This prevents editing profile after deletion.
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.Id == id && c.IsActive);
+
             if (customer == null) return NotFound();
 
             if (customer.SalesRepId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
@@ -92,13 +96,31 @@ namespace CRM.Controllers
             if (ModelState.IsValid)
             {
                 await _customerService.UpdateAsync(id, customer);
-
                 return RedirectToAction(nameof(Details), new { id = customer.Id });
             }
-
             return View(customer);
         }
-        // --- 5. NOTES & INTERACTIONS ---
+
+        // --- 5. ARCHIVE (Safe Delete) ---
+        // Handles the "Archive" button from Edit AND Details pages
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var customer = await _context.Customers.FindAsync(id);
+
+            if (customer != null)
+            {
+                // Soft Delete
+                customer.IsActive = false;
+                await _context.SaveChangesAsync();
+            }
+
+            // REDIRECT TO INDEX: This ensures you leave the Customer page immediately
+            return RedirectToAction(nameof(Index));
+        }
+
+        // --- 6. NOTES ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddNote(int customerId, string title, string content, DateTime? reminderDate)
@@ -110,14 +132,7 @@ namespace CRM.Controllers
             return RedirectToAction("Details", new { id = customerId });
         }
 
-        // --- 6. SOFT DELETE ---
-        public async Task<IActionResult> Delete(int id)
-        {
-            await _customerService.SoftDeleteAsync(id, _userManager.GetUserId(User), User.IsInRole("Admin"));
-            return RedirectToAction(nameof(Index));
-        }
-
-        // --- 7. ARCHIVE & RESTORE ---
+        // --- 7. UTILITIES ---
         public async Task<IActionResult> Archived()
         {
             var userId = _userManager.GetUserId(User);
@@ -131,7 +146,6 @@ namespace CRM.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // --- 8. EXPORT ---
         public async Task<IActionResult> Export()
         {
             var csv = await _customerService.GenerateCsvAsync(_userManager.GetUserId(User));

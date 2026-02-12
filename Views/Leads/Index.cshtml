@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CRM.Models.Lead>
+﻿@* @model IEnumerable<CRM.Models.Lead>
 @using CRM.Models
 
 @{
@@ -136,7 +136,7 @@
                         <div class="card-actions">
                             @if (status != LeadStatus.New)
                             {
-                                // Move Backwards
+                                
                                 <form asp-action="UpdateStatus" method="post">
                                     <input type="hidden" name="id" value="@lead.Id" />
                                     <input type="hidden" name="status" value="@(status - 1)" />
@@ -146,12 +146,12 @@
                                 </form>
                             }
 
-                            @if (status != LeadStatus.Lost) // Can't move forward from Lost (usually)
+                            @if (status != LeadStatus.Lost) 
                             {
-                                // Move Forwards
+                               
                                 <form asp-action="UpdateStatus" method="post">
                                     <input type="hidden" name="id" value="@lead.Id" />
-                                     @* Logic to stop at "Won" or "Lost" boundary *@
+                                     
                                     <input type="hidden" name="status" value="@(status == LeadStatus.Won ? LeadStatus.Won : status + 1)" />
 
                                     @if (status != LeadStatus.Won)
@@ -175,4 +175,4 @@
             </div>
         }
     </div>
-</div>
+</div> *@

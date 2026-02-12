@@ -54,13 +54,13 @@ namespace CRM.Services
                 NewCustomersThisMonth = await _context.Customers
                     .CountAsync(c => c.SalesRepId == userId && c.IsActive && c.CreatedAt >= startDate),
 
-                TotalPipelineValue = await _context.Leads
-                    .Where(l => l.SalesRepId == userId && l.Status != LeadStatus.Won && l.Status != LeadStatus.Lost)
-                    .SumAsync(l => (decimal?)l.Value) ?? 0,
+                //TotalPipelineValue = await _context.Leads
+                //    .Where(l => l.SalesRepId == userId && l.Status != LeadStatus.Won && l.Status != LeadStatus.Lost)
+                //    .SumAsync(l => (decimal?)l.Value) ?? 0,
 
-                TotalRevenueWon = await _context.Leads
-                    .Where(l => l.SalesRepId == userId && l.Status == LeadStatus.Won)
-                    .SumAsync(l => (decimal?)l.Value) ?? 0,
+                //TotalRevenueWon = await _context.Leads
+                //    .Where(l => l.SalesRepId == userId && l.Status == LeadStatus.Won)
+                //    .SumAsync(l => (decimal?)l.Value) ?? 0,
 
                 RecentActivities = await _context.Notes
                     .Include(n => n.Customer)

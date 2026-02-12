@@ -1,56 +1,84 @@
 ﻿@model IEnumerable<CRM.Models.Customer>
 
 @{
-    ViewData["Title"] = "Archived Customers";
+    ViewData["Title"] = "Recycle Bin";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-secondary"><i class="fa-solid fa-trash-can-arrow-up me-2"></i>Archived Customers</h2>
-            <p class="text-muted">Restore customers you previously removed.</p>
+            <h2 class="fw-bold text-secondary"><i class="fa-solid fa-trash-can-arrow-up me-2"></i>Recycle Bin</h2>
+            <p class="text-muted mb-0">Restore customers to your active pipeline.</p>
         </div>
         <a asp-action="Index" class="btn btn-outline-secondary">
-            <i class="fa-solid fa-arrow-left"></i> Back to Active List
+            <i class="fa-solid fa-arrow-left me-2"></i>Back to Active List
         </a>
     </div>
 
-    <div class="card shadow-sm">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th class="ps-4">Company</th>
-                    <th>Industry</th>
-                    <th>Email</th>
-                    <th class="text-end pe-4">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-uppercase small fw-bold text-muted">
                     <tr>
-                        <td class="ps-4 fw-bold text-muted">@item.CompanyName</td>
-                        <td>@item.Industry</td>
-                        <td>@item.Email</td>
-                        <td class="text-end pe-4">
-                            <a asp-action="Restore" asp-route-id="@item.Id" class="btn btn-sm btn-success text-white"
-                               onclick="return confirm('Restore this customer to your active list?');">
-                                <i class="fa-solid fa-rotate-left"></i> Restore
-                            </a>
-                        </td>
+                        <th class="ps-4" style="width: 30%;">Company</th>
+                        <th style="width: 20%;">Industry</th>
+                        <th style="width: 10%;">Status</th>
+                        <th style="width: 15%;">Time Archived</th>
+                        <th class="text-end pe-4">Action</th>
                     </tr>
-                }
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="4" class="text-center py-5 text-muted">
-                            <i class="fa-regular fa-folder-open fa-2x mb-3"></i>
-                            <p>The recycle bin is empty.</p>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">@item.CompanyName</div>
+                                <div class="small text-muted">@item.Email</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">@item.Industry</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">
+                                    Archived
+                                </span>
+                            </td>
+                            <td class="text-muted small">
+                                @if (item.UpdatedAt.HasValue)
+                                {
+                                    <div class="fw-bold"><i class="fa-regular fa-calendar me-1"></i>@item.UpdatedAt.Value.ToString("MMM dd, yyyy")</div>
+                                    <div class="text-muted" style="font-size:0.75rem;">@item.UpdatedAt.Value.ToShortTimeString()</div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">Unknown</span>
+                                }
+                            </td>
+                            <td class="text-end pe-4" style="width: 1%; white-space: nowrap;">
+                                <form asp-action="Restore" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-success fw-bold"
+                                            onclick="return confirm('Restore @item.CompanyName to active list?');">
+                                        <i class="fa-solid fa-rotate-left me-1"></i> Restore
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <div class="opacity-50 mb-3">
+                                    <i class="fa-regular fa-folder-open fa-3x"></i>
+                                </div>
+                                <h6 class="fw-bold">The bin is empty</h6>
+                                <p class="mb-0 small">No archived customers found.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

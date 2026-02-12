@@ -1,34 +1,236 @@
 ﻿@model CRM.Models.Customer
+
 @{
-    ViewData["Title"] = "Edit Customer"; 
+    ViewData["Title"] = "Edit Profile";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <h2>Edit Customer</h2>
-    <form asp-action="Edit">
+<style>
+    /* ... (Keep your existing styles) ... */
+    .crm-header-bar {
+        background: #fff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 20px 32px;
+        margin: -24px -24px 30px -24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-pane {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        margin-bottom: 24px;
+    }
+
+    .pane-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        color: #044D66;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+    }
+
+    .form-label-top {
+        font-weight: 700;
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .input-group-text {
+        background-color: #f8fafc;
+        border-color: #e2e8f0;
+        color: #64748b;
+    }
+
+    .metadata-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px dashed #e2e8f0;
+        font-size: 0.9rem;
+    }
+
+    .metadata-label {
+        color: #64748b;
+    }
+
+    .metadata-value {
+        font-weight: 600;
+        color: #334155;
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="d-flex align-items-center gap-3">
+        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; color: #044D66;">
+            <i class="fa-solid fa-pen-to-square fa-lg"></i>
+        </div>
+        <div>
+            <h2 class="fw-bold mb-0" style="font-family: 'Outfit', sans-serif; color: #0F172A; font-size: 1.5rem;">Edit Customer</h2>
+            <p class="text-muted small mb-0">Update profile details for <span class="fw-bold text-dark">@Model.CompanyName</span></p>
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary px-4 fw-bold rounded-pill">
+            Cancel
+        </a>
+        <button type="submit" form="editCustomerForm" class="btn btn-primary px-4 fw-bold rounded-pill shadow-sm" style="background: #0066CC; border: none;">
+            <i class="fa-solid fa-check me-2"></i> Save Changes
+        </button>
+    </div>
+</div>
+
+<div class="container-fluid px-0">
+    <form asp-action="Edit" id="editCustomerForm">
         <input type="hidden" asp-for="Id" />
-        <div class="form-group mb-3">
-            <label asp-for="CompanyName" class="control-label"></label>
-            <input asp-for="CompanyName" class="form-control" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="form-pane">
+                    <div class="pane-title"><i class="fa-solid fa-building me-2"></i> Company Identity</div>
+                    <div class="row g-4">
+                        <div class="col-md-12">
+                            <label asp-for="CompanyName" class="form-label-top">Company Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-signature"></i></span>
+                                <input asp-for="CompanyName" class="form-control form-control-lg fw-bold text-dark" />
+                            </div>
+                            <span asp-validation-for="CompanyName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Industry" class="form-label-top">Industry Vertical</label>
+                            <select asp-for="Industry" class="form-select">
+                                <option value="">-- Select Industry --</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-pane">
+                    <div class="pane-title"><i class="fa-solid fa-address-book me-2"></i> Contact & Location</div>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label-top">Primary Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                <input asp-for="Email" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Phone" class="form-label-top">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                <input asp-for="Phone" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Address" class="form-label-top">Headquarters Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
+                                <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="form-pane h-100">
+                    <div class="pane-title"><i class="fa-solid fa-server me-2"></i> System Metadata</div>
+
+                    <div class="metadata-row">
+                        <span class="metadata-label">Record ID</span>
+                        <span class="metadata-value font-monospace">#@Model.Id</span>
+                    </div>
+                    <div class="metadata-row">
+                        <span class="metadata-label">Status</span>
+                        <span class="badge bg-success-subtle text-success border border-success rounded-pill px-3">Active</span>
+                    </div>
+
+                    <div class="metadata-row">
+                        <span class="metadata-label">Last Edited</span>
+                        <span class="metadata-value">
+                            @{
+                               
+                                var dateDisplay = Model.UpdatedAt.HasValue
+                                ? Model.UpdatedAt.Value.ToString("MMM dd, yyyy")
+                                : Model.CreatedAt.ToString("MMM dd, yyyy");
+                            }
+                            @dateDisplay
+                        </span>
+                    </div>
+
+                    <hr class="my-4 opacity-25">
+
+                    <h6 class="text-danger fw-bold small text-uppercase">Danger Zone</h6>
+                    <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
+                        <p class="small text-danger mb-2" style="font-size: 0.8rem;">
+                            Archiving hides this customer from your lists.
+                        </p>
+                        <button type="button" class="btn btn-outline-danger w-100 btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#archiveModal">
+                            <i class="fa-solid fa-box-archive me-2"></i> Archive Customer
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group mb-3">
-            <label asp-for="Industry" class="control-label"></label>
-            <input asp-for="Industry" class="form-control" />
-        </div>
-        <div class="form-group mb-3">
-            <label asp-for="Email" class="control-label"></label>
-            <input asp-for="Email" class="form-control" />
-        </div>
-        <div class="form-group mb-3">
-            <label asp-for="Phone" class="control-label"></label>
-            <input asp-for="Phone" class="form-control" />
-        </div>
-        <div class="form-group mb-3">
-            <label asp-for="Address" class="control-label"></label>
-            <input asp-for="Address" class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
+
+<div class="modal fade" id="archiveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">Archive Customer?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3 text-danger opacity-50">
+                    <i class="fa-solid fa-box-archive fa-3x"></i>
+                </div>
+                <p class="mb-0 text-muted">
+                    Are you sure you want to archive <strong>@Model.CompanyName</strong>?
+                </p>
+                <p class="small text-muted mb-0">
+                    You will be redirected to the customer list.
+                </p>
+            </div>
+            <div class="modal-footer border-0 pt-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal">Cancel</button>
+
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                    <button type="submit" class="btn btn-danger fw-bold px-4">Yes, Archive It</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

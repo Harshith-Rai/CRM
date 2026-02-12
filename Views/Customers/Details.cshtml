@@ -61,6 +61,14 @@
         overflow: hidden;
     }
 
+    .customer-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
     /* Grid Layout */
     .grid-layout {
         display: grid;
@@ -123,19 +131,6 @@
             transform: translateX(4px);
         }
 
-    /* Responsive adjustments */
-    @@media (max-width: 1200px) {
-        .grid-layout {
-            grid-template-columns: 35% 63%;
-        }
-    }
-
-    @@media (max-width: 992px) {
-        .grid-layout {
-            grid-template-columns: 1fr;
-        }
-    }
-
     /* Note styling */
     .note-box {
         background: white;
@@ -179,6 +174,7 @@
         text-decoration: none;
         border: none;
         cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .btn-white {
@@ -186,11 +182,21 @@
         color: var(--primary-blue);
     }
 
+        .btn-white:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+        }
+
     .btn-light-outline {
         background: transparent;
         color: var(--white);
         border: 2px solid rgba(255, 255, 255, 0.3);
     }
+
+        .btn-light-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--white);
+        }
 
     .form-control {
         width: 100%;
@@ -272,7 +278,6 @@
             color: white;
         }
 
-    /* Delete Button Style */
     .btn-sm-danger {
         background: var(--light-red);
         color: var(--danger-red);
@@ -293,12 +298,13 @@
                     @Model.CompanyName
                     <span class="badge badge-success">Active</span>
                 </h1>
-                <div class="customer-meta" style="display:flex; gap:20px; color:rgba(255,255,255,0.8);">
+                <div class="customer-meta">
                     <span><i class="fa-solid fa-industry me-2"></i>@Model.Industry</span>
                     <span><i class="fa-solid fa-location-dot me-2"></i>@Model.Address</span>
                 </div>
             </div>
-            <div class="customer-actions">
+
+            <div class="customer-actions" style="display:flex; gap: 10px;">
                 <a href="mailto:@Model.Email" class="btn btn-white">
                     <i class="fa-regular fa-envelope"></i> Email
                 </a>
@@ -310,15 +316,17 @@
     </div>
 
     <div class="grid-layout">
-
         <div class="sidebar-column">
-
             <div class="contacts-section">
                 <div class="section-header">
                     <h4><i class="fa-solid fa-users me-2"></i>People</h4>
-                    <a href="/Contacts/Create?customerId=@Model.Id" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8rem;">
+
+                    <button type="button" class="btn btn-primary"
+                            style="padding: 5px 10px; font-size: 0.8rem;"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addContactModal">
                         <i class="fa-solid fa-plus"></i>
-                    </a>
+                    </button>
                 </div>
 
                 @if (Model.Contacts != null && Model.Contacts.Any())
@@ -326,22 +334,15 @@
                     foreach (var contact in Model.Contacts)
                     {
                         <div class="contact-card">
-                            <div style="font-weight: 700; color: var(--deep-blue);">@contact.FullName</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">@contact.Position</div>
+                            <div class="contact-name">@contact.FullName</div>
+                            <div class="contact-pos">@contact.Position</div>
 
                             <div class="contact-actions">
-                                <a href="mailto:@contact.Email" class="btn-sm btn-sm-primary" title="Email">
-                                    <i class="fa-solid fa-envelope"></i>
-                                </a>
-                                <a href="tel:@contact.Phone" class="btn-sm btn-sm-primary" title="Call">
-                                    <i class="fa-solid fa-phone"></i>
-                                </a>
-                                <a asp-controller="Contacts"
-                                   asp-action="Delete"
-                                   asp-route-id="@contact.Id"
-                                   class="btn-sm btn-sm-danger"
-                                   title="Delete Contact"
-                                   onclick="return confirm('Are you sure you want to delete @contact.FullName?');">
+                                <a href="mailto:@contact.Email" class="btn-sm btn-sm-primary" title="Email"><i class="fa-solid fa-envelope"></i></a>
+                                <a href="tel:@contact.Phone" class="btn-sm btn-sm-primary" title="Call"><i class="fa-solid fa-phone"></i></a>
+                                <a asp-controller="Contacts" asp-action="Delete" asp-route-id="@contact.Id"
+                                   class="btn-sm btn-sm-danger" title="Delete Contact"
+                                   onclick="return confirm('Delete @contact.FullName?');">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
                             </div>
@@ -355,37 +356,32 @@
             </div>
 
             <div class="add-note-card">
-                <div class="section-header" style="margin-bottom: 15px;">
+                <div class="section-header mb-3">
                     <h4 style="font-size: 1.1rem;"><i class="fa-solid fa-pen-to-square me-2"></i>Log Interaction</h4>
                 </div>
-
                 <form asp-action="AddNote" method="post">
                     <input type="hidden" name="customerId" value="@Model.Id" />
-
-                    <div style="margin-bottom: 10px;">
+                    <div class="mb-2">
                         <input name="title" class="form-control" placeholder="Subject (e.g. Call Summary)" required style="font-weight:600;" />
                     </div>
-
-                    <div style="margin-bottom: 10px;">
+                    <div class="mb-2">
                         <textarea name="content" class="form-control" rows="4" placeholder="What happened?" required></textarea>
                     </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 4px; display: block;">Reminder:</label>
+                    <div class="mb-3">
+                        <label class="text-label">Reminder:</label>
                         <input type="date" name="reminderDate" class="form-control" />
                     </div>
-
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <button type="submit" class="btn btn-primary btn-full">
                         <i class="fa-solid fa-floppy-disk me-2"></i> Save Note
                     </button>
                 </form>
             </div>
+        </div>
 
-        </div> <div class="timeline-section">
+        <div class="timeline-section">
             <div class="section-header">
                 <h4><i class="fa-solid fa-clock-rotate-left me-2"></i>Interaction Timeline</h4>
             </div>
-
             <div class="timeline-wrapper">
                 @if (Model.Notes != null && Model.Notes.Any())
                 {
@@ -393,34 +389,20 @@
                     {
                         <div class="timeline-item">
                             <div class="note-box">
-                                <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                <div class="note-header">
                                     <div>
-                                        <div style="font-weight:700; color: var(--deep-blue);">@note.Title</div>
-                                        <div style="font-size:0.8rem; color: var(--text-light);">
-                                            @note.CreatedAt.ToString("MMM dd, yyyy • hh:mm tt")
-                                        </div>
+                                        <div class="note-title">@note.Title</div>
+                                        <div class="note-date">@note.CreatedAt.ToString("MMM dd, yyyy • hh:mm tt")</div>
                                     </div>
-
-                                    <div style="display:flex; gap: 8px;">
-                                        <a asp-controller="Notes" asp-action="Edit" asp-route-id="@note.Id"
-                                           class="btn-sm" style="color: #64748B; padding: 4px;" title="Edit Note">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </a>
-                                        <a asp-controller="Notes" asp-action="Delete" asp-route-id="@note.Id"
-                                           class="btn-sm" style="color: #DC2626; padding: 4px;" title="Delete Note"
-                                           onclick="return confirm('Delete this note?');">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </a>
+                                    <div class="note-actions">
+                                        <a asp-controller="Notes" asp-action="Edit" asp-route-id="@note.Id" class="btn-sm btn-icon-edit"><i class="fa-solid fa-pen"></i></a>
+                                        <a asp-controller="Notes" asp-action="Delete" asp-route-id="@note.Id" class="btn-sm btn-icon-delete" onclick="return confirm('Delete note?');"><i class="fa-solid fa-trash"></i></a>
                                     </div>
                                 </div>
-
-                                <p style="margin:0; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap;">@note.Content</p>
-
+                                <p class="note-content">@note.Content</p>
                                 @if (note.ReminderDate.HasValue)
                                 {
-                                    <div class="reminder-badge">
-                                        <i class="fa-regular fa-bell"></i> Follow up: @note.ReminderDate.Value.ToString("MMM dd, yyyy")
-                                    </div>
+                                    <div class="reminder-badge"><i class="fa-regular fa-bell"></i> Follow up: @note.ReminderDate.Value.ToString("MMM dd")</div>
                                 }
                             </div>
                         </div>
@@ -428,13 +410,61 @@
                 }
                 else
                 {
-                    <div class="empty-state" style="padding: 60px 0;">
-                        <i class="fa-regular fa-comments"></i>
+                    <div class="empty-state">
+                        <i class="fa-regular fa-comments fa-2x mb-2"></i>
                         <p>No interactions recorded yet.</p>
                     </div>
                 }
             </div>
         </div>
-
     </div>
 </div>
+
+<div class="modal fade" id="addContactModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color: var(--deep-blue);">Add New Person</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form asp-controller="Contacts" asp-action="Create" method="post">
+                    <input type="hidden" name="CustomerId" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">FULL NAME</label>
+                        <input type="text" name="FullName" class="form-control" placeholder="e.g. John Doe" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">POSITION / TITLE</label>
+                        <input type="text" name="Position" class="form-control" placeholder="e.g. Sales Manager" />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-bold">EMAIL</label>
+                            <input type="email" name="Email" class="form-control" placeholder="john@company.com" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-bold">PHONE</label>
+                            <input type="tel" name="Phone" class="form-control" placeholder="+1 555..." />
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary fw-bold py-2">
+                            <i class="fa-solid fa-user-plus me-2"></i> Save Contact
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

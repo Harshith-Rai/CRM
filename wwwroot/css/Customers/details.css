@@ -1,5 +1,7 @@
-﻿/* Import fonts */
-@@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+﻿/* wwwroot/css/customer-details.css */
+
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
 
 :root {
     --primary-blue: #0066CC;
@@ -30,7 +32,7 @@ body {
     animation: fadeIn 0.6s ease-in-out;
 }
 
-@@keyframes fadeIn {
+@keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(20px);
@@ -54,12 +56,41 @@ body {
     overflow: hidden;
 }
 
+.customer-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
 /* Grid Layout */
 .grid-layout {
     display: grid;
-    grid-template-columns: 25% 75%;
+    grid-template-columns: 28% 70%;
     gap: 24px;
     align-items: start;
+}
+
+/* Sidebar Wrapper (Left Column) */
+.sidebar-column {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Cards */
+.contacts-section, .timeline-section, .add-note-card {
+    background: var(--white);
+    padding: 24px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* Add Note Card Specifics */
+.add-note-card {
+    background: linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%);
+    border: 2px solid var(--border-color);
 }
 
 /* Section Headers */
@@ -71,7 +102,7 @@ body {
 }
 
     .section-header h4 {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-weight: 700;
         color: var(--deep-blue);
         margin: 0;
@@ -80,14 +111,6 @@ body {
         align-items: center;
         gap: 10px;
     }
-
-/* Cards */
-.contacts-section, .timeline-section {
-    background: var(--white);
-    padding: 24px;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-}
 
 .contact-card {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -103,17 +126,15 @@ body {
         transform: translateX(4px);
     }
 
-/* Responsive adjustments */
-@@media (max-width: 1200px) {
-    .grid-layout {
-        grid-template-columns: 30% 70%;
-    }
+.contact-name {
+    font-weight: 700;
+    color: var(--deep-blue);
 }
 
-@@media (max-width: 992px) {
-    .grid-layout {
-        grid-template-columns: 1fr;
-    }
+.contact-pos {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 10px;
 }
 
 /* Note styling */
@@ -125,6 +146,30 @@ body {
     border: 1px solid var(--border-color);
 }
 
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.note-title {
+    font-weight: 700;
+    color: var(--deep-blue);
+}
+
+.note-date {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.note-content {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
 /* Buttons & Badges */
 .customer-title-section h1 {
     margin: 0 0 12px 0;
@@ -134,6 +179,12 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
+}
+
+.customer-meta {
+    display: flex;
+    gap: 20px;
+    color: rgba(255,255,255,0.8);
 }
 
 .badge {
@@ -159,6 +210,7 @@ body {
     text-decoration: none;
     border: none;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .btn-white {
@@ -166,22 +218,37 @@ body {
     color: var(--primary-blue);
 }
 
+    .btn-white:hover {
+        background: #f1f5f9;
+        transform: translateY(-2px);
+    }
+
 .btn-light-outline {
     background: transparent;
     color: var(--white);
     border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
+    .btn-light-outline:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--white);
+    }
+
 .form-control {
     width: 100%;
     padding: 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
+    font-size: 0.9rem;
 }
 
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
     color: white;
+}
+
+.btn-full {
+    width: 100%;
 }
 
 /* Timeline */
@@ -251,7 +318,6 @@ body {
         color: white;
     }
 
-/* NEW: Delete Button Style */
 .btn-sm-danger {
     background: var(--light-red);
     color: var(--danger-red);
@@ -261,3 +327,54 @@ body {
     .btn-sm-danger:hover {
         background: var(--danger-red);
         color: white;
+    }
+
+/* Utilities */
+.mb-2 {
+    margin-bottom: 10px;
+}
+
+.mb-3 {
+    margin-bottom: 15px;
+}
+
+.text-label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.note-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-icon-edit {
+    color: #64748B;
+    padding: 4px;
+}
+
+.btn-icon-delete {
+    color: #DC2626;
+    padding: 4px;
+}
+
+.empty-state {
+    padding: 60px 0;
+    text-align: center;
+    color: #94a3b8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .grid-layout {
+        grid-template-columns: 35% 63%;
+    }
+}
+
+@media (max-width: 992px) {
+    .grid-layout {
+        grid-template-columns: 1fr;
+    }
+}
