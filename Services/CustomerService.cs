@@ -11,6 +11,7 @@ namespace CRM.Services
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+
         public CustomerService(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
@@ -21,24 +22,20 @@ namespace CRM.Services
         {
             try
             {
-
-                // Not in cache, fetch from database
                 var salesExecutives = await _userManager.GetUsersInRoleAsync("SalesExecutive");
-                var sortedExecs = salesExecutives.OrderBy(e => e.FullName).ToList();
-
-                return sortedExecs;
+                return salesExecutives.OrderBy(e => e.FullName).ToList();
             }
-            catch (Exception ex)
+            catch
             {
-               
                 return Enumerable.Empty<ApplicationUser>();
             }
         }
+
         // --- 1. GET ALL (Active Only) ---
         public async Task<List<Customer>> GetAllCustomersAsync(string userId, bool isAdmin)
         {
             var query = _context.Customers
-                .Include(c=>c.SalesRep)
+                .Include(c => c.SalesRep)
                 .Where(c => c.IsActive);
 
             if (!isAdmin)
@@ -53,8 +50,7 @@ namespace CRM.Services
         public async Task CreateAsync(Customer customer)
         {
             customer.IsActive = true;
-            customer.CreatedAt = DateTime.UtcNow;
-            // UpdatedAt is null on creation
+            customer.CreatedAt = DateTime.UtcNow; // Always UTC
             _context.Add(customer);
             await _context.SaveChangesAsync();
         }
@@ -66,6 +62,7 @@ namespace CRM.Services
                 .Include(c => c.Contacts)
                 .Include(c => c.Notes)
                     .ThenInclude(n => n.Author)
+                .Include(c => c.SalesRep)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 
@@ -87,7 +84,6 @@ namespace CRM.Services
 
             _context.Notes.Add(note);
 
-            // Optional: Update the Customer's UpdatedAt when a note is added
             var customer = await _context.Customers.FindAsync(customerId);
             if (customer != null)
             {
@@ -97,42 +93,43 @@ namespace CRM.Services
             await _context.SaveChangesAsync();
         }
 
-        // --- 5. UPDATE (The Key Change) ---
+        // --- 5. UPDATE ---
         public async Task UpdateAsync(int id, Customer customer)
         {
-            // 1. Fetch the existing record (Tracked)
             var existing = await _context.Customers.FindAsync(id);
-
             if (existing != null)
             {
-                // 2. Map editable fields
                 existing.CompanyName = customer.CompanyName;
                 existing.Industry = customer.Industry;
                 existing.Email = customer.Email;
                 existing.Phone = customer.Phone;
                 existing.Address = customer.Address;
 
-                // 3. SET LAST EDITED DATE
-                // Ensure your Customer model has: public DateTime? UpdatedAt { get; set; }
+                // Track Last Edit in UTC
                 existing.UpdatedAt = DateTime.UtcNow;
 
-                // 4. Save (EF Core detects changes automatically)
                 await _context.SaveChangesAsync();
             }
         }
 
-        // --- 6. SOFT DELETE ---
+        // --- 6. SOFT DELETE (ARCHIVE) ---
         public async Task SoftDeleteAsync(int id, string userId, bool isAdmin)
         {
             var customer = await _context.Customers.FindAsync(id);
+
+            // Permission Check
             if (customer != null && (customer.SalesRepId == userId || isAdmin))
             {
                 customer.IsActive = false;
-                customer.UpdatedAt = DateTime.UtcNow; // Track when it was archived
+
+                // CORRECT: Using UtcNow prevents the "Double Conversion" error
+                customer.ArchivedAt = DateTime.UtcNow;
+
+                customer.UpdatedAt = DateTime.UtcNow;
+
                 await _context.SaveChangesAsync();
             }
         }
-       
 
         // --- 7. RESTORE ---
         public async Task RestoreAsync(int id, string userId, bool isAdmin)
@@ -141,7 +138,12 @@ namespace CRM.Services
             if (customer != null && (customer.SalesRepId == userId || isAdmin))
             {
                 customer.IsActive = true;
-                customer.UpdatedAt = DateTime.UtcNow; // Track when it was restored
+
+                // Clear Archive Flags
+                customer.ArchivedAt = null;
+                customer.IsHiddenFromBin = false;
+
+                customer.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
         }
@@ -149,9 +151,15 @@ namespace CRM.Services
         // --- 8. GET ARCHIVED ---
         public async Task<List<Customer>> GetAllArchivedAsync(string userId, bool isAdmin)
         {
-            var query = _context.Customers.Where(c => !c.IsActive);
-            if (!isAdmin) query = query.Where(c => c.SalesRepId == userId);
-            return await query.ToListAsync();
+            // Filter: Not Active AND Not Hidden
+            var query = _context.Customers.Where(c => !c.IsActive && !c.IsHiddenFromBin);
+
+            if (!isAdmin)
+            {
+                query = query.Where(c => c.SalesRepId == userId);
+            }
+
+            return await query.OrderByDescending(c => c.ArchivedAt).ToListAsync();
         }
 
         // --- 9. CSV EXPORT ---
@@ -162,20 +170,46 @@ namespace CRM.Services
                 .ToListAsync();
 
             var builder = new StringBuilder();
-            builder.AppendLine("Company Name,Industry,Email,Phone,Address,Created Date");
+            builder.AppendLine("Company Name,Industry,Email,Phone,Address,Created Date (IST)");
+
+            // Robust Timezone Logic (Same as View)
+            TimeZoneInfo istZone;
+            try
+            {
+                istZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
+            }
+            catch
+            {
+                try
+                {
+                    istZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
+                }
+                catch
+                {
+                    istZone = TimeZoneInfo.Utc; // Fallback
+                }
+            }
+
             foreach (var c in customers)
             {
-                builder.AppendLine($"{c.CompanyName},{c.Industry},{c.Email},{c.Phone},{c.Address},{c.CreatedAt.ToShortDateString()}");
+                DateTime istDate;
+                if (istZone == TimeZoneInfo.Utc)
+                {
+                    // Manual fallback if OS timezone DB is missing
+                    istDate = c.CreatedAt.AddHours(5).AddMinutes(30);
+                }
+                else
+                {
+                    istDate = TimeZoneInfo.ConvertTimeFromUtc(c.CreatedAt, istZone);
+                }
+
+                builder.AppendLine($"{c.CompanyName},{c.Industry},{c.Email},{c.Phone},{c.Address},{istDate}");
             }
             return builder.ToString();
         }
 
-        // --- 10. NOTE MANAGEMENT ---
-        public async Task<Note> GetNoteAsync(int id)
-        {
-            return await _context.Notes.FindAsync(id);
-        }
-
+        // ... Notes Methods ...
+        public async Task<Note> GetNoteAsync(int id) => await _context.Notes.FindAsync(id);
         public async Task UpdateNoteAsync(Note note)
         {
             var existing = await _context.Notes.FindAsync(note.Id);
@@ -187,7 +221,6 @@ namespace CRM.Services
                 await _context.SaveChangesAsync();
             }
         }
-
         public async Task DeleteNoteAsync(int id)
         {
             var note = await _context.Notes.FindAsync(id);
@@ -198,4 +231,4 @@ namespace CRM.Services
             }
         }
     }
-}
+}   

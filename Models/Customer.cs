@@ -32,6 +32,7 @@ namespace CRM.Models
         // --- Relationships ---
         public virtual ICollection<Contact> Contacts { get; set; } = new List<Contact>();
         public virtual ICollection<Note> Notes { get; set; } = new List<Note>();
-        public DateTime? UpdatedAt { get; set; } 
+        public DateTime? UpdatedAt { get; set; }
+        public bool IsHiddenFromBin { get; set; } = false;
     }
 }

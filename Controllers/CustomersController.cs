@@ -120,26 +120,31 @@ namespace CRM.Controllers
         }
 
         // --- 5. ARCHIVE (Safe Delete) ---
+        // POST: Customers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] // Strict Admin Only
+        [Authorize(Roles = "Admin")] // Ensure only Admins can delete/archive
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
 
             if (customer != null)
             {
-                // Soft Delete
+                // 1. Soft Delete: Mark as Inactive
                 customer.IsActive = false;
 
-                // FIX 5: Set the Archive Time!
+                // 2. Set the Archive Time (CRITICAL STEP)
+                // Use UtcNow to prevent PostgreSQL errors
                 customer.ArchivedAt = DateTime.UtcNow;
 
+                _context.Customers.Update(customer);
                 await _context.SaveChangesAsync();
             }
 
             return RedirectToAction(nameof(Index));
         }
+
+
 
         // --- 6. NOTES ---
         [HttpPost]
@@ -177,6 +182,20 @@ namespace CRM.Controllers
         {
             var csv = await _customerService.GenerateCsvAsync(_userManager.GetUserId(User));
             return File(Encoding.UTF8.GetBytes(csv), "text/csv", "MyCustomers.csv");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Hide(int id)
+        {
+            var customer = await _context.Customers.FindAsync(id);
+            if (customer != null)
+            {
+                // Mark as hidden so it disappears from the list
+                customer.IsHiddenFromBin = true;
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Archived));
         }
     }
 }   
