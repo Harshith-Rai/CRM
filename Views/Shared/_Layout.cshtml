@@ -11,15 +11,10 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="/css/layout/_layout.css" />
-
-    <style>
-        
-    </style>
+    <link rel="stylesheet" href="~/css/layout/_layout.css" asp-append-version="true" />
 </head>
 <body>
 
-    @* --- Sidebar Section --- *@
     @{
         var routeValues = ViewContext.RouteData.Values;
         var currentController = routeValues["controller"]?.ToString();
@@ -27,7 +22,6 @@
         var isAuthPage = currentController?.ToLowerInvariant() == "account" &&
         (currentAction?.ToLowerInvariant() == "login" || currentAction?.ToLowerInvariant() == "register");
 
-        // Fetch User Data for Display
         ApplicationUser currentUser = null;
         if (User.Identity.IsAuthenticated)
         {
@@ -37,34 +31,20 @@
 
     @if (!isAuthPage)
     {
-        <!-- Mobile toggle button -->
-        <button class="sidebar-toggle" id="sidebarToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-
-        <!-- Overlay for mobile -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
         <div class="sidebar" id="sidebar">
             <a href="/" class="brand">
                 <span>CRM Portal</span>
-                <button class="sidebar-close" id="sidebarClose">
-                    <i class="fas fa-times"></i>
-                </button>
             </a>
+
             <div class="menu">
                 <a href="@Url.Action("Index", "Home")" class="menu-item @(currentController == "Home" ? "active" : "")">
                     <i class="fa-solid fa-gauge-high"></i> Dashboard
                 </a>
-
                 <a href="@Url.Action("Index", "Customers")" class="menu-item @(currentController == "Customers" ? "active" : "")">
                     <i class="fa-solid fa-address-book"></i> My Customers
                 </a>
-
-                @* <a href="@Url.Action("Index", "Leads")" class="menu-item @(currentController == "Leads" ? "active" : "")">
-                    <i class="fa-solid fa-money-bill-trend-up"></i> Sales Pipeline
-                </a> *@
-
                 <a href="@Url.Action("Index", "Tasks")" class="menu-item @(currentController == "Tasks" ? "active" : "")">
                     <i class="fa-solid fa-calendar-check"></i> My Tasks
                 </a>
@@ -76,51 +56,70 @@
                     </a>
                 }
             </div>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-profile-box">
+                    <i class="fas fa-user-circle"></i>
+                    <div class="sidebar-profile-info">
+                        <div class="sidebar-profile-name">
+                            @(currentUser?.FullName ?? User.Identity?.Name)
+                        </div>
+                        <div class="sidebar-profile-email" title="@(currentUser?.Email ?? "user@example.com")">
+                            @(currentUser?.Email ?? "user@example.com")
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 
     <div class="main-wrapper">
         @if (!isAuthPage)
         {
-            <nav class="navbar navbar-expand-lg app-navbar sticky-top">
-                <div class="container-fluid px-4">
+            <nav class="navbar app-navbar sticky-top">
+                <div class="container-fluid px-2 px-md-4 flex-nowrap gap-2">
 
-                    <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index", "Home")" style="color: var(--mri-blue); font-weight: 700;">
-                        Hello, @(currentUser?.FullName ?? User.Identity?.Name ?? "Guest")
-                    </a>
+                    <div class="d-flex align-items-center flex-shrink-0">
+                        <button class="btn p-0 me-2 d-lg-none" id="mobileMenuToggle" style="color: var(--mri-blue); font-size: 1.4rem; border:none; background:transparent;">
+                            <i class="fas fa-bars"></i>
+                        </button>
 
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+                        <a class="navbar-brand d-flex align-items-center me-0 text-truncate" href="@Url.Action("Index", "Home")" style="max-width: 120px;">
+                            Hello, @(currentUser?.FullName?.Split(' ')[0] ?? User.Identity?.Name ?? "Guest")
+                        </a>
+                    </div>
 
-                    <div class="collapse navbar-collapse" id="mainNavbar">
-                        <form class="d-flex mx-auto navbar-search" role="search" style="max-width: 400px; width: 100%;">
-                            <div class="input-group">
-                                <input class="form-control" type="search" placeholder="Search Options...">
-                                <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
+                    <form class="navbar-search flex-grow-1" role="search">
+                        <div class="input-group">
+                            <input class="form-control" type="search" placeholder="Search...">
+                            <button class="btn btn-outline-secondary" type="submit" style="padding: 0 10px;"><i class="fas fa-search"></i></button>
+                        </div>
+                    </form>
+
+                    <div class="dropdown flex-shrink-0">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="text-end d-none d-lg-block" style="font-size: 0.85rem; line-height: 1.3;">
+                                <div style="font-weight: 600; color: var(--mri-blue);">@(currentUser?.FullName ?? User.Identity?.Name)</div>
+                                <div style="color: #64748b; font-size: 0.8rem;">@(currentUser?.Email ?? "user@example.com")</div>
                             </div>
-                        </form>
-
-                        <ul class="navbar-nav ms-auto align-items-center">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user-circle fa-2x" style="color: var(--mri-blue);"></i>
-                                    <div class="d-none d-lg-block" style="font-size: 0.85rem; line-height: 1.3;">
-                                        <div style="font-weight: 600; color: var(--mri-blue);">@(currentUser?.FullName ?? User.Identity?.Name)</div>
-                                        <div style="color: #64748b; font-size: 0.8rem;">@(currentUser?.Email ?? "user@example.com")</div>
-                                    </div>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow">
-                                    <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign out</a></li>
-                                </ul>
+                            <i class="fas fa-user-circle fa-2x" style="color: var(--mri-blue);"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                            <li>
+                                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i>Sign out
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </div>
+
                 </div>
             </nav>
         }
 
-        <main role="main" class="p-4">
+        <main role="main" class="p-3 p-lg-4">
             @RenderBody()
         </main>
     </div>
@@ -130,52 +129,32 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
-        // Mobile sidebar toggle functionality
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.getElementById('sidebar');
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebarClose = document.getElementById('sidebarClose');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+            const overlay = document.getElementById('sidebarOverlay');
 
-            function openSidebar() {
-                sidebar.classList.add('active');
-                sidebarOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
+            // Sidebar Toggle Logic
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sidebar.classList.toggle('mobile-active');
+                    if (overlay) overlay.classList.toggle('active');
+                });
             }
 
             function closeSidebar() {
-                sidebar.classList.remove('active');
-                sidebarOverlay.classList.remove('active');
-                document.body.style.overflow = '';
+                sidebar.classList.remove('mobile-active');
+                if (overlay) overlay.classList.remove('active');
             }
 
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', openSidebar);
-            }
+            if (overlay) overlay.addEventListener('click', closeSidebar);
 
-            if (sidebarClose) {
-                sidebarClose.addEventListener('click', closeSidebar);
-            }
-
-            if (sidebarOverlay) {
-                sidebarOverlay.addEventListener('click', closeSidebar);
-            }
-
-            // Close sidebar when clicking on menu items on mobile
-            const menuItems = document.querySelectorAll('.menu-item');
-            menuItems.forEach(item => {
+            // Close on menu item click (Mobile)
+            document.querySelectorAll('.menu-item').forEach(item => {
                 item.addEventListener('click', function() {
-                    if (window.innerWidth <= 768) {
-                        closeSidebar();
-                    }
+                    if (window.innerWidth <= 991) closeSidebar();
                 });
-            });
-
-            // Handle window resize
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 768) {
-                    closeSidebar();
-                }
             });
         });
     </script>
