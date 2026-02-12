@@ -1,19 +1,39 @@
 ﻿using CRM.Data;
 using CRM.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using CRM.DTOS.Customers;
 
 namespace CRM.Services
 {
     public class CustomerService : ICustomerService
     {
         private readonly AppDbContext _context;
-
-        public CustomerService(AppDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public CustomerService(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
+        public async Task<IEnumerable<ApplicationUser>> GetSalesExecutivesAsync()
+        {
+            try
+            {
+
+                // Not in cache, fetch from database
+                var salesExecutives = await _userManager.GetUsersInRoleAsync("SalesExecutive");
+                var sortedExecs = salesExecutives.OrderBy(e => e.FullName).ToList();
+
+                return sortedExecs;
+            }
+            catch (Exception ex)
+            {
+               
+                return Enumerable.Empty<ApplicationUser>();
+            }
+        }
         // --- 1. GET ALL (Active Only) ---
         public async Task<List<Customer>> GetAllCustomersAsync(string userId, bool isAdmin)
         {
@@ -29,9 +49,8 @@ namespace CRM.Services
         }
 
         // --- 2. CREATE ---
-        public async Task CreateAsync(Customer customer, string userId)
+        public async Task CreateAsync(Customer customer)
         {
-            customer.SalesRepId = userId;
             customer.IsActive = true;
             customer.CreatedAt = DateTime.UtcNow;
             _context.Add(customer);

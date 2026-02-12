@@ -1,4 +1,4 @@
-﻿@model CRM.Models.Customer
+﻿@model CRM.Models.CreateCustomerViewModel
 
 @{
     ViewData["Title"] = "Add New Customer";
@@ -65,7 +65,7 @@
 <div class="crm-header-bar">
     <div>
         <h2 class="fw-bold mb-0" style="font-family: 'Outfit', sans-serif; color: #044D66;">Create Company Profile</h2>
-        <p class="text-muted small mb-0">establish a new legal entity record for your pipeline.</p>
+        <p class="text-muted small mb-0">Establish a new legal entity record for your pipeline.</p>
     </div>
     <div class="d-flex gap-2">
         <a asp-action="Index" class="btn btn-outline-secondary px-4 fw-bold rounded-pill">Cancel</a>
@@ -76,7 +76,7 @@
 </div>
 
 <div class="container-fluid px-0">
-    <form asp-action="Create" id="createCustomerForm">
+    <form asp-action="Create" id="createCustomerForm" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
         <div class="row g-4">
@@ -86,17 +86,17 @@
 
                     <div class="row g-4">
                         <div class="col-12">
-                            <label asp-for="CompanyName" class="form-label-top">Company Name</label>
+                            <label asp-for="Customer.CompanyName" class="form-label-top">Company Name</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-signature"></i></span>
-                                <input asp-for="CompanyName" class="form-control form-control-lg" placeholder="e.g. Acme Corporation" />
+                                <input asp-for="Customer.CompanyName" class="form-control form-control-lg" placeholder="e.g. Acme Corporation" />
                             </div>
-                            <span asp-validation-for="CompanyName" class="text-danger small"></span>
+                            <span asp-validation-for="Customer.CompanyName" class="text-danger small"></span>
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="Industry" class="form-label-top">Industry Vertical</label>
-                            <select asp-for="Industry" class="form-select">
+                            <label asp-for="Customer.Industry" class="form-label-top">Industry Vertical</label>
+                            <select asp-for="Customer.Industry" class="form-select">
                                 <option value="">-- Select Industry --</option>
                                 <option value="Technology">Technology</option>
                                 <option value="Finance">Finance</option>
@@ -105,15 +105,19 @@
                                 <option value="Retail">Retail</option>
                                 <option value="Other">Other</option>
                             </select>
-                            <span asp-validation-for="Industry" class="text-danger small"></span>
+                            <span asp-validation-for="Customer.Industry" class="text-danger small"></span>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label-top">Expected Annual Value</label>
+                            <label asp-for="SelectedSalesExecutiveId" class="form-label-top">Assign Sales Executive</label>
                             <div class="input-group">
-                                <span class="input-group-text">₹</span>
-                                <input type="number" class="form-control" placeholder="0.00" />
+                                <span class="input-group-text"><i class="fa-solid fa-user-tie"></i></span>
+                                <select asp-for="SelectedSalesExecutiveId" class="form-select"
+                                        asp-items="@(new SelectList(Model.SalesExecutives, "Id", "FullName"))">
+                                    <option value="">-- Assign Executive --</option>
+                                </select>
                             </div>
+                            <span asp-validation-for="SelectedSalesExecutiveId" class="text-danger small"></span>
                         </div>
                     </div>
                 </div>
@@ -122,25 +126,25 @@
                     <span class="pane-title"><i class="fa-solid fa-address-card"></i> Contact & Location</span>
                     <div class="row g-4">
                         <div class="col-md-6">
-                            <label asp-for="Email" class="form-label-top">Official Email</label>
+                            <label asp-for="Customer.Email" class="form-label-top">Official Email</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                                <input asp-for="Email" class="form-control" placeholder="contact@company.com" />
+                                <input asp-for="Customer.Email" class="form-control" placeholder="contact@company.com" />
                             </div>
-                            <span asp-validation-for="Email" class="text-danger small"></span>
+                            <span asp-validation-for="Customer.Email" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6">
-                            <label asp-for="Phone" class="form-label-top">Main Phone</label>
+                            <label asp-for="Customer.Phone" class="form-label-top">Main Phone</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                                <input asp-for="Phone" class="form-control" placeholder="+1 555-0123" />
+                                <input asp-for="Customer.Phone" class="form-control" placeholder="+1 555-0123" />
                             </div>
-                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                            <span asp-validation-for="Customer.Phone" class="text-danger small"></span>
                         </div>
                         <div class="col-12">
-                            <label asp-for="Address" class="form-label-top">Physical Address</label>
-                            <textarea asp-for="Address" class="form-control" rows="3" placeholder="Street, City, ZIP..."></textarea>
-                            <span asp-validation-for="Address" class="text-danger small"></span>
+                            <label asp-for="Customer.Address" class="form-label-top">Physical Address</label>
+                            <textarea asp-for="Customer.Address" class="form-control" rows="3" placeholder="Street, City, ZIP..."></textarea>
+                            <span asp-validation-for="Customer.Address" class="text-danger small"></span>
                         </div>
                     </div>
                 </div>
@@ -150,10 +154,10 @@
                 <div class="form-pane h-100">
                     <span class="pane-title"><i class="fa-solid fa-user-shield"></i> Administration</span>
 
-                    <div class="mb-4 text-center py-4 bg-light rounded-3">
+                    @* <div class="mb-4 text-center py-4 bg-light rounded-3">
                         @{
-                            var userName = User.Identity?.Name ?? "User";
-                            var firstLetter = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
+                                var userName = "User";
+                                var firstLetter = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
                         }
                         <div class="avatar-circle bg-primary text-white mx-auto d-flex align-items-center justify-content-center mb-3" style="width:64px; height:64px; border-radius: 50%; font-size: 1.5rem;">
                             @firstLetter
@@ -172,7 +176,7 @@
                             <input class="form-check-input" type="checkbox" id="activeProspect" checked disabled>
                             <label class="form-check-label small fw-bold text-muted" for="activeProspect">Active Prospect</label>
                         </div>
-                    </div>
+                    </div> *@
                 </div>
             </div>
         </div>
