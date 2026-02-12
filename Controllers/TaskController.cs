@@ -37,11 +37,11 @@ namespace CRM.Controllers
                 case "completed":
                     query = query.Where(n => n.IsReminderDone);
                     break;
-                    // "all" does nothing, returns everything
+             
             }
 
             var tasks = await query
-                .OrderBy(n => n.IsReminderDone) // Pending first
+                .OrderBy(n => n.IsReminderDone) 
                 .ThenBy(n => n.ReminderDate)
                 .ToListAsync();
 
