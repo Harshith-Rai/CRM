@@ -1,0 +1,117 @@
+﻿@* @model CRM.Models.VerifyOtpViewModel
+
+@{
+    ViewData["Title"] = "Verify OTP";
+}
+<link rel="stylesheet" href="~/css/VerifyOtp.css" />
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%; border-radius: 12px; border: 1px solid #dee2e6;">
+        <h3 class="text-center mb-3">Verify Your Code</h3>
+        <p class="text-muted text-center small">
+            We've sent a 6-digit verification code to <br />
+            <span class="fw-bold text-dark">@Model.Email</span>
+        </p>
+
+        <form asp-action="VerifyOtp" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <input type="hidden" asp-for="Email" />
+
+            <div class="form-group mb-4 text-center">
+                <label asp-for="Code" class="form-label small text-uppercase text-muted">Enter 6-Digit Code</label>
+                <input asp-for="Code" class="form-control text-center fw-bold"
+                       placeholder="000000" maxlength="6" autocomplete="off"
+                       style="letter-spacing: 10px; font-size: 1.8rem; height: 65px; border: 2px solid #0d6efd;" required />
+                <span asp-validation-for="Code" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                Verify & Reset Password
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <p class="small text-muted mb-0">Didn't receive the code?</p>
+            <a asp-action="ForgotPassword" class="text-decoration-none small fw-bold">Resend Code</a>
+        </div>
+    </div>
+</div> *@
+
+@model CRM.Models.VerifyOtpViewModel
+
+@{
+    ViewData["Title"] = "Verify Code";
+    Layout = null;
+}
+
+<link rel="stylesheet" href="~/css/VerifyOtp.css" />
+
+<div class="bg-decoration"></div>
+<div class="bg-decoration"></div>
+<div class="bg-decoration"></div>
+
+<div class="login-container">
+    <div class="brand-section">
+        <div class="brand-content">
+            <h1 class="logo">CRM</h1>
+            <p class="logo-subtitle">CUSTOMER RELATIONSHIP MANAGEMENT</p>
+            <div class="decorative-line"></div>
+            <p class="brand-tagline">Secure Verification</p>
+            <p class="brand-description">
+                Please enter the 6-digit code sent to your email to verify your identity and reset your password.
+            </p>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Verify OTP</h2>
+                <p>Code sent to <span style="color:var(--medium-blue); font-weight:700;">@Model.Email</span></p>
+            </div>
+
+            <form asp-action="VerifyOtp" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+                <input type="hidden" asp-for="Email" />
+
+                <div class="form-group">
+                    <label>Verification Code</label>
+                    <div class="input-wrapper">
+                        <input asp-for="Code" class="otp-input" placeholder="000000" maxlength="6" autocomplete="off" required />
+                    </div>
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn-verify">Verify & Continue</button>
+
+                <div class="otp-timer">
+                    <p id="timer-text">Resend code in <span id="countdown" style="font-weight:700;">60</span>s</p>
+                    <a asp-action="ForgotPassword" asp-route-email="@Model.Email" id="resend-link" class="resend-btn d-none">Resend Code</a>
+                </div>
+            </form>
+
+            <div class="signup-link">
+                <a asp-action="Login">Back to Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let timeLeft = 60;
+        const countdownElem = document.getElementById("countdown");
+        const timerText = document.getElementById("timer-text");
+        const resendLink = document.getElementById("resend-link");
+
+        const timer = setInterval(function () {
+            timeLeft--;
+            countdownElem.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                timerText.classList.add("d-none");
+                resendLink.classList.remove("d-none");
+            }
+        }, 1000);
+    });
+</script>

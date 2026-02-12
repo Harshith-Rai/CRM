@@ -1,0 +1,43 @@
+Connected to smtp://smtp.gmail.com:587/?starttls=always
+S: 220 smtp.gmail.com ESMTP 41be03b00d2f7-c6e1ac0e004sm774526a12.6 - gsmtp
+C: EHLO MRIPF5Y37RT
+S: 250-smtp.gmail.com at your service, [2409:408c:ad4c:5a7d:8c81:8699:bca3:7843]
+S: 250-SIZE 35882577
+S: 250-8BITMIME
+S: 250-STARTTLS
+S: 250-ENHANCEDSTATUSCODES
+S: 250-PIPELINING
+S: 250-CHUNKING
+S: 250 SMTPUTF8
+C: STARTTLS
+S: 220 2.0.0 Ready to start TLS
+C: EHLO MRIPF5Y37RT
+S: 250-smtp.gmail.com at your service, [2409:408c:ad4c:5a7d:8c81:8699:bca3:7843]
+S: 250-SIZE 35882577
+S: 250-8BITMIME
+S: 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+S: 250-ENHANCEDSTATUSCODES
+S: 250-PIPELINING
+S: 250-CHUNKING
+S: 250 SMTPUTF8
+C: AUTH PLAIN ********
+S: 235 2.7.0 Accepted
+C: MAIL FROM:<pga22796@gmail.com> SIZE=737
+C: RCPT TO:<pragatipoojary@gmail.com>
+S: 250 2.1.0 OK 41be03b00d2f7-c6e1ac0e004sm774526a12.6 - gsmtp
+S: 250 2.1.5 OK 41be03b00d2f7-c6e1ac0e004sm774526a12.6 - gsmtp
+C: DATA
+S: 354 Go ahead 41be03b00d2f7-c6e1ac0e004sm774526a12.6 - gsmtp
+C: From: CRM System <pga22796@gmail.com>
+C: Date: Wed, 11 Feb 2026 11:52:15 +0530
+C: Subject: Reset your password
+C: Message-Id: <RB1L9BK8HSU4.1IFUKCBVO5LM@mripf5y37rt>
+C: To: pragatipoojary@gmail.com
+C: MIME-Version: 1.0
+C: Content-Type: text/html; charset=utf-8
+C: 
+C: <p>Click the link to reset your password:</p><p><a href='https://localhost:7173/Account/ResetPassword?token=Q2ZESjhDdTFCcGVualJkSmdudnVrZjVBZDJJN3VKVmdKelZXVTVSWDJnQTN4S1NOZGRrQkhNWDJIRUF5MTF2STB0aWhvbUdOa09yYkVWRFhIcEQ5SU43VUpRL0UyVVQyb3doRy9ZMkk5bWg3UXROR3phV2p1aXBkV29UVG1UdWFDN2pJN1RMQlI4NEorWTlXTDk4Szk2YTViUHg3YnorcngvSTd6RFFnUjIwV1BmQXlySS9RSStJYnRVemtxdjdBWjNYT3dzMUhaWU9XNkxzRlpvckhqNWNyQy8zMG1kd0hzUkdEOGxTMUFiV1F1RHZi&email=pragatipoojary@gmail.com'>Reset Password</a></p>
+C: .
+S: 250 2.0.0 OK  1770790939 41be03b00d2f7-c6e1ac0e004sm774526a12.6 - gsmtp
+C: QUIT
+S: 221 2.0.0 closing connection 41be03b00d2f7-c6e1ac0e004sm774526a12.6 - gsmtp

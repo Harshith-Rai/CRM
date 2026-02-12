@@ -1,0 +1,372 @@
+﻿
+
+:root {
+    --light-blue: #C2E6F2;
+    --bright-blue: #179AD7;
+    --medium-blue: #187ABF;
+    --mri-blue: #044D66;
+    --light-green: #00B188;
+    --mri-green: #BCB336;
+    --orange: #FAA41C;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--mri-blue) 0%, var(--medium-blue) 50%, var(--bright-blue) 100%);
+    position: relative;
+}
+
+/* Background decorations */
+.bg-decoration {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    z-index: 0;
+}
+
+    .bg-decoration:nth-child(1) {
+        width: 400px;
+        height: 400px;
+        background: var(--light-green);
+        top: -100px;
+        left: -100px;
+    }
+
+    .bg-decoration:nth-child(2) {
+        width: 300px;
+        height: 300px;
+        background: var(--orange);
+        bottom: -80px;
+        right: -80px;
+    }
+
+.landing-page {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+/* Left Side - Info */
+.info-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+    color: white;
+}
+
+.logo {
+    font-family: 'Outfit', sans-serif;
+    font-size: 64px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.logo-subtitle {
+    font-size: 14px;
+    color: var(--light-blue);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 30px;
+}
+
+.main-title {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+    .main-title span {
+        color: var(--light-green);
+    }
+
+.description {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 40px;
+    max-width: 500px;
+}
+
+/* Right Side - Animation Area */
+.animation-side {
+    flex: 1.2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.illustration-container {
+    position: relative;
+    width: 80%;
+    max-width: 600px;
+}
+
+.main-img {
+    width: 100%;
+    filter: drop-shadow(0 20px 50px rgba(0,0,0,0.3));
+    z-index: 2;
+    position: relative;
+}
+
+/* Floating Animation */
+.icon-circle {
+    position: absolute;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    animation: floatMove 6s ease-in-out infinite;
+    z-index: 3;
+}
+
+@keyframes floatMove {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-30px) scale(1.1);
+    }
+}
+
+.mri-bg-bright {
+    background: var(--bright-blue);
+    top: 10%;
+    left: 10%;
+}
+
+.mri-bg-green {
+    background: var(--light-green);
+    bottom: 15%;
+    left: 5%;
+    animation-delay: 2s;
+}
+
+.mri-bg-orange {
+    background: var(--orange);
+    top: 20%;
+    right: 5%;
+    animation-delay: 4s;
+}
+
+.mri-bg-light {
+    background: var(--light-blue);
+    bottom: 10%;
+    right: 15%;
+    color: var(--mri-blue);
+    animation-delay: 1s;
+}
+
+/* Get Started Button */
+.btn-get-started {
+    display: inline-block;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, var(--bright-blue), var(--medium-blue));
+    color: white;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(23, 154, 215, 0.4);
+    transition: transform 0.3s ease;
+    width: fit-content;
+}
+
+    .btn-get-started:hover {
+        transform: translateY(-3px);
+        color: white;
+    }
+/* Stack images on top of each other */
+.illustration-container {
+    position: relative;
+    cursor: pointer;
+}
+
+.main-img {
+    width: 100%;
+    max-width: 600px;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Initially, hide the smiling version */
+.img-smile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+/* HANDSHAKE ANIMATION: The whole image moves slightly like a pump */
+@keyframes shakeAction {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(1deg) translateY(-2px);
+    }
+
+    75% {
+        transform: rotate(-1deg) translateY(2px);
+    }
+}
+
+/* HOVER LOGIC: Change expression + Start Handshake */
+.handshake-trigger:hover .img-neutral {
+    opacity: 0;
+}
+
+.handshake-trigger:hover .img-smile {
+    opacity: 1;
+}
+
+.handshake-trigger:hover .main-img {
+    animation: shakeAction 0.8s infinite ease-in-out;
+}
+
+/* Bubble Styling with MRI Colors */
+.feature-bubble {
+    position: absolute;
+    width: 55px;
+    height: 55px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bright-blue);
+    z-index: 20;
+    transition: all 0.3s ease;
+}
+
+    .feature-bubble:hover {
+        transform: scale(1.4) !important;
+        background: var(--light-blue);
+        box-shadow: 0 0 15px var(--bright-blue);
+    }
+/* --- MAIN IMAGE HOVER (BRIGHTENING) --- */
+.main-img {
+    width: 100%;
+    max-width: 600px;
+    display: block;
+    filter: drop-shadow(0 20px 50px rgba(0,0,0,0.3)); /* Base shadow */
+    transition: filter 0.5s ease; /* Smooth transition for brightening */
+    z-index: 2;
+}
+
+/* Brighten and add contrast when hovering over the area */
+.illustration-container:hover .main-img {
+    filter: brightness(1.15) contrast(1.05) drop-shadow(0 20px 60px rgba(0,0,0,0.4));
+}
+
+/* --- BUBBLE STYLES & FUNCTIONALITY --- */
+.feature-bubble {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Springy animation */
+    z-index: 10;
+    border: 2px solid var(--bright-blue);
+    animation: bubbleFloat 4s infinite ease-in-out; /* Gentle floating */
+}
+
+    /* Show the text detail on hover */
+    .feature-bubble:hover {
+        width: 60px;
+        height: 60px;
+        background: var(--bright-blue);
+        transform: scale(1.2);
+        z-index: 20;
+    }
+
+        .feature-bubble:hover .icon-content {
+            color: white;
+        }
+
+        .feature-bubble:hover .feature-detail {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+/* Text label appearing below the bubble */
+.feature-detail {
+    position: absolute;
+    white-space: nowrap;
+    background: var(--mri-blue);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    bottom: -45px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+/* Floating effect for bubbles */
+@keyframes bubbleFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+/* Positioning around the meeting image */
+.bubble-1 {
+    top: 5%;
+    left: 15%;
+    animation-delay: 0s;
+}
+
+.bubble-2 {
+    top: 30%;
+    right: 3%;
+    animation-delay: 1s;
+}
+
+.bubble-3 {
+    bottom: 20%;
+    left: 5%;
+    animation-delay: 2s;
+}
+
+.bubble-4 {
+    bottom: 15%;
+    right: 10%;
+    animation-delay: 1.5s;
+}
+
+.icon-content {
+    font-size: 1.2rem;
+    color: var(--mri-blue);
+}

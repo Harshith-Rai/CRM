@@ -1,0 +1,8 @@
+Connected to smtp://smtp.mailtrap.io:587/?starttls=always
+S: 220 smtp.mailtrap.io ESMTP ready
+C: EHLO MRIPF5Y37RT
+Connected to smtp://smtp.mailtrap.io:587/?starttls=always
+S: 220 smtp.mailtrap.io ESMTP ready
+Connected to smtp://smtp.mailtrap.io:587/?starttls=always
+S: 220 smtp.mailtrap.io ESMTP ready
+C: EHLO MRIPF5Y37RT

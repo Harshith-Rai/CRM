@@ -1,8 +1,54 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "MRI CRM - Digital Management";
+    Layout = null;
 }
-@* 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div> *@
+
+<link rel="stylesheet" href="~/css/LandingPage.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+<div class="bg-decoration"></div>
+<div class="bg-decoration"></div>
+<div class="bg-decoration"></div>
+
+<div class="landing-page">
+    <div class="info-side">
+        <h1 class="logo">CRM</h1>
+        <p class="logo-subtitle">Customer Management System</p>
+        <div class="decorative-line"></div>
+
+        <div class="content-box">
+            <p class="description">
+                Optimize your workflow with our advanced tracking systems.
+                Visualize data flow in real-time and manage your digital
+                marketing leads with precision using MRI technology.
+            </p>
+            <a asp-controller="Account" asp-action="Login" class="btn-get-started">Get Started</a>
+        </div>
+    </div>
+    <div class="animation-side">
+        <div class="illustration-container">
+            <img src="~/images/crm-meeting.png" class="main-img" alt="MRI CRM Meeting">
+
+            <div class="feature-bubble bubble-1">
+                <div class="icon-content"></div>
+                <div class="feature-detail">Lead Analytics</div>
+            </div>
+
+            <div class="feature-bubble bubble-2">
+                <div class="icon-content"></div>
+                <div class="feature-detail">Smart Automation</div>
+            </div>
+
+            <div class="feature-bubble bubble-3">
+                <div class="icon-content"></div>
+                <div class="feature-detail">Client Support</div>
+            </div>
+
+            <div class="feature-bubble bubble-4">
+                <div class="icon-content"></div>
+                <div class="feature-detail">Data Security</div>
+            </div>
+        </div>
+    </div>
+        </div>
+ 

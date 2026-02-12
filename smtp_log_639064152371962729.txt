@@ -1,0 +1,49 @@
+Connected to smtp://smtp.gmail.com:587/?starttls=always
+S: 220 smtp.gmail.com ESMTP 41be03b00d2f7-c6e196a8eb2sm1366723a12.11 - gsmtp
+C: EHLO MRIPF5Y37RT
+S: 250-smtp.gmail.com at your service, [2409:408c:ad4c:5a7d:8c81:8699:bca3:7843]
+S: 250-SIZE 35882577
+S: 250-8BITMIME
+S: 250-STARTTLS
+S: 250-ENHANCEDSTATUSCODES
+S: 250-PIPELINING
+S: 250-CHUNKING
+S: 250 SMTPUTF8
+C: STARTTLS
+S: 220 2.0.0 Ready to start TLS
+C: EHLO MRIPF5Y37RT
+S: 250-smtp.gmail.com at your service, [2409:408c:ad4c:5a7d:8c81:8699:bca3:7843]
+S: 250-SIZE 35882577
+S: 250-8BITMIME
+S: 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+S: 250-ENHANCEDSTATUSCODES
+S: 250-PIPELINING
+S: 250-CHUNKING
+S: 250 SMTPUTF8
+C: AUTH PLAIN ********
+S: 235 2.7.0 Accepted
+C: MAIL FROM:<pga22796@gmail.com> SIZE=794
+C: RCPT TO:<pga22796@gmail.com>
+S: 250 2.1.0 OK 41be03b00d2f7-c6e196a8eb2sm1366723a12.11 - gsmtp
+S: 250 2.1.5 OK 41be03b00d2f7-c6e196a8eb2sm1366723a12.11 - gsmtp
+C: DATA
+S: 354 Go ahead 41be03b00d2f7-c6e196a8eb2sm1366723a12.11 - gsmtp
+C: From: CRM System <pga22796@gmail.com>
+C: Date: Wed, 11 Feb 2026 14:00:37 +0530
+C: Subject: Your Reset Code
+C: Message-Id: <7O5MYOJ9HSU4.WYPKKMOVMYYQ1@mripf5y37rt>
+C: To: pga22796@gmail.com
+C: MIME-Version: 1.0
+C: Content-Type: text/html; charset=utf-8
+C: 
+C: 
+C:                 <div style='font-family: sans-serif; border: 1px solid #eee; padding: 20px; border-radius: 10px;'>
+C:                     <h2 style='color: #333;'>Password Reset Code</h2>
+C:                     <p>Enter the code below on the verification page to reset your password:</p>
+C:                     <div style='font-size: 32px; font-weight: bold; color: #e74c3c; letter-spacing: 5px; padding: 10px;'>890829</div>
+C:                     <p style='color: #777; font-size: 12px;'>This code is valid for a limited time.</p>
+C:                 </div>
+C: .
+S: 250 2.0.0 OK  1770798651 41be03b00d2f7-c6e196a8eb2sm1366723a12.11 - gsmtp
+C: QUIT
+S: 221 2.0.0 closing connection 41be03b00d2f7-c6e196a8eb2sm1366723a12.11 - gsmtp

@@ -139,7 +139,7 @@ body {
 
 /* Glassmorphism card - slightly lighter background for improved readability */
 .login-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.22));
+    background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.60));
     border-radius: 24px;
     padding: 56px 48px;
     width: 100%;
@@ -467,3 +467,18 @@ input[type="text"] {
         font-size: 26px; /* Smaller title for mobile */
     }
 }
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between box and text */
+    cursor: pointer;
+    color: white; /* Matches your landing page theme */
+    font-size: 14px;
+}
+
+    .remember-me input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: var(--bright-blue); /* Colors the checkbox to match MRI blue */
+    }

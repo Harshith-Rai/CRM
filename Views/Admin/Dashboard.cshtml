@@ -1,0 +1,37 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="admin-dashboard">
+    <header>
+        <h1>@ViewData["Title"]</h1>
+        <p class="lead">Overview of key metrics for administrators.</p>
+    </header>
+
+    <section class="dashboard-grid" role="region" aria-label="Admin summary">
+        <div class="card">
+            <h3>Total Users</h3>
+            <p class="stat">—</p>
+        </div>
+
+        <div class="card">
+            <h3>Active Properties</h3>
+            <p class="stat">—</p>
+        </div>
+
+        <div class="card">
+            <h3>Open Tickets</h3>
+            <p class="stat">—</p>
+        </div>
+    </section>
+</div>
+
+<style>
+.admin-dashboard { padding: 2rem; }
+.admin-dashboard header { margin-bottom: 1.25rem; }
+.dashboard-grid { display:flex; gap:1rem; flex-wrap:wrap; }
+.card { background:#fff; padding:1rem; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,.08); min-width:160px; flex:1 1 200px; }
+.stat { font-size:1.5rem; font-weight:600; margin-top:.5rem; }
+.lead { color: #555; margin:0; }
+</style>
