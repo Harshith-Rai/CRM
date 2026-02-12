@@ -1,0 +1,210 @@
+﻿@using CRM.DTOS.SalesManager
+@model SalesManagerDashBoardDto;
+@{
+    ViewData["Title"] = "Sales Manager Dashboard";
+}
+
+<link rel="stylesheet" href="~/css/sales-manager-dashboard.css">
+
+<!-- Dashboard Content -->
+<div class="dashboard-content">
+    <div class="dashboard-header">
+        <div>
+            <h1 class="page-title">Sales Dashboard</h1>
+            <p class="page-subtitle">Monitor team performance and manage customer assignments</p>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-icon kpi-icon-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+            <div class="kpi-content">
+                <span class="kpi-label">Total Customers</span>
+                <span class="kpi-value">@Model.TotalCustomers</span>
+            </div>
+        </div>
+
+        <div class="kpi-card kpi-card-warning">
+            <div class="kpi-icon kpi-icon-orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+            <div class="kpi-content">
+                <span class="kpi-label">Unassigned Customers</span>
+                <span class="kpi-value">@Model.UnassignedCustomers</span>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon kpi-icon-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <polyline points="17 11 19 13 23 9"></polyline>
+                </svg>
+            </div>
+            <div class="kpi-content">
+                <span class="kpi-label">Active Team Members</span>
+                <span class="kpi-value">@Model.ActiveTeamMembers</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="widgets-grid">
+        <div class="widget">
+            <div class="widget-header">
+                <div>
+                    <h3 class="widget-title">Recently Added Customers</h3>
+                    <p class="widget-subtitle">New business pipeline</p>
+                </div>
+            </div>
+            <div class="widget-content">
+                <div class="customer-list">
+                    @if (Model?.RecentlyAddedCustomers != null && Model.RecentlyAddedCustomers.Any())
+                    {
+                        @foreach (var customer in Model.RecentlyAddedCustomers)
+                        {
+                            <div class="customer-item">
+                                <div class="customer-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="customer-details">
+                                    <div class="customer-name">@customer.CompanyName</div>
+                                    <div class="customer-meta">
+                                        <span class="customer-id">Email: @customer.Email</span>
+                                        <span class="customer-time">@GetRelativeTime(customer.CreatedAt)</span>
+                                    </div>
+                                </div>
+                                <span class="status-badge @(string.IsNullOrEmpty(customer.SalesRepId)? "status-assigned" : "status-unassigned")">
+                                    @(string.IsNullOrEmpty(customer.SalesRepId) ? "Assigned" : "Unassigned")
+                                </span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div style="padding: 20px; text-align: center; color: #999;">
+                            <p>No recently added customers</p>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="widget-footer">
+                <a href="#" class="view-all-link">View All Customers →</a>
+            </div>
+        </div>
+
+        <!-- Team Distribution Pie Chart Widget -->
+        <div class="widget">
+            <div class="widget-header">
+                <div>
+                    <h3 class="widget-title">Team Distribution</h3>
+                    <p class="widget-subtitle">Customer assignments per sales rep</p>
+                </div>
+                <button class="btn-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="12" cy="5" r="1"></circle>
+                        <circle cx="12" cy="19" r="1"></circle>
+                    </svg>
+                </button>
+            </div>
+            <div class="widget-content">
+                <div class="pie-chart-wrapper">
+                    <svg class="pie-chart" viewBox="0 0 200 200">
+                        <!-- Pie segments -->
+                        <path class="pie-segment" d="M 100,100 L 100,20 A 80,80 0 0,1 167.08,64.27 Z" fill="#5a6268" opacity="0.9"></path>
+                        <path class="pie-segment" d="M 100,100 L 167.08,64.27 A 80,80 0 0,1 159.87,142.76 Z" fill="#6c757d" opacity="0.9"></path>
+                        <path class="pie-segment" d="M 100,100 L 159.87,142.76 A 80,80 0 0,1 89.44,177.82 Z" fill="#7d8388" opacity="0.9"></path>
+                        <path class="pie-segment" d="M 100,100 L 89.44,177.82 A 80,80 0 0,1 32.92,135.73 Z" fill="#8e9196" opacity="0.9"></path>
+                        <path class="pie-segment" d="M 100,100 L 32.92,135.73 A 80,80 0 0,1 40.13,57.24 Z" fill="#9fa3a8" opacity="0.9"></path>
+                        <path class="pie-segment" d="M 100,100 L 40.13,57.24 A 80,80 0 0,1 100,20 Z" fill="#b0b3b7" opacity="0.9"></path>
+
+                        <!-- Center circle for donut effect -->
+                        <circle cx="100" cy="100" r="50" fill="white"></circle>
+
+                        <!-- Center text -->
+                        <text x="100" y="95" text-anchor="middle" class="pie-center-value">137</text>
+                        <text x="100" y="110" text-anchor="middle" class="pie-center-label">Total</text>
+                    </svg>
+
+                    <div class="pie-legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #5a6268;"></span>
+                            <div class="legend-details">
+                                <span class="legend-name">Robert Johnson</span>
+                                <span class="legend-value">31 (22.6%)</span>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #6c757d;"></span>
+                            <div class="legend-details">
+                                <span class="legend-name">David Wilson</span>
+                                <span class="legend-value">27 (19.7%)</span>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #7d8388;"></span>
+                            <div class="legend-details">
+                                <span class="legend-name">John Doe</span>
+                                <span class="legend-value">24 (17.5%)</span>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #8e9196;"></span>
+                            <div class="legend-details">
+                                <span class="legend-name">Emily Brown</span>
+                                <span class="legend-value">22 (16.1%)</span>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #9fa3a8;"></span>
+                            <div class="legend-details">
+                                <span class="legend-name">Sarah Miller</span>
+                                <span class="legend-value">18 (13.1%)</span>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #b0b3b7;"></span>
+                            <div class="legend-details">
+                                <span class="legend-name">Lisa Anderson</span>
+                                <span class="legend-value">15 (10.9%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+@functions {
+    private string GetRelativeTime(DateTime createdAt)
+    {
+        var timespan = DateTime.UtcNow - createdAt;
+
+        if (timespan.TotalMinutes < 60)
+            return $"{(int)timespan.TotalMinutes} minutes ago";
+        else if (timespan.TotalHours < 24)
+            return $"{(int)timespan.TotalHours} hours ago";
+        else if (timespan.TotalDays < 7)
+            return $"{(int)timespan.TotalDays} days ago";
+        else
+            return createdAt.ToString("MMM d, yyyy");
+    }
+}

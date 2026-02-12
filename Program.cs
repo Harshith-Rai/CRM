@@ -53,6 +53,7 @@ builder.Services.AddScoped<IUserAdminService, UserAdminService>();
 
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ISalesManagerService, SalesManagerService>();
 
 var app = builder.Build();
 

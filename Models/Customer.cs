@@ -20,7 +20,6 @@ namespace CRM.Models
         public string Phone { get; set; } // Main HQ Phone
         public string Address { get; set; }
 
-        // --- RBAC & Workflow Fields ---
         public string SalesRepId { get; set; } // The User ID of the Sales Rep
         public bool IsActive { get; set; } = true; // Soft Delete flag
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
