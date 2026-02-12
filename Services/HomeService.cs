@@ -1,16 +1,17 @@
 ﻿using CRM.Data;
 using CRM.Models;
 using Microsoft.EntityFrameworkCore;
-
+using CRM.Services;
 namespace CRM.Services
 {
     public class HomeService : IHomeService
     {
         private readonly AppDbContext _context;
-
-        public HomeService(AppDbContext context)
+        private readonly ISalesManagerService _salesManagerService;
+        public HomeService(AppDbContext context,ISalesManagerService salesManagerService)
         {
             _context = context;
+            _salesManagerService = salesManagerService;
         }
 
         public async Task<DashboardViewModel> GetDashboardDataAsync(string userId)
@@ -28,7 +29,7 @@ namespace CRM.Services
 
             // Fetch actual data from DB
             var dbGrowth = await _context.Customers
-                .Where(c => c.SalesRepId == userId && c.IsActive && c.CreatedAt >= sixMonthsAgo)
+                .Where(c=>c.IsActive && c.CreatedAt >= sixMonthsAgo)
                 .GroupBy(c => new { c.CreatedAt.Year, c.CreatedAt.Month })
                 .Select(g => new { g.Key.Year, g.Key.Month, Count = g.Count() })
                 .ToListAsync();
@@ -74,7 +75,9 @@ namespace CRM.Services
                     .Select(g => new { Industry = g.Key, Count = g.Count() })
                     .ToDictionaryAsync(x => x.Industry, x => x.Count),
 
-                MonthlyGrowth = monthlyGrowth
+                MonthlyGrowth = monthlyGrowth,
+
+                RecentlyAddedCustomers = await _salesManagerService.GetRecentlyAddedCustomersAsync()
             };
         }
     }

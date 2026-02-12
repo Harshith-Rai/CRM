@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CRM.DTOS.SalesManager;
+using System.Collections.Generic;
 
 namespace CRM.Models
 {
@@ -17,5 +18,7 @@ namespace CRM.Models
 
         // For Monthly Growth Line Chart
         public Dictionary<string, int> MonthlyGrowth { get; set; } = new Dictionary<string, int>();
+        public IEnumerable<CustomerDashboardDto> RecentlyAddedCustomers { get; set; }
+
     }
 }

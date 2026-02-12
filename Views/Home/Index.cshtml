@@ -5,6 +5,7 @@
 }
 
 <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/sales-manager-dashboard.css"/>
 
 <div class="container-fluid p-4">
 
@@ -165,54 +166,47 @@
             </div>
         </div>
     </div>
-
-    <div class="row g-4">
-
+    <div class="row g-4 mt-2">
         <div class="col-lg-8">
-            <div class="dashboard-card animate-in animate-delay-3">
-                <div class="card-header-clean d-flex justify-content-between align-items-center">
-                    <h5>Recent Activity</h5>
-                    <small class="text-muted">Last 30 days</small>
+            <div class="widget animate-in animate-delay-4 h-100">
+                <div class="widget-header">
+                    <div>
+                        <h3 class="widget-title">Recently Added Customers</h3>
+                        <p class="widget-subtitle">New business pipeline</p>
+                    </div>
+                    <a asp-controller="Customers" asp-action="Index" class="view-all-link">View All Customers →</a>
                 </div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        @if (Model.RecentActivities.Any())
+
+                <div class="widget-content">
+                    <div class="customer-list">
+                        @if (Model?.RecentlyAddedCustomers != null && Model.RecentlyAddedCustomers.Any())
                         {
-                            @foreach (var note in Model.RecentActivities)
+                            @foreach (var customer in Model.RecentlyAddedCustomers)
                             {
-                                <div class="activity-feed-item">
-                                    <div class="d-flex">
-                                        <div class="activity-icon me-3">
-                                            <i class="fa-solid fa-note-sticky"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <div>
-                                                    <h6 class="mb-0 fw-bold" style="color: var(--primary-blue); font-size: 1rem;">
-                                                        @note.Customer.CompanyName
-                                                    </h6>
-                                                    <span class="activity-badge">Note</span>
-                                                </div>
-                                                <small class="text-muted" style="font-size: 0.75rem; white-space: nowrap;">
-                                                    @note.CreatedAt.ToString("MMM dd, hh:mm tt")
-                                                </small>
-                                            </div>
-                                            <p class="mb-0 text-dark" style="font-size: 0.9rem; line-height: 1.6;">
-                                                @note.Content
-                                            </p>
+                                <div class="customer-item">
+                                    <div class="customer-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="customer-details">
+                                        <div class="customer-name">@customer.CompanyName</div>
+                                        <div class="customer-meta">
+                                            <span class="customer-id">Email: @customer.Email</span>
+                                            <span class="customer-time">@GetRelativeTime(customer.CreatedAt)</span>
                                         </div>
                                     </div>
+                                    <span class="status-badge @(string.IsNullOrEmpty(customer.SalesRepId) ? "status-unassigned" : "status-assigned")">
+                                        @(string.IsNullOrEmpty(customer.SalesRepId) ? "Unassigned" : "Assigned")
+                                    </span>
                                 </div>
                             }
                         }
                         else
                         {
-                            <div class="empty-state">
-                                <div class="empty-state-icon">
-                                    <i class="fa-regular fa-folder-open"></i>
-                                </div>
-                                <h6>No Recent Activity</h6>
-                                <p>Start adding notes and interactions to see your activity feed here.</p>
+                            <div style="padding: 40px; text-align: center; color: #999;">
+                                <p>No recently added customers</p>
                             </div>
                         }
                     </div>
@@ -221,42 +215,49 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="dashboard-card animate-in animate-delay-4">
-                <div class="card-header-clean">
-                    <h5>Industry Breakdown</h5>
+            <div class="widget animate-in animate-delay-4 h-100">
+                <div class="widget-header">
+                    <h3 class="widget-title">Industry Breakdown</h3>
                 </div>
-                <div class="card-body p-0">
-                    <div class="p-3">
-                        @if (Model.CustomersByIndustry.Any())
+                <div class="widget-content p-3">
+                    @if (Model.CustomersByIndustry.Any())
+                    {
+                        @foreach (var industry in Model.CustomersByIndustry)
                         {
-                            @foreach (var industry in Model.CustomersByIndustry)
-                            {
-                                <div class="industry-item">
-                                    <span class="industry-name">@industry.Key</span>
-                                    <span class="industry-badge">
-                                        @industry.Value
-                                    </span>
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            <div class="empty-state">
-                                <div class="empty-state-icon">
-                                    <i class="fa-solid fa-chart-pie"></i>
-                                </div>
-                                <h6>No Industry Data</h6>
-                                <p>Add customers to see industry breakdown.</p>
+                            <div class="industry-item d-flex justify-content-between align-items-center mb-2 p-2 rounded" style="background: var(--bg-secondary);">
+                                <span class="industry-name" style="font-size: 14px; font-weight: 500;">@industry.Key</span>
+                                <span class="badge badge-count">@industry.Value</span>
                             </div>
                         }
-                    </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fa-solid fa-chart-pie fa-2x mb-2" style="color: var(--border-light);"></i>
+                            <p class="text-muted small">No Industry Data</p>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
-
     </div>
-</div>
 
+</div>
+@functions {
+    private string GetRelativeTime(DateTime createdAt)
+    {
+        var timespan = DateTime.UtcNow - createdAt;
+
+        if (timespan.TotalMinutes < 60)
+            return $"{(int)timespan.TotalMinutes} minutes ago";
+        else if (timespan.TotalHours < 24)
+            return $"{(int)timespan.TotalHours} hours ago";
+        else if (timespan.TotalDays < 7)
+            return $"{(int)timespan.TotalDays} days ago";
+        else
+            return createdAt.ToString("MMM d, yyyy");
+    }
+}
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="~/js/dashboard.js" asp-append-version="true"></script>
