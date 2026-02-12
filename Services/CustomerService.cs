@@ -37,7 +37,9 @@ namespace CRM.Services
         // --- 1. GET ALL (Active Only) ---
         public async Task<List<Customer>> GetAllCustomersAsync(string userId, bool isAdmin)
         {
-            var query = _context.Customers.Where(c => c.IsActive);
+            var query = _context.Customers
+                .Include(c=>c.SalesRep)
+                .Where(c => c.IsActive);
 
             if (!isAdmin)
             {

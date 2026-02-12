@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CRM.Models
 {
@@ -21,6 +22,10 @@ namespace CRM.Models
         public string Address { get; set; }
 
         public string? SalesRepId { get; set; } // The User ID of the Sales Rep
+        public DateTime? ArchivedAt { get; set; }
+
+        [ForeignKey("SalesRepId")]
+        public virtual ApplicationUser? SalesRep { get; set; }
         public bool IsActive { get; set; } = true; // Soft Delete flag
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

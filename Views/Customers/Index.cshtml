@@ -1,28 +1,51 @@
 ﻿@model IEnumerable<CRM.Models.Customer>
+@using Microsoft.AspNetCore.Identity
 
 @{
     ViewData["Title"] = "My Customers";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Role Checks
+    bool isAdmin = User.IsInRole("Admin");
+    bool isManager = User.IsInRole("Sales Manager");
+    bool isRep = User.IsInRole("Sales Rep");
 }
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="~/css/Customers/index.css"/>
+<link rel="stylesheet" href="~/css/Customers/index.css" />
 
 <div class="main-container">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold mb-1">Customer Management</h2>
-            <p class="text-muted mb-0">Manage your accounts in list view.</p>
+            <p class="text-muted mb-0">
+                @if (isRep)
+                {
+                    <span>Manage your assigned accounts.</span>
+                }
+                else
+                {
+                    <span>Overview of all organization accounts.</span>
+                }
+            </p>
         </div>
         <div class="header-actions">
-            <a asp-action="Archived" class="btn-action btn-outline">
-                <i class="fa-solid fa-archive"></i> Archived
-            </a>
-            <a asp-action="Export" class="btn-action btn-outline">
-                <i class="fa-solid fa-download"></i> Export
-            </a>
+            @if (isAdmin)
+            {
+                <a asp-action="Archived" class="btn-action btn-outline">
+                    <i class="fa-solid fa-archive"></i> Archived
+                </a>
+            }
+
+            @if (isAdmin || isManager)
+            {
+                <a asp-action="Export" class="btn-action btn-outline">
+                    <i class="fa-solid fa-download"></i> Export
+                </a>
+            }
+
             <a asp-action="Create" class="btn-action btn-primary">
                 <i class="fa-solid fa-plus"></i> New Customer
             </a>
@@ -89,16 +112,22 @@
     {
         <div class="table-container">
             <div class="table-responsive">
-                <table class="table" id="customersTable">
+                <table class="table align-middle" id="customersTable">
                     <thead>
                         <tr>
-                            <th>Company Name</th>
-                            <th>Industry</th>
-                            <th>Contact Info</th>
-                            <th>Location</th>
-                            <th>Status</th>
-                            <th>Created</th>
-                            <th class="text-end">Actions</th>
+                            <th style="width: 25%;">Company Name</th>
+                            <th style="width: 15%;">Industry</th>
+                            <th style="width: 20%;">Contact Info</th>
+                            <th style="width: 15%;">Location</th>
+
+                            @if (!isRep)
+                            {
+                                <th style="width: 10%;">Owner</th>
+                            }
+
+                            <th style="width: 10%;">Status</th>
+                            <th style="width: 10%;">Created</th>
+                            <th class="text-end" style="width: 120px; padding-right: 24px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="customersTableBody">
@@ -114,57 +143,92 @@
                                 data-location="@(item.Address?.Split(',').LastOrDefault()?.Trim() ?? "")">
 
                                 <td>
-                                    <div class="company-cell">
-                                        <div class="company-avatar">
+                                    <div class="company-cell d-flex align-items-center gap-3">
+                                        <div class="company-avatar rounded-3 d-flex align-items-center justify-content-center fw-bold text-primary bg-primary-subtle" style="width: 40px; height: 40px;">
                                             @item.CompanyName.Substring(0, 1).ToUpper()
                                         </div>
                                         <div class="company-info">
-                                            <div class="fw-bold">@item.CompanyName</div>
+                                            <div class="fw-bold text-dark">@item.CompanyName</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:0.85rem;">
+                                    <span class="badge bg-light text-secondary border fw-normal">
                                         @item.Industry
                                     </span>
                                 </td>
                                 <td>
-                                    <div style="font-size:0.9rem;">
-                                        <i class="fa-regular fa-envelope text-muted me-1"></i> @(item.Email ?? "-")
-                                    </div>
-                                    <div style="font-size:0.9rem;">
-                                        <i class="fa-solid fa-phone text-muted me-1"></i> @(item.Phone ?? "-")
+                                    <div class="d-flex flex-column gap-1 small">
+                                        <div class="text-truncate" style="max-width: 180px;">
+                                            <i class="fa-regular fa-envelope text-muted me-1"></i> @(item.Email ?? "-")
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-phone text-muted me-1"></i> @(item.Phone ?? "-")
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
                                     @if (!string.IsNullOrEmpty(item.Address))
                                     {
-                                        <i class="fa-solid fa-location-dot text-muted me-1"></i>
-                                        @(item.Address.Length > 20 ? item.Address.Substring(0, 20) + "..." : item.Address)
+                                        <div class="text-truncate" style="max-width: 150px;">
+                                            <i class="fa-solid fa-location-dot text-muted me-1"></i>
+                                            @(item.Address.Split(',').LastOrDefault()?.Trim())
+                                        </div>
                                     }
                                     else
                                     {
-
-                                        <span class="text-muted">-</span>
+                                        <span class="text-muted small">-</span>
                                     }
                                 </td>
+
+                                @if (!isRep)
+                                {
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2 border" style="width: 24px; height: 24px;">
+                                                <i class="fa-solid fa-user text-muted" style="font-size: 0.7rem;"></i>
+                                            </div>
+                                            <span class="small text-dark">@(item.SalesRep?.FullName ?? "Unassigned")</span>
+                                        </div>
+                                    </td>
+                                }
+
                                 <td>
-                                    <span class="status-badge @(item.IsActive ? "active" : "inactive")">
-                                        @(item.IsActive ? "Active" : "Inactive")
-                                    </span>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Inactive</span>
+                                    }
                                 </td>
-                                <td class="text-muted">
+                                <td class="text-muted small">
                                     @item.CreatedAt.ToString("MMM dd, yyyy")
                                 </td>
-                                <td class="text-end">
-                                    <a asp-action="Edit" asp-route-id="@item.Id" style="color:#350aff;margin-right:10px;"><i class="fa-solid fa-pen-to-square"></i></a>
-                                    <a asp-action="Details" asp-route-id="@item.Id" style="color:#64748b; margin-right:10px;"><i class="fa-solid fa-eye"></i></a>
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <a asp-action="Delete" asp-route-id="@item.Id" style="color:#ef4444;" onclick="return confirm('Are you sure you want to delete this customer?');">
-                                            <i class="fa-solid fa-trash"></i>
+
+                                <td class="text-end" style="padding-right: 24px;">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light border text-primary" title="Edit" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-pen"></i>
                                         </a>
-                                    }
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-light border text-secondary" title="Details" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+
+                                        @if (isAdmin)
+                                        {
+                                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-light border text-danger"
+                                                        onclick="return confirm('Are you sure you want to delete this customer? This cannot be undone.');"
+                                                        title="Delete"
+                                                        style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -172,8 +236,8 @@
                 </table>
             </div>
         </div>
-        <div class="mt-3 text-muted small">
-            Showing <strong id="visibleCount">@Model.Count()</strong> results
+        <div class="mt-3 text-muted small d-flex justify-content-between">
+            <span>Showing <strong id="visibleCount">@Model.Count()</strong> results</span>
         </div>
     }
     else
@@ -237,7 +301,7 @@
                 const status = row.dataset.status;
                 const email = (row.dataset.email || '').toLowerCase();
                 const phone = (row.dataset.phone || '').toLowerCase();
-                const createdDateStr = row.dataset.created; // yyyy-MM-dd
+                const createdDateStr = row.dataset.created;
 
                 const matchesSearch = !searchTerm || company.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
                 const matchesIndustry = !selectedIndustry || industry === selectedIndustry;
@@ -245,27 +309,19 @@
 
                 if (matchesSearch && matchesIndustry && matchesStatus) {
                     row.style.display = '';
-
-                    // Increment Counts for Visible Rows
                     visibleCount++;
-
-                    // Check if new
                     const rowDate = new Date(createdDateStr);
                     if (rowDate >= thirtyDaysAgo) {
                         newCustomersCount++;
                     }
-
-                    // Track Industries
                     if (industry) {
                         activeIndustriesSet.add(industry);
                     }
-
                 } else {
                     row.style.display = 'none';
                 }
             });
 
-            // Update UI Stats
             if (totalStatsCount) totalStatsCount.innerText = visibleCount;
             if (newStatsCount) newStatsCount.innerText = newCustomersCount;
             if (industryStatsCount) industryStatsCount.innerText = activeIndustriesSet.size;

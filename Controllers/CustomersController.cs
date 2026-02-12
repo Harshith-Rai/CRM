@@ -27,7 +27,11 @@ namespace CRM.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
-            var customers = await _customerService.GetAllCustomersAsync(userId, User.IsInRole("Admin"));
+
+            // FIX 1: Allow "Sales Manager" to see all records too
+            bool canSeeAll = User.IsInRole("Admin") || User.IsInRole("Sales Manager");
+
+            var customers = await _customerService.GetAllCustomersAsync(userId, canSeeAll);
             return View(customers);
         }
 
@@ -48,11 +52,18 @@ namespace CRM.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateCustomerViewModel viewModel)
         {
-
-            viewModel.Customer.SalesRepId = viewModel.SelectedSalesExecutiveId ?? "";
+            // FIX 2: If the user is a Sales Rep, Force assign the ID to themselves
+            // This prevents errors if the dropdown was hidden in the UI
+            if (User.IsInRole("Sales Rep"))
+            {
+                viewModel.Customer.SalesRepId = _userManager.GetUserId(User);
+            }
+            else
+            {
+                viewModel.Customer.SalesRepId = viewModel.SelectedSalesExecutiveId ?? _userManager.GetUserId(User);
+            }
 
             await _customerService.CreateAsync(viewModel.Customer);
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -62,25 +73,31 @@ namespace CRM.Controllers
             var customer = await _customerService.GetDetailsAsync(id);
             if (customer == null) return NotFound();
 
-            if (customer.SalesRepId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
-                return Forbid();
+            // FIX 3: Allow "Sales Manager" to view details
+            bool hasAccess = customer.SalesRepId == _userManager.GetUserId(User) ||
+                             User.IsInRole("Admin") ||
+                             User.IsInRole("Sales Manager");
+
+            if (!hasAccess) return Forbid();
 
             return View(customer);
         }
 
-
+        // --- 4. EDIT ---
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            // SECURITY: If customer is Archived (IsActive == false), return NotFound.
-            // This prevents editing profile after deletion.
             var customer = await _context.Customers
                 .FirstOrDefaultAsync(c => c.Id == id && c.IsActive);
 
             if (customer == null) return NotFound();
 
-            if (customer.SalesRepId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
-                return Forbid();
+            // FIX 4: Allow "Sales Manager" to edit
+            bool hasAccess = customer.SalesRepId == _userManager.GetUserId(User) ||
+                             User.IsInRole("Admin") ||
+                             User.IsInRole("Sales Manager");
+
+            if (!hasAccess) return Forbid();
 
             return View(customer);
         }
@@ -91,6 +108,7 @@ namespace CRM.Controllers
         {
             if (id != customer.Id) return NotFound();
 
+            // Prevent Reps from changing the Owner if they hack the form
             ModelState.Remove("SalesRepId");
 
             if (ModelState.IsValid)
@@ -102,10 +120,9 @@ namespace CRM.Controllers
         }
 
         // --- 5. ARCHIVE (Safe Delete) ---
-        // Handles the "Archive" button from Edit AND Details pages
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")] // Strict Admin Only
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
@@ -114,10 +131,13 @@ namespace CRM.Controllers
             {
                 // Soft Delete
                 customer.IsActive = false;
+
+                // FIX 5: Set the Archive Time!
+                customer.ArchivedAt = DateTime.UtcNow;
+
                 await _context.SaveChangesAsync();
             }
 
-            // REDIRECT TO INDEX: This ensures you leave the Customer page immediately
             return RedirectToAction(nameof(Index));
         }
 
@@ -134,6 +154,9 @@ namespace CRM.Controllers
         }
 
         // --- 7. UTILITIES ---
+
+        // FIX 6: Restrict Access to Archived List
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Archived()
         {
             var userId = _userManager.GetUserId(User);
@@ -141,16 +164,19 @@ namespace CRM.Controllers
             return View(archived);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Restore(int id)
         {
             await _customerService.RestoreAsync(id, _userManager.GetUserId(User), User.IsInRole("Admin"));
             return RedirectToAction(nameof(Index));
         }
 
+        // FIX 7: Prevent Sales Reps from Exporting
+        [Authorize(Roles = "Admin, Sales Manager")]
         public async Task<IActionResult> Export()
         {
             var csv = await _customerService.GenerateCsvAsync(_userManager.GetUserId(User));
             return File(Encoding.UTF8.GetBytes(csv), "text/csv", "MyCustomers.csv");
         }
     }
-}
+}   
