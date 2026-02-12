@@ -27,13 +27,13 @@ namespace CRM.Models
         public List<LeadItem> HotLeads { get; set; } = new List<LeadItem>();
         public List<ActivityItem> RecentActivities { get; set; } = new List<ActivityItem>();
 
-        // --- 4. Pipeline Counts (Placeholders for now) ---
+     
         public int DealsInProposal { get; set; }
         public int DealsInNegotiation { get; set; }
         public int DealsClosedWon { get; set; }
     }
 
-    // --- Helper Classes ---
+
     public class TaskItem
     {
         public int Id { get; set; }

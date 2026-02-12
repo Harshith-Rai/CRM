@@ -34,19 +34,19 @@ namespace CRM.Controllers
                 .Where(n => n.AuthorId == userId)
                 .Where(n => n.Customer.IsActive); // <--- KEEPS DELETED CUSTOMERS OUT
 
-            var myLeadsQuery = _context.Leads
-                .Where(l => l.SalesRepId == userId);
+            //var myLeadsQuery = _context.Leads
+            //    .Where(l => l.SalesRepId == userId);
 
             // 2. METRICS (Same as before)
             var totalCustomers = await myCustomersQuery.CountAsync(c => c.IsActive);
             var newThisMonth = await myCustomersQuery.CountAsync(c => c.CreatedAt.Month == DateTime.UtcNow.Month && c.CreatedAt.Year == DateTime.UtcNow.Year);
             var totalContacts = await myCustomersQuery.SelectMany(c => c.Contacts).CountAsync();
 
-            var dealsProposal = await myLeadsQuery.CountAsync(l => l.Status == LeadStatus.Proposal);
-            var dealsNegotiation = await myLeadsQuery.CountAsync(l => l.Status == LeadStatus.Negotiation);
-            var dealsWon = await myLeadsQuery.CountAsync(l => l.Status == LeadStatus.Won);
-            var revenueWon = await myLeadsQuery.Where(l => l.Status == LeadStatus.Won).SumAsync(l => l.Value);
-            var pipelineValue = await myLeadsQuery.Where(l => l.Status == LeadStatus.Proposal || l.Status == LeadStatus.Negotiation || l.Status == LeadStatus.Qualification).SumAsync(l => l.Value);
+            //var dealsProposal = await myLeadsQuery.CountAsync(l => l.Status == LeadStatus.Proposal);
+            //var dealsNegotiation = await myLeadsQuery.CountAsync(l => l.Status == LeadStatus.Negotiation);
+            //var dealsWon = await myLeadsQuery.CountAsync(l => l.Status == LeadStatus.Won);
+            //var revenueWon = await myLeadsQuery.Where(l => l.Status == LeadStatus.Won).SumAsync(l => l.Value);
+            //var pipelineValue = await myLeadsQuery.Where(l => l.Status == LeadStatus.Proposal || l.Status == LeadStatus.Negotiation || l.Status == LeadStatus.Qualification).SumAsync(l => l.Value);
 
             // 3. CHARTS (Same as before)
             var industryData = await myCustomersQuery
@@ -85,12 +85,12 @@ namespace CRM.Controllers
                 .ToListAsync();
 
             // Hot Leads
-            var hotLeads = await myLeadsQuery
-                .Where(l => l.Status != LeadStatus.Won && l.Status != LeadStatus.Lost)
-                .OrderByDescending(l => l.CreatedAt)
-                .Take(5)
-                .Select(l => new LeadItem { Name = l.Title, Company = l.Source, Score = 75 })
-                .ToListAsync();
+            //var hotLeads = await myLeadsQuery
+            //    .Where(l => l.Status != LeadStatus.Won && l.Status != LeadStatus.Lost)
+            //    .OrderByDescending(l => l.CreatedAt)
+            //    .Take(5)
+            //    .Select(l => new LeadItem { Name = l.Title, Company = l.Source, Score = 75 })
+            //    .ToListAsync();
 
             // Recent Activity
             var activities = await myNotesQuery
@@ -111,15 +111,15 @@ namespace CRM.Controllers
                 TotalCustomers = totalCustomers,
                 NewCustomersThisMonth = newThisMonth,
                 TotalContacts = totalContacts,
-                TotalSalesThisMonth = revenueWon,
-                TotalPipelineValue = pipelineValue,
-                DealsInProposal = dealsProposal,
-                DealsInNegotiation = dealsNegotiation,
-                DealsClosedWon = dealsWon,
+                //TotalSalesThisMonth = revenueWon,
+                //TotalPipelineValue = pipelineValue,
+                //DealsInProposal = dealsProposal,
+                //DealsInNegotiation = dealsNegotiation,
+                //DealsClosedWon = dealsWon,
                 CustomersByIndustry = industryData,
                 MonthlyGrowth = monthlyGrowth,
                 TodaysTasks = tasks,
-                HotLeads = hotLeads,
+                //HotLeads = hotLeads,
                 RecentActivities = activities
             };
 
