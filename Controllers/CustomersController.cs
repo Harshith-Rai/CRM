@@ -68,7 +68,7 @@ namespace CRM.Controllers
             return View(customer);
         }
 
-        // --- 4. EDIT (Strictly Active Only) ---
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -105,6 +105,7 @@ namespace CRM.Controllers
         // Handles the "Archive" button from Edit AND Details pages
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var customer = await _context.Customers.FindAsync(id);

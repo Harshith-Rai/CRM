@@ -115,16 +115,19 @@
                     </div>
 
                     <hr class="my-4 opacity-25">
+                        @if (User.IsInRole("Admin"))
+                        {
+                        <h6 class="text-danger fw-bold small text-uppercase">Danger Zone</h6>
+                        <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
+                            <p class="small text-danger mb-2" style="font-size: 0.8rem;">
+                                Archiving hides this customer from your lists.
+                            </p>
+                            <button type="button" class="btn btn-outline-danger w-100 btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#archiveModal">
+                                <i class="fa-solid fa-box-archive me-2"></i> Archive Customer
+                            </button>
+                        </div>
+                        }
 
-                    <h6 class="text-danger fw-bold small text-uppercase">Danger Zone</h6>
-                    <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
-                        <p class="small text-danger mb-2" style="font-size: 0.8rem;">
-                            Archiving hides this customer from your lists.
-                        </p>
-                        <button type="button" class="btn btn-outline-danger w-100 btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#archiveModal">
-                            <i class="fa-solid fa-box-archive me-2"></i> Archive Customer
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
