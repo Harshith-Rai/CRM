@@ -1,239 +1,53 @@
-﻿@model CRM.Models.DashboardViewModel
-
-@{
-    ViewData["Title"] = "Dashboard";
+﻿﻿@{
+ViewData["Title"] = "MRI CRM - Digital Management";
+Layout = null;
 }
 
-<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
-<link rel="stylesheet" href="~/css/sales-manager-dashboard.css"/>
+<link rel="stylesheet" href="~/css/LandingPage/landingPage.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
-<div class="container-fluid p-4">
+<div class="bg-decoration"></div>
+<div class="bg-decoration"></div>
+<div class="bg-decoration"></div>
 
-    <div class="dashboard-header animate-in">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h2>Dashboard</h2>
-                <p>Welcome back! Here's what's happening with your sales pipeline and customer growth.</p>
-            </div>
-            <a asp-controller="Customers" asp-action="Create" class="btn btn-header">
-                <i class="fa-solid fa-plus me-2"></i> New Customer
-            </a>
+<div class="landing-page">
+    <div class="info-side">
+        <h1 class="logo">CRM</h1>
+        <p class="logo-subtitle">Customer Management System</p>
+        <div class="decorative-line"></div>
+
+        <div class="content-box">
+            <p class="description">
+                Optimize your workflow with our advanced tracking systems.
+                Visualize data flow in real-time and manage your digital
+                marketing leads with precision using MRI technology.
+            </p>
+            <a asp-controller="Account" asp-action="Login" class="btn-get-started">Get Started</a>
         </div>
     </div>
-    <div class="row mb-4 g-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="dashboard-card kpi-card animate-in animate-delay-1">
-                <div class="d-flex align-items-start justify-content-between">
-                    <div class="d-flex align-items-start">
-                        <div class="stat-icon-circle me-3" style="background: #E0F2FE; color: #0284C7;">
-                            <i class="fa-solid fa-users"></i>
-                        </div>
-                        <div>
-                            <div class="stat-label">Active Customers</div>
-                            <div class="stat-value">@Model.TotalCustomers</div>
-                            <div class="stat-change positive">
-                                <i class="fa-solid fa-arrow-up"></i>
-                                <span>Active</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="animation-side">
+        <div class="illustration-container">
+            <img src="~/images/crm-meeting.png" class="main-img" alt="MRI CRM Meeting">
 
-        <div class="col-xl-3 col-md-6">
-            <div class="dashboard-card kpi-card animate-in animate-delay-2">
-                <div class="d-flex align-items-start justify-content-between">
-                    <div class="d-flex align-items-start">
-                        <div class="stat-icon-circle me-3" style="background: #DCFCE7; color: #16A34A;">
-                            <i class="fa-solid fa-user-plus"></i>
-                        </div>
-                        <div>
-                            <div class="stat-label">New This Month</div>
-                            <div class="stat-value">@Model.NewCustomersThisMonth</div>
-                            <div class="stat-change positive">
-                                <i class="fa-solid fa-arrow-up"></i>
-                                <span>+@((Model.NewCustomersThisMonth * 100.0 / Math.Max(Model.TotalCustomers, 1)).ToString("F0"))%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="feature-bubble bubble-1">
+                <div class="icon-content"></div>
+                <div class="feature-detail">Lead Analytics</div>
             </div>
-        </div>
 
-        <div class="col-xl-3 col-md-6">
-            <div class="dashboard-card kpi-card animate-in animate-delay-3">
-                <div class="d-flex align-items-start justify-content-between">
-                    <div class="d-flex align-items-start">
-                        <div class="stat-icon-circle me-3" style="background: #FFF7ED; color: #EA580C;">
-                            <i class="fa-regular fa-address-card"></i>
-                        </div>
-                        <div>
-                            <div class="stat-label">Total Contacts</div>
-                            <div class="stat-value">@Model.TotalContacts</div>
-                            <div class="stat-change neutral">
-                                <i class="fa-solid fa-minus"></i>
-                                <span>@(Model.TotalCustomers > 0 ? (Model.TotalContacts * 1.0 / Model.TotalCustomers).ToString("F1") : "0") avg</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="feature-bubble bubble-2">
+                <div class="icon-content"></div>
+                <div class="feature-detail">Smart Automation</div>
             </div>
-        </div>
 
-        <div class="col-xl-3 col-md-6">
-            <div class="dashboard-card kpi-card animate-in animate-delay-4">
-                <div class="d-flex align-items-start justify-content-between">
-                    <div class="d-flex align-items-start">
-                        <div class="stat-icon-circle me-3" style="background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white;">
-                            <i class="fa-solid fa-sack-dollar"></i>
-                        </div>
-                        <div>
-                            <div class="stat-label">Pipeline Value</div>
-                            <div class="stat-value">₹@Model.TotalPipelineValue.ToString("N0")</div>
-                            <div class="stat-change positive">
-                                <i class="fa-solid fa-arrow-up"></i>
-                                <span>Total</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="feature-bubble bubble-3">
+                <div class="icon-content"></div>
+                <div class="feature-detail">Client Support</div>
+            </div>
+
+            <div class="feature-bubble bubble-4">
+                <div class="icon-content"></div>
+                <div class="feature-detail">Data Security</div>
             </div>
         </div>
     </div>
-
-    <div class="row mb-4 g-4">
-        <div class="col-lg-8">
-            <div class="dashboard-card animate-in animate-delay-2">
-                <div class="card-header-clean">
-                    <h5>Customer Acquisition Trend</h5>
-                    <small class="text-muted ms-auto">Last 6 months</small>
-                </div>
-                <div class="card-body p-4">
-                    <div class="chart-container">
-                        <canvas id="growthChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-            <div class="dashboard-card animate-in animate-delay-3">
-                <div class="card-header-clean">
-                    <h5>Market Distribution</h5>
-                </div>
-                <div class="card-body p-4 d-flex justify-content-center align-items-center" style="height: 360px;">
-                    <canvas id="industryChart" style="max-height: 280px;"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row g-4 mt-2">
-        <div class="col-lg-8">
-            <div class="widget animate-in animate-delay-4 h-100">
-                <div class="widget-header">
-                    <div>
-                        <h3 class="widget-title">Recently Added Customers</h3>
-                        <p class="widget-subtitle">New business pipeline</p>
-                    </div>
-                    <a asp-controller="Customers" asp-action="Index" class="view-all-link">View All Customers →</a>
-                </div>
-
-                <div class="widget-content">
-                    <div class="customer-list">
-                        @if (Model?.RecentlyAddedCustomers != null && Model.RecentlyAddedCustomers.Any())
-                        {
-                            @foreach (var customer in Model.RecentlyAddedCustomers)
-                            {
-                                <div class="customer-item">
-                                    <div class="customer-icon">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                        </svg>
-                                    </div>
-                                    <div class="customer-details">
-                                        <div class="customer-name">@customer.CompanyName</div>
-                                        <div class="customer-meta">
-                                            <span class="customer-id">Email: @customer.Email</span>
-                                            <span class="customer-time">@GetRelativeTime(customer.CreatedAt)</span>
-                                        </div>
-                                    </div>
-                                    <span class="status-badge @(string.IsNullOrEmpty(customer.SalesRepId) ? "status-unassigned" : "status-assigned")">
-                                        @(string.IsNullOrEmpty(customer.SalesRepId) ? "Unassigned" : "Assigned")
-                                    </span>
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            <div style="padding: 40px; text-align: center; color: #999;">
-                                <p>No recently added customers</p>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-            <div class="widget animate-in animate-delay-4 h-100">
-                <div class="widget-header">
-                    <h3 class="widget-title">Industry Breakdown</h3>
-                </div>
-                <div class="widget-content p-3">
-                    @if (Model.CustomersByIndustry.Any())
-                    {
-                        @foreach (var industry in Model.CustomersByIndustry)
-                        {
-                            <div class="industry-item d-flex justify-content-between align-items-center mb-2 p-2 rounded" style="background: var(--bg-secondary);">
-                                <span class="industry-name" style="font-size: 14px; font-weight: 500;">@industry.Key</span>
-                                <span class="badge badge-count">@industry.Value</span>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="text-center py-5">
-                            <i class="fa-solid fa-chart-pie fa-2x mb-2" style="color: var(--border-light);"></i>
-                            <p class="text-muted small">No Industry Data</p>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
-@functions {
-    private string GetRelativeTime(DateTime createdAt)
-    {
-        var timespan = DateTime.UtcNow - createdAt;
-
-        if (timespan.TotalMinutes < 60)
-            return $"{(int)timespan.TotalMinutes} minutes ago";
-        else if (timespan.TotalHours < 24)
-            return $"{(int)timespan.TotalHours} hours ago";
-        else if (timespan.TotalDays < 7)
-            return $"{(int)timespan.TotalDays} days ago";
-        else
-            return createdAt.ToString("MMM d, yyyy");
-    }
-}
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="~/js/dashboard.js" asp-append-version="true"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Retrieve data from Razor Model
-            const growthKeys = @Html.Raw(Json.Serialize(Model.MonthlyGrowth.Keys));
-            const growthValues = @Html.Raw(Json.Serialize(Model.MonthlyGrowth.Values));
-            const industryKeys = @Html.Raw(Json.Serialize(Model.CustomersByIndustry.Keys));
-            const industryValues = @Html.Raw(Json.Serialize(Model.CustomersByIndustry.Values));
-
-            // Initialize the charts using the function from dashboard.js
-            initDashboardCharts(growthKeys, growthValues, industryKeys, industryValues);
-        });
-    </script>
-}

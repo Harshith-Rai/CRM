@@ -51,7 +51,7 @@
                 @if (User.IsInRole("Admin"))
                 {
                     <hr style="border-color: rgba(255,255,255,0.2); margin: 15px 0;" />
-                    <a asp-controller="AdminUser" asp-action="index" class="menu-item @(currentController == "AdminUser" ? "active" : "")">
+                    <a asp-controller="Admin" asp-action="users" class="menu-item @(currentController == "AdminUser" ? "active" : "")">
                         <i class="fa-solid fa-shield-halved"></i> Admin Panel
                     </a>
                 }

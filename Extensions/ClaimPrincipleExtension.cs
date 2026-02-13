@@ -10,6 +10,7 @@ namespace CRM.Extensions
 
             var claim = user.FindFirst("DashBoardPage");
 
+            //throw new Exception($"Claim 'DashBoardPage' not found for user {user.Identity.Name} {claim.Value}");
             return claim?.Value ?? "/Home/Index";
         }
     }

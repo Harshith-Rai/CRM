@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CRM.Controllers
 {
     [Authorize(Roles = "Admin")]
-    [Route("admin/users")]
+    //[Route("admin/users")]
     public class AdminUserController : Controller
     {
         private readonly IUserAdminService _adminService;

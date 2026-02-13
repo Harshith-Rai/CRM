@@ -1,20 +1,23 @@
-﻿using CRM.Models;
+﻿using CRM.DTOS;
+using CRM.Models;
 using CRM.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using CRM.DTOS;
+using System.Security.Claims;
 
 namespace CRM.Controllers
 {
     public class AccountController : Controller
     {
         public UserManager<ApplicationUser> userManager;
+        public SignInManager<ApplicationUser> _signInManager;
         public JwtService jwtService;
 
-        public AccountController(UserManager<ApplicationUser> userManager, JwtService jwtService)
+        public AccountController(UserManager<ApplicationUser> userManager, JwtService jwtService, SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.jwtService = jwtService;
+            _signInManager = signInManager;
         }
 
         public IActionResult Register()
@@ -79,14 +82,16 @@ namespace CRM.Controllers
 
             TempData["Successmessage"] = "Logged In Successfully";
 
-            if(User.IsInRole("SalesManager"))
-            {
-                return RedirectToAction("Index", "SalesManager");
-            }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            string landingUrl = "/Home/Index";
+
+            if (await userManager.IsInRoleAsync(user, "Admin"))
+                landingUrl = "/Admin/Dashboard";
+            else if (await userManager.IsInRoleAsync(user, "SalesManager"))
+                landingUrl = "/SalesManager/Dashboard";
+
+
+
+            return LocalRedirect(landingUrl);
         }
 
         [HttpPost]

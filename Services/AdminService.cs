@@ -1,17 +1,24 @@
 ﻿using CRM.Data;
+using CRM.DTOS.admin;
 using CRM.Models;
-using Microsoft.EntityFrameworkCore;
 using CRM.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
 namespace CRM.Services
 {
-    public class HomeService : IHomeService
+    public class AdminService : IAdminService
     {
         private readonly AppDbContext _context;
         private readonly ISalesManagerService _salesManagerService;
-        public HomeService(AppDbContext context,ISalesManagerService salesManagerService)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public AdminService(AppDbContext context,ISalesManagerService salesManagerService,UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _salesManagerService = salesManagerService;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<DashboardViewModel> GetDashboardDataAsync(string userId)
@@ -78,6 +85,86 @@ namespace CRM.Services
 
                 RecentlyAddedCustomers = await _salesManagerService.GetRecentlyAddedCustomersAsync()
             };
+        }
+
+
+        public async Task<IEnumerable<UserListDto>> GetAllUsersAsync()
+        {
+            var users = await _userManager.Users.ToListAsync();
+
+            var userDto = new List<UserListDto>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // Skip admin users - only show non-admin users
+                if (roles.Contains("Admin"))
+                {
+                    continue;
+                }
+
+                userDto.Add(new UserListDto
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    CurrentRole = roles.FirstOrDefault() ?? "No Role"
+                });
+            }
+
+            return userDto;
+        }
+        public async Task<bool> UpdateUserRoleAsync(string userId, string newRole)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null) return false;
+
+                if (!await _roleManager.RoleExistsAsync(newRole)) throw new Exception("Role does not exist");
+
+                if (newRole == "SalesManager")
+                {
+                    await _context.Customers.Where(c => c.SalesRepId == userId).ExecuteUpdateAsync(s => s.SetProperty(c => c.SalesRepId, (string)null));
+                }
+
+                var currentRoles = await _userManager.GetRolesAsync(user);
+
+                if (currentRoles.Any())
+                {
+                    var removedRoles = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                    if (!removedRoles.Succeeded) throw new Exception("Failed to remove existing roles");
+
+                }
+
+                var res = _userManager.AddToRoleAsync(user, newRole);
+                return res.Result.Succeeded;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteUserAsync(string userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null) return false;
+
+                await _context.Customers.Where(c => c.SalesRepId == userId).ExecuteUpdateAsync(s => s.SetProperty(c => c.SalesRepId, (string)null));
+
+                var result = await _userManager.DeleteAsync(user);
+                return result.Succeeded;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
         }
     }
 }

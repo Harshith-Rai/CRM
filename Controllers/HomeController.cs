@@ -1,26 +1,29 @@
-using CRM.Models;
-using CRM.Services;
+﻿using CRM.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
-public class HomeController : Controller
+using CRM.Models;
+using Microsoft.AspNetCore.Authorization;
+namespace CRM.Controllers
 {
-    private readonly IHomeService _homeService; // Only ask for the Service
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public HomeController(IHomeService homeService, UserManager<ApplicationUser> userManager)
+    //[Authorize(Roles ="Admin")]
+    public class HomeController : Controller
     {
-        _homeService = homeService;
-        _userManager = userManager;
-    }
+        private readonly UserManager<ApplicationUser> _userManager;
 
-    public async Task<IActionResult> Index()
-    {
-        var userId = _userManager.GetUserId(User);
-
-        // One line of code to get everything!
-        var model = await _homeService.GetDashboardDataAsync(userId);
-
-        return View(model);
+        public HomeController(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+        public IActionResult Index()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                if(User.IsInRole("Admin"))
+                    return RedirectToAction("dashboard", "Admin");
+                else 
+                    return RedirectToAction("dashboard", "SalesManager");
+            }
+            return View();
+        }
     }
 }

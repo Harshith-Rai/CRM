@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CRM.Controllers
 {
-    [Authorize]
+    //[Authorize]
+    [Route("SalesManager/dashboard")]
     public class SalesManagerController : Controller
     {
         private readonly ISalesManagerService _salesManagerService;
