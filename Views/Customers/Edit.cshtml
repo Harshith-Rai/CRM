@@ -40,38 +40,34 @@
                         <div class="col-md-12">
                             <label asp-for="CompanyName" class="form-label-top">Company Name</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-signature text-muted"></i></span>
-                                <input asp-for="CompanyName" class="form-control form-control-lg fw-bold text-dark border-start-0 ps-0" placeholder="e.g. Acme Corp" />
+                                <span class="input-group-text"><i class="fa-solid fa-signature"></i></span>
+                                <input asp-for="CompanyName" class="form-control form-control-lg fw-bold text-dark" />
                             </div>
                             <span asp-validation-for="CompanyName" class="text-danger small"></span>
                         </div>
-
                         <div class="col-md-6">
                             <label asp-for="Industry" class="form-label-top">Industry Vertical</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-industry text-muted"></i></span>
-                                <select asp-for="Industry" class="form-select border-start-0 ps-0">
-                                    <option value="">-- Select Industry --</option>
-                                    <option value="Technology">Technology</option>
-                                    <option value="Finance">Finance</option>
-                                    <option value="Manufacturing">Manufacturing</option>
-                                    <option value="Healthcare">Healthcare</option>
-                                    <option value="Retail">Retail</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
+                            <select asp-for="Industry" class="form-select">
+                                <option value="">-- Select Industry --</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
-
                         <div class="col-md-6">
-                            <label class="form-label-top">Account Owner</label>
+                           
 
                             @if (User.IsInRole("Admin"))
                             {
-                                /* --- ADMIN VIEW: Dropdown to Assign --- */
+                                 <label class="form-label-top">Account Owner</label>
+                                /* --- ADMIN VIEW: Dropdown to Reassign --- */
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user-tie text-muted"></i></span>
                                     <select asp-for="SalesRepId" class="form-select border-start-0 ps-0"
-                                            asp-items="@(new SelectList(ViewBag.SalesExecutives, "Id", "FullName", Model.SalesRepId))">
+                                            asp-items="@(new SelectList(ViewBag.SalesExecutives ?? new List<ApplicationUser>(), "Id", "FullName", Model.SalesRepId))">
                                         <option value="">-- Unassigned --</option>
                                     </select>
                                 </div>
@@ -79,27 +75,59 @@
                             }
                             else
                             {
-                                /* --- REP VIEW: Read-Only Display --- */
-                                /* We use a hidden input to ensure the ID is sent back unchanged on Post */
-                                <input type="hidden" asp-for="SalesRepId" />
+                                <div class="col-md-6">
+    <label class="form-label-top">Account Owner</label>
+    <input type="hidden" asp-for="SalesRepId" />
 
-                                <div class="d-flex align-items-center p-2 rounded-3 border bg-light">
-                                    <div class="bg-white border rounded-circle d-flex align-items-center justify-content-center me-3"
-                                         style="width: 38px; height: 38px; color: #044D66;">
-                                        <i class="fa-solid fa-user-shield"></i>
-                                    </div>
-                                    <div>
-                                        <div class="small text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Current Owner</div>
-                                        <div class="fw-bold text-dark">
-                                            @(Model.SalesRep?.FullName ?? "Unassigned")
-                                        </div>
-                                    </div>
-                                    @if (Model.SalesRepId == null)
-                                    {
-                                        <span class="badge bg-warning text-dark ms-auto">Pending</span>
-                                    }
-                                </div>
+    <div class="p-2 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-lock text-muted opacity-50"></i>
+            <div>
+                <div class="fw-bold text-dark" style="font-size: 0.9rem;">
+                    @(Model.SalesRep?.FullName ?? "Unassigned")
+                </div>
+                <div class="small text-muted" style="font-size: 0.7rem;">Assignment Locked</div>
+            </div>
+        </div>
+
+        <a href="mailto:admin@company.com?subject=Request Transfer for Customer #@Model.Id" 
+           class="btn btn-sm btn-white border shadow-sm fw-bold text-dark" 
+           style="font-size: 0.75rem;">
+            <i class="fa-solid fa-arrow-right-arrow-left me-1 text-primary"></i> Request Transfer
+        </a>
+    </div>
+</div>
                             }
+                        </div>
+                    </div>
+                    
+
+                    
+                </div>
+
+                <div class="form-pane">
+                    <div class="pane-title"><i class="fa-solid fa-address-book me-2"></i> Contact & Location</div>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label-top">Primary Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                <input asp-for="Email" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Phone" class="form-label-top">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                <input asp-for="Phone" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Address" class="form-label-top">Headquarters Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
+                                <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>

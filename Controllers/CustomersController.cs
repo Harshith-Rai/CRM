@@ -52,21 +52,43 @@ namespace CRM.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateCustomerViewModel viewModel)
         {
-            // FIX 2: If the user is a Sales Rep, Force assign the ID to themselves
-            // This prevents errors if the dropdown was hidden in the UI
-            if (User.IsInRole("Sales Rep"))
+            var currentUserId = _userManager.GetUserId(User);
+            bool isManagerialRole = User.IsInRole("Admin") || User.IsInRole("Sales Manager");
+
+            if (isManagerialRole)
             {
-                viewModel.Customer.SalesRepId = _userManager.GetUserId(User);
+                viewModel.Customer.SalesRepId = viewModel.SelectedSalesExecutiveId ?? currentUserId;
             }
             else
             {
-                viewModel.Customer.SalesRepId = viewModel.SelectedSalesExecutiveId ?? _userManager.GetUserId(User);
+                viewModel.Customer.SalesRepId = currentUserId;
             }
 
-            await _customerService.CreateAsync(viewModel.Customer);
-            return RedirectToAction(nameof(Index));
-        }
+            // --- FIX START ---
+            // 1. Remove "SalesExecutives" because the list is empty on POST
+            ModelState.Remove("SalesExecutives");
 
+            // 2. Remove "SelectedSalesExecutiveId" because Sales Reps don't send it
+            ModelState.Remove("SelectedSalesExecutiveId");
+
+            // 3. Remove Customer navigation properties
+            ModelState.Remove("Customer.SalesRepId"); // We set this manually above
+            ModelState.Remove("Customer.SalesRep");
+            ModelState.Remove("Customer.Contacts");
+            ModelState.Remove("Customer.Notes");
+            // --- FIX END ---
+
+            if (ModelState.IsValid)
+            {
+                await _customerService.CreateAsync(viewModel.Customer);
+                return RedirectToAction(nameof(Index));
+            }
+
+            // If we reach here, something else is wrong (like empty Company Name).
+            // This line refills the list so the page can reload without crashing.
+            viewModel.SalesExecutives = await _customerService.GetSalesExecutivesAsync();
+            return View(viewModel);
+        }
         // --- 3. DETAILS WORKSPACE ---
         public async Task<IActionResult> Details(int id)
         {
@@ -88,17 +110,16 @@ namespace CRM.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var customer = await _context.Customers
-                .Include(c => c.SalesRep)
                 .FirstOrDefaultAsync(c => c.Id == id && c.IsActive);
 
             if (customer == null) return NotFound();
 
-            // Check access: Owner, Admin, or Sales Manager
+            // FIX 4: Allow "Sales Manager" to edit
             bool hasAccess = customer.SalesRepId == _userManager.GetUserId(User) ||
-                             User.IsInRole("Admin") || User.IsInRole("Sales Manager");
-            if (!hasAccess) return Forbid();
+                             User.IsInRole("Admin") ||
+                             User.IsInRole("Sales Manager");
 
-            // Only Admins need the dropdown list
+            if (!hasAccess) return Forbid();
             if (User.IsInRole("Admin"))
             {
                 var salesExecutives = await _userManager.GetUsersInRoleAsync("SalesExecutive");
@@ -108,29 +129,20 @@ namespace CRM.Controllers
             return View(customer);
         }
 
-        // CustomersController.cs
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Customer customer)
         {
             if (id != customer.Id) return NotFound();
 
-            ModelState.Remove("SalesRepId"); // Prevents validation errors for read-only fields
+            // Prevent Reps from changing the Owner if they hack the form
+            ModelState.Remove("SalesRepId");
 
             if (ModelState.IsValid)
             {
                 await _customerService.UpdateAsync(id, customer);
                 return RedirectToAction(nameof(Details), new { id = customer.Id });
             }
-
-            // Re-populate list to prevent 'Value cannot be null' error on reload
-            if (User.IsInRole("Admin"))
-            {
-                var salesExecutives = await _userManager.GetUsersInRoleAsync("SalesExecutive");
-                ViewBag.SalesExecutives = salesExecutives.OrderBy(u => u.FullName).ToList();
-            }
-
             return View(customer);
         }
 
