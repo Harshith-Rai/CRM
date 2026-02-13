@@ -136,6 +136,9 @@ namespace CRM.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("ArchivedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -154,6 +157,9 @@ namespace CRM.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsHiddenFromBin")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("text");
@@ -165,6 +171,8 @@ namespace CRM.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SalesRepId");
 
                     b.ToTable("Customers");
                 });
@@ -351,6 +359,15 @@ namespace CRM.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("CRM.Models.Customer", b =>
+                {
+                    b.HasOne("CRM.Models.ApplicationUser", "SalesRep")
+                        .WithMany()
+                        .HasForeignKey("SalesRepId");
+
+                    b.Navigation("SalesRep");
                 });
 
             modelBuilder.Entity("CRM.Models.Note", b =>

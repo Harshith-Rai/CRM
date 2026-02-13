@@ -89,6 +89,7 @@ namespace CRM.Controllers
             }
         }
 
+        [HttpPost]
         public ActionResult Logout()
         {
             Response.Cookies.Delete("cookie");

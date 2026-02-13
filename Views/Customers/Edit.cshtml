@@ -5,76 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<style>
-    /* ... (Keep your existing styles) ... */
-    .crm-header-bar {
-        background: #fff;
-        border-bottom: 1px solid #e2e8f0;
-        padding: 20px 32px;
-        margin: -24px -24px 30px -24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-
-    .form-pane {
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 30px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        margin-bottom: 24px;
-    }
-
-    .pane-title {
-        font-family: 'Outfit', sans-serif;
-        font-weight: 700;
-        color: #044D66;
-        border-bottom: 2px solid #f1f5f9;
-        padding-bottom: 12px;
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 1.1rem;
-    }
-
-    .form-label-top {
-        font-weight: 700;
-        font-size: 0.75rem;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 8px;
-    }
-
-    .input-group-text {
-        background-color: #f8fafc;
-        border-color: #e2e8f0;
-        color: #64748b;
-    }
-
-    .metadata-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px dashed #e2e8f0;
-        font-size: 0.9rem;
-    }
-
-    .metadata-label {
-        color: #64748b;
-    }
-
-    .metadata-value {
-        font-weight: 600;
-        color: #334155;
-    }
-</style>
+<link rel="stylesheet" href="~/css/Customers/Edit.css"/>
 
 <div class="crm-header-bar">
     <div class="d-flex align-items-center gap-3">
@@ -126,7 +57,52 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
+                        <div class="col-md-6">
+                           
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                 <label class="form-label-top">Account Owner</label>
+                                /* --- ADMIN VIEW: Dropdown to Reassign --- */
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user-tie text-muted"></i></span>
+                                    <select asp-for="SalesRepId" class="form-select border-start-0 ps-0"
+                                            asp-items="@(new SelectList(ViewBag.SalesExecutives ?? new List<ApplicationUser>(), "Id", "FullName", Model.SalesRepId))">
+                                        <option value="">-- Unassigned --</option>
+                                    </select>
+                                </div>
+                                <div class="form-text small text-muted"><i class="fa-solid fa-circle-info me-1"></i>Admins can reassign accounts.</div>
+                            }
+                            else
+                            {
+                                <div class="col-md-6">
+    <label class="form-label-top">Account Owner</label>
+    <input type="hidden" asp-for="SalesRepId" />
+
+    <div class="p-2 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-lock text-muted opacity-50"></i>
+            <div>
+                <div class="fw-bold text-dark" style="font-size: 0.9rem;">
+                    @(Model.SalesRep?.FullName ?? "Unassigned")
+                </div>
+                <div class="small text-muted" style="font-size: 0.7rem;">Assignment Locked</div>
+            </div>
+        </div>
+
+        <a href="mailto:admin@company.com?subject=Request Transfer for Customer #@Model.Id" 
+           class="btn btn-sm btn-white border shadow-sm fw-bold text-dark" 
+           style="font-size: 0.75rem;">
+            <i class="fa-solid fa-arrow-right-arrow-left me-1 text-primary"></i> Request Transfer
+        </a>
+    </div>
+</div>
+                            }
+                        </div>
                     </div>
+                    
+
+                    
                 </div>
 
                 <div class="form-pane">
@@ -184,16 +160,41 @@
                     </div>
 
                     <hr class="my-4 opacity-25">
+                        @if (User.IsInRole("Admin"))
+                        {
+                        <h6 class="text-danger fw-bold small text-uppercase">Danger Zone</h6>
+                        <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
+                            <p class="small text-danger mb-2" style="font-size: 0.8rem;">
+                                Archiving hides this customer from your lists.
+                            </p>
+                            <button type="button" class="btn btn-outline-danger w-100 btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#archiveModal">
+                                <i class="fa-solid fa-box-archive me-2"></i> Archive Customer
+                            </button>
+                        </div>
+                        }
+                    else
+                    {
+                        <div class="protected-zone p-3 rounded-3 border border-secondary border-opacity-10 bg-light">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px;">
+                                    <i class="fa-solid fa-shield-halved" style="font-size: 0.7rem;"></i>
+                                </div>
+                                <h6 class="text-secondary fw-bold small text-uppercase mb-0">Record Protected</h6>
+                            </div>
 
-                    <h6 class="text-danger fw-bold small text-uppercase">Danger Zone</h6>
-                    <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
-                        <p class="small text-danger mb-2" style="font-size: 0.8rem;">
-                            Archiving hides this customer from your lists.
-                        </p>
-                        <button type="button" class="btn btn-outline-danger w-100 btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#archiveModal">
-                            <i class="fa-solid fa-box-archive me-2"></i> Archive Customer
-                        </button>
-                    </div>
+                            <p class="small text-muted mb-0" style="line-height: 1.4;">
+                                Archiving is restricted to Administrators to ensure data integrity.
+                            </p>
+
+                            <div class="mt-2 pt-2 border-top border-secondary border-opacity-10">
+                                <a href="mailto:admin@yourcompany.com?subject=Request to Archive Customer: @Model.CompanyName&body=Please archive customer ID #@Model.Id"
+                                   class="text-decoration-none small fw-bold" style="color: #044D66; font-size: 0.75rem;">
+                                    <i class="fa-regular fa-paper-plane me-1"></i> Request Removal
+                                </a>
+                            </div>
+                        </div>
+                    }
+
                 </div>
             </div>
         </div>
