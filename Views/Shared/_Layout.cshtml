@@ -106,13 +106,14 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
                             <li>
-                                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                                    <button type="submit" class="dropdown-item text-danger">
+                                <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
+                                    <button type="submit" class="dropdown-item text-danger" style="cursor: pointer;">
                                         <i class="fa-solid fa-right-from-bracket me-2"></i>Sign out
                                     </button>
                                 </form>
                             </li>
                         </ul>
+
                     </div>
 
                 </div>
