@@ -45,14 +45,14 @@ namespace CRM.Services
 
             return new DashboardViewModel
             {
-                TotalCustomers = await _context.Customers.CountAsync(c => c.SalesRepId == userId && c.IsActive),
+                TotalCustomers = await _context.Customers.CountAsync(),
 
                 TotalContacts = await _context.Contacts
                     .Include(c => c.Customer)
-                    .CountAsync(c => c.Customer.SalesRepId == userId && c.Customer.IsActive),
+                    .CountAsync(),
 
                 NewCustomersThisMonth = await _context.Customers
-                    .CountAsync(c => c.SalesRepId == userId && c.IsActive && c.CreatedAt >= startDate),
+                    .CountAsync(c=>c.CreatedAt >= startDate),
 
                 //TotalPipelineValue = await _context.Leads
                 //    .Where(l => l.SalesRepId == userId && l.Status != LeadStatus.Won && l.Status != LeadStatus.Lost)
@@ -62,15 +62,14 @@ namespace CRM.Services
                 //    .Where(l => l.SalesRepId == userId && l.Status == LeadStatus.Won)
                 //    .SumAsync(l => (decimal?)l.Value) ?? 0,
 
-                RecentActivities = await _context.Notes
-                    .Include(n => n.Customer)
-                    .Where(n => n.AuthorId == userId && n.Customer.IsActive)
-                    .OrderByDescending(n => n.CreatedAt)
-                    .Take(5)
-                    .ToListAsync(),
+                //RecentActivities = await _context.Notes
+                //    .Include(n => n.Customer)
+                //    .Where(n => n.AuthorId == userId && n.Customer.IsActive)
+                //    .OrderByDescending(n => n.CreatedAt)
+                //    .Take(5)
+                //    .ToListAsync(),
 
                 CustomersByIndustry = await _context.Customers
-                    .Where(c => c.SalesRepId == userId && c.IsActive && c.Industry != null)
                     .GroupBy(c => c.Industry)
                     .Select(g => new { Industry = g.Key, Count = g.Count() })
                     .ToDictionaryAsync(x => x.Industry, x => x.Count),

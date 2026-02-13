@@ -20,44 +20,6 @@
             </a>
         </div>
     </div>
-
-    <div class="quick-stats-bar animate-in animate-delay-1">
-        <div class="quick-stat">
-            <div class="quick-stat-icon" style="background: #E0F2FE; color: #0284C7;">
-                <i class="fa-solid fa-chart-line"></i>
-            </div>
-            <div class="quick-stat-content">
-                <h6>Growth Rate</h6>
-                <p>+@((Model.NewCustomersThisMonth * 100.0 / Math.Max(Model.TotalCustomers, 1)).ToString("F0"))%</p>
-            </div>
-        </div>
-
-        <div class="quick-stat">
-            <div class="quick-stat-icon" style="background: #DCFCE7; color: #16A34A;">
-                <i class="fa-solid fa-calendar-check"></i>
-            </div>
-            <div class="quick-stat-content">
-                <h6>This Month</h6>
-                <p>@DateTime.Now.ToString("MMMM yyyy")</p>
-            </div>
-        </div>
-
-        <div class="quick-stat">
-            <div class="quick-stat-icon" style="background: #FEF3C7; color: #D97706;">
-                <i class="fa-solid fa-fire"></i>
-            </div>
-            <div class="quick-stat-content">
-                <h6>Active Deals</h6>
-                <p>@Model.RecentActivities.Count()</p>
-            </div>
-        </div>
-
-        <div class="performance-badge">
-            <i class="fa-solid fa-arrow-trend-up"></i>
-            <span>Performing Well</span>
-        </div>
-    </div>
-
     <div class="row mb-4 g-4">
         <div class="col-xl-3 col-md-6">
             <div class="dashboard-card kpi-card animate-in animate-delay-1">

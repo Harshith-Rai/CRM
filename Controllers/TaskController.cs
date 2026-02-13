@@ -37,7 +37,6 @@ namespace CRM.Controllers
                 case "completed":
                     query = query.Where(n => n.IsReminderDone);
                     break;
-                    // "all" does nothing, returns everything
             }
 
             var tasks = await query
