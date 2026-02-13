@@ -24,48 +24,79 @@
                         <th class="ps-4" style="width: 30%;">Company</th>
                         <th style="width: 20%;">Industry</th>
                         <th style="width: 10%;">Status</th>
-                        <th style="width: 15%;">Time Archived</th>
+                        <th style="width: 20%;">Time Archived (IST)</th>
                         <th class="text-end pe-4">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        <tr>
-                            <td class="ps-4">
-                                <div class="fw-bold text-dark">@item.CompanyName</div>
-                                <div class="small text-muted">@item.Email</div>
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark border">@item.Industry</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">
-                                    Archived
-                                </span>
-                            </td>
-                            <td class="text-muted small">
-                                @if (item.UpdatedAt.HasValue)
-                                {
-                                    <div class="fw-bold"><i class="fa-regular fa-calendar me-1"></i>@item.UpdatedAt.Value.ToString("MMM dd, yyyy")</div>
-                                    <div class="text-muted" style="font-size:0.75rem;">@item.UpdatedAt.Value.ToShortTimeString()</div>
-                                }
-                                else
-                                {
-                                    <span class="text-muted fst-italic">Unknown</span>
-                                }
-                            </td>
-                            <td class="text-end pe-4" style="width: 1%; white-space: nowrap;">
-                                <form asp-action="Restore" asp-route-id="@item.Id" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-outline-success fw-bold"
-                                            onclick="return confirm('Restore @item.CompanyName to active list?');">
-                                        <i class="fa-solid fa-rotate-left me-1"></i> Restore
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                        // Ensure we don't show hidden items if the service didn't filter them
+                        if (!item.IsHiddenFromBin)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">@item.CompanyName</div>
+                                    <div class="small text-muted">@item.Email</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">@item.Industry</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">
+                                        Archived
+                                    </span>
+                                </td>
+                                <td class="text-muted small">
+                                    @if (item.ArchivedAt.HasValue)
+                                    {
+                                        /* Robust IST Conversion */
+                                        DateTime istDate;
+                                        try
+                                        {
+                                            var istZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
+                                            istDate = TimeZoneInfo.ConvertTimeFromUtc(item.ArchivedAt.Value, istZone);
+                                        }
+                                        catch
+                                        {
+                                            istDate = item.ArchivedAt.Value.AddHours(5).AddMinutes(30);
+                                        }
+
+                                        <div class="fw-bold text-dark">
+                                            <i class="fa-regular fa-calendar me-1"></i>
+                                            @istDate.ToString("dd-MM-yyyy")
+                                        </div>
+                                        <div class="text-muted" style="font-size:0.75rem;">
+                                            @istDate.ToString("hh:mm tt")
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">Unknown</span>
+                                    }
+                                </td>
+                                <td class="text-end pe-4" style="width: 1%; white-space: nowrap;">
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <form asp-action="Restore" asp-route-id="@item.Id" method="post">
+                                            <button type="submit" class="btn btn-sm btn-outline-success fw-bold"
+                                                    onclick="return confirm('Restore @item.CompanyName to active list?');">
+                                                <i class="fa-solid fa-rotate-left me-1"></i> Restore
+                                            </button>
+                                        </form>
+
+                                        <form asp-action="Hide" asp-route-id="@item.Id" method="post">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary fw-bold"
+                                                    title="Dismiss from list (Keep in DB)"
+                                                    onclick="return confirm('Dismiss @item.CompanyName from this list? (It will remain in the database)');">
+                                                <i class="fa-solid fa-eye-slash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
-                    @if (!Model.Any())
+                    @if (!Model.Any(m => !m.IsHiddenFromBin))
                     {
                         <tr>
                             <td colspan="5" class="text-center py-5 text-muted">

@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Add New Customer";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin");
+    bool isRep = User.IsInRole("Sales Rep");
 }
 
 <style>
@@ -77,8 +79,7 @@
 
 <div class="container-fluid px-0">
     <form asp-action="Create" id="createCustomerForm" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
+        
         <div class="row g-4">
             <div class="col-lg-8">
                 <div class="form-pane">
@@ -108,18 +109,32 @@
                             <span asp-validation-for="Customer.Industry" class="text-danger small"></span>
                         </div>
 
-                        <div class="col-md-6">
-                            <label asp-for="SelectedSalesExecutiveId" class="form-label-top">Assign Sales Executive</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fa-solid fa-user-tie"></i></span>
-                                <select asp-for="SelectedSalesExecutiveId" class="form-select"
-                                        asp-items="@(new SelectList(Model.SalesExecutives, "Id", "FullName"))">
-                                    <option value="">-- Assign Executive --</option>
-                                </select>
-                            </div>
-                            <span asp-validation-for="SelectedSalesExecutiveId" class="text-danger small"></span>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Sales Manager"))
+                            {
+                                <div class="col-md-6">
+                                    <label asp-for="SelectedSalesExecutiveId" class="form-label-top">Assign Sales Executive</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-user-tie text-muted"></i></span>
+                                        <select asp-for="SelectedSalesExecutiveId" class="form-select"
+                                                asp-items="@(new SelectList(Model.SalesExecutives, "Id", "FullName"))">
+                                            <option value="">-- Assign Executive --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="SelectedSalesExecutiveId" class="text-danger small"></span>
+                                </div>
+                            }
+                            else
+                            {
+                                /* FOR SALES REPS: This logic was missing! */
+                                <div class="col-md-6">
+                                    <label class="form-label-top">Account Owner</label>
+                                    <div class="d-flex align-items-center p-2 rounded-3 border bg-light" style="height: 48px;">
+                                        <i class="fa-solid fa-user-check text-success me-2 ms-2"></i>
+                                        <span class="fw-bold text-dark">Assigned to You (Self)</span>
+                                    </div>
+                                    </div>
+                            }
                         </div>
-                    </div>
                 </div>
 
                 <div class="form-pane">
