@@ -22,22 +22,14 @@ namespace CRM.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
-
-            // 1. DATA QUERIES
-
             var myCustomersQuery = _context.Customers
                 .Where(c => c.SalesRepId == userId);
 
-            // FIX: Ensure we filter out deleted customers immediately
             var myNotesQuery = _context.Notes
                 .Include(n => n.Customer)
                 .Where(n => n.AuthorId == userId)
-                .Where(n => n.Customer.IsActive); // <--- KEEPS DELETED CUSTOMERS OUT
-
-            //var myLeadsQuery = _context.Leads
-            //    .Where(l => l.SalesRepId == userId);
-
-            // 2. METRICS (Same as before)
+                .Where(n => n.Customer.IsActive); 
+           
             var totalCustomers = await myCustomersQuery.CountAsync(c => c.IsActive);
             var newThisMonth = await myCustomersQuery.CountAsync(c => c.CreatedAt.Month == DateTime.UtcNow.Month && c.CreatedAt.Year == DateTime.UtcNow.Year);
             var totalContacts = await myCustomersQuery.SelectMany(c => c.Contacts).CountAsync();
@@ -48,9 +40,8 @@ namespace CRM.Controllers
             //var revenueWon = await myLeadsQuery.Where(l => l.Status == LeadStatus.Won).SumAsync(l => l.Value);
             //var pipelineValue = await myLeadsQuery.Where(l => l.Status == LeadStatus.Proposal || l.Status == LeadStatus.Negotiation || l.Status == LeadStatus.Qualification).SumAsync(l => l.Value);
 
-            // 3. CHARTS (Same as before)
             var industryData = await myCustomersQuery
-                .Where(c => c.IsActive) // Ensure charts ignore deleted
+                .Where(c => c.IsActive) 
                 .GroupBy(c => c.Industry)
                 .Select(g => new { Industry = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(k => k.Industry ?? "Unspecified", v => v.Count);
@@ -65,20 +56,16 @@ namespace CRM.Controllers
             var monthlyGrowth = new Dictionary<string, int>();
             foreach (var item in growthData) monthlyGrowth[item.Month] = item.Count;
 
-            // 4. LISTS (FIXED)
-
-            // Fix Priority Tasks: Filter Pending & Populate ID/Type
             var tasks = await myNotesQuery
-                .Where(n => n.ReminderDate != null && n.ReminderDate >= DateTime.UtcNow.Date) // Future/Today tasks
-                .Where(n => !n.IsReminderDone) // Only Pending
+                .Where(n => n.ReminderDate != null && n.ReminderDate >= DateTime.UtcNow.Date) 
+                .Where(n => !n.IsReminderDone) 
                 .OrderBy(n => n.ReminderDate)
                 .Take(5)
                 .Select(n => new TaskItem
                 {
-                    Id = n.Id, // <--- Necessary for the button to work
+                    Id = n.Id, 
                     Title = n.Title ?? "Follow Up",
                     Subtitle = n.Customer.CompanyName,
-                    // Simple Logic to determine icon type
                     Type = (n.Title.ToLower().Contains("call") ? "Call" :
                            (n.Title.ToLower().Contains("email") ? "Email" : "Meeting"))
                 })
@@ -122,7 +109,6 @@ namespace CRM.Controllers
                 //HotLeads = hotLeads,
                 RecentActivities = activities
             };
-
             return View(model);
         }
 

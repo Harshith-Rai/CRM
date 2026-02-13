@@ -119,7 +119,6 @@ namespace CRM.Controllers
             var user = await userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                // Security: don't reveal user doesn't exist, just redirect to the verification page
                 return RedirectToAction("VerifyOtp", new { email = email });
             }
 
