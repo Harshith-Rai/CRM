@@ -78,7 +78,15 @@ namespace CRM.Controllers
             });
 
             TempData["Successmessage"] = "Logged In Successfully";
-            return RedirectToAction("index", "Home");
+
+            if(User.IsInRole("SalesManager"))
+            {
+                return RedirectToAction("Index", "SalesManager");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpPost]

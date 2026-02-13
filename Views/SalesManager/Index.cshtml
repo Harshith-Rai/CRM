@@ -110,88 +110,35 @@
 
         <!-- Team Distribution Pie Chart Widget -->
         <div class="widget">
-            <div class="widget-header">
-                <div>
-                    <h3 class="widget-title">Team Distribution</h3>
-                    <p class="widget-subtitle">Customer assignments per sales rep</p>
-                </div>
-                <button class="btn-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="1"></circle>
-                        <circle cx="12" cy="5" r="1"></circle>
-                        <circle cx="12" cy="19" r="1"></circle>
-                    </svg>
-                </button>
+            <div class="widget  border-0 ">
+    <div class="widget-header border-0  pt-4 px-4">
+        <div class="d-flex align-items-center">
+            <div style="width: 4px; height: 24px; background-color: #0061d5; border-radius: 2px; margin-right: 12px;"></div>
+            <h3 class="widget-title mb-0" style="font-size: 1.25rem; color: #1e293b;">Customer Distribution</h3>
+        </div>
+    </div>
+    <div class="widget-content py-4">
+        <div class="d-flex flex-column align-items-center">
+            <div style="width: 240px; height: 240px; ">
+                <canvas id="distributionPieChart"></canvas>
             </div>
-            <div class="widget-content">
-                <div class="pie-chart-wrapper">
-                    <svg class="pie-chart" viewBox="0 0 200 200">
-                        <!-- Pie segments -->
-                        <path class="pie-segment" d="M 100,100 L 100,20 A 80,80 0 0,1 167.08,64.27 Z" fill="#5a6268" opacity="0.9"></path>
-                        <path class="pie-segment" d="M 100,100 L 167.08,64.27 A 80,80 0 0,1 159.87,142.76 Z" fill="#6c757d" opacity="0.9"></path>
-                        <path class="pie-segment" d="M 100,100 L 159.87,142.76 A 80,80 0 0,1 89.44,177.82 Z" fill="#7d8388" opacity="0.9"></path>
-                        <path class="pie-segment" d="M 100,100 L 89.44,177.82 A 80,80 0 0,1 32.92,135.73 Z" fill="#8e9196" opacity="0.9"></path>
-                        <path class="pie-segment" d="M 100,100 L 32.92,135.73 A 80,80 0 0,1 40.13,57.24 Z" fill="#9fa3a8" opacity="0.9"></path>
-                        <path class="pie-segment" d="M 100,100 L 40.13,57.24 A 80,80 0 0,1 100,20 Z" fill="#b0b3b7" opacity="0.9"></path>
+                        <div id="custom-legend" class="d-flex flex-wrap justify-content-center gap-3 px-3 py-3 border-top w-100">
+                        </div>
 
-                        <!-- Center circle for donut effect -->
-                        <circle cx="100" cy="100" r="50" fill="white"></circle>
-
-                        <!-- Center text -->
-                        <text x="100" y="95" text-anchor="middle" class="pie-center-value">137</text>
-                        <text x="100" y="110" text-anchor="middle" class="pie-center-label">Total</text>
-                    </svg>
-
-                    <div class="pie-legend">
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #5a6268;"></span>
-                            <div class="legend-details">
-                                <span class="legend-name">Robert Johnson</span>
-                                <span class="legend-value">31 (22.6%)</span>
+                        <div class="workload-insights w-100 px-4 mt-2">
+                            <h6 class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Team Insights</h6>
+                            <div id="insights-list" class="mt-3">
                             </div>
                         </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #6c757d;"></span>
-                            <div class="legend-details">
-                                <span class="legend-name">David Wilson</span>
-                                <span class="legend-value">27 (19.7%)</span>
-                            </div>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #7d8388;"></span>
-                            <div class="legend-details">
-                                <span class="legend-name">John Doe</span>
-                                <span class="legend-value">24 (17.5%)</span>
-                            </div>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #8e9196;"></span>
-                            <div class="legend-details">
-                                <span class="legend-name">Emily Brown</span>
-                                <span class="legend-value">22 (16.1%)</span>
-                            </div>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #9fa3a8;"></span>
-                            <div class="legend-details">
-                                <span class="legend-name">Sarah Miller</span>
-                                <span class="legend-value">18 (13.1%)</span>
-                            </div>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #b0b3b7;"></span>
-                            <div class="legend-details">
-                                <span class="legend-name">Lisa Anderson</span>
-                                <span class="legend-value">15 (10.9%)</span>
-                            </div>
-                        </div>
-                    </div>
+            <div id="custom-legend" class="d-flex flex-wrap justify-content-center gap-3 px-3">
                 </div>
-            </div>
+        </div>
+    </div>
+</div>
+            
         </div>
 
     </div>
-</div>
 </div>
 @functions {
     private string GetRelativeTime(DateTime createdAt)
@@ -207,4 +154,64 @@
         else
             return createdAt.ToString("MMM d, yyyy");
     }
+}
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const labels = @Html.Raw(Json.Serialize(Model.CustomerDistribution.Keys));
+            const counts = @Html.Raw(Json.Serialize(Model.CustomerDistribution.Values));
+            const colors = ['#0061d5', '#00ace1', '#1ec386', '#f59e0b', '#ec4899'];
+
+            const ctx = document.getElementById('distributionPieChart').getContext('2d');
+
+            const myChart = new Chart(ctx, {
+                type: 'doughnut', // This gives the "Market Distribution" look
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: colors,
+                        hoverOffset: 4,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        cutout: '70%' // Controls the thickness of the ring
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                        backgroundColor: '#0F172A',
+                        padding: 12,
+                        bodyFont: { weight: 'bold' },
+                        callbacks: {
+                            label: function (context) {
+                                return ` ${context.label}: ${context.parsed} customers`;
+                            }
+                        }
+                    }
+                    },
+                    
+                }
+            });
+
+            // Logic to generate the legend matching your reference image
+            const legendContainer = document.getElementById('custom-legend');
+            const total = counts.reduce((a, b) => a + b, 0);
+
+            labels.forEach((label, i) => {
+                const percentage = ((counts[i] / total) * 100).toFixed(1);
+                const item = document.createElement('div');
+                item.className = 'd-flex align-items-center';
+                item.innerHTML = `
+                    <div style="width: 14px; height: 14px; background-color: ${colors[i % colors.length]}; border-radius: 50%; margin-right: 8px; border: 1px solid #64748b;"></div>
+                    <span style="font-size: 0.85rem; color: #1e293b; font-weight: 500;">${label} (${percentage}%)</span>
+                `;
+                legendContainer.appendChild(item);
+            });
+        });
+    </script>
 }

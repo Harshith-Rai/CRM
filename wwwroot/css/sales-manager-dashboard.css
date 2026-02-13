@@ -1,5 +1,4 @@
-﻿/* Sales Manager Dashboard - Professional CRM Portal Styling */
-
+﻿
 /* CSS Variables for Consistency */
 :root {
     /* Refined Color Palette */
@@ -145,6 +144,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
+    align-items: flex-start;
 }
 
 .widget {
@@ -214,190 +214,7 @@
         height: 16px;
     }
 
-/* Pie Chart Wrapper */
-.pie-chart-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 32px 24px;
-    gap: 28px;
-}
 
-.pie-chart {
-    width: 240px;
-    height: 240px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
-}
-
-.pie-segment {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    transform-origin: center;
-    cursor: pointer;
-}
-
-    .pie-segment:hover {
-        opacity: 1 !important;
-        transform: scale(1.02);
-    }
-
-.pie-center-value {
-    font-size: 32px;
-    font-weight: 700;
-    fill: var(--text-primary);
-}
-
-.pie-center-label {
-    font-size: 12px;
-    font-weight: 500;
-    fill: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-/* Legend Styles */
-.pie-legend {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: var(--radius-md);
-    transition: background-color var(--transition-fast);
-    cursor: pointer;
-}
-
-    .legend-item:hover {
-        background-color: var(--bg-tertiary);
-    }
-
-.legend-color {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    flex-shrink: 0;
-}
-
-.legend-details {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex: 1;
-}
-
-.legend-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary);
-}
-
-.legend-value {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-/* Performance Table - Keeping for backward compatibility if needed */
-.table-container {
-    overflow-x: auto;
-}
-
-.performance-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-    .performance-table thead {
-        background-color: var(--bg-tertiary);
-    }
-
-    .performance-table th {
-        padding: 14px 20px;
-        text-align: left;
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .performance-table tbody tr {
-        border-bottom: 1px solid var(--border-light);
-        transition: background-color var(--transition-fast);
-    }
-
-        .performance-table tbody tr:hover {
-            background-color: var(--bg-tertiary);
-        }
-
-    .performance-table td {
-        padding: 16px 20px;
-        font-size: 14px;
-    }
-
-.rep-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.rep-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-teal));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 13px;
-    color: white;
-    flex-shrink: 0;
-}
-
-.rep-name {
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 14px;
-    margin-bottom: 2px;
-}
-
-.rep-email {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 12px;
-    border-radius: var(--radius-md);
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.badge-count {
-    background-color: var(--bg-tertiary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-}
-
-.activity-count {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.time-ago {
-    color: var(--text-secondary);
-    font-size: 13px;
-}
 
 .status-badge {
     display: inline-flex;
@@ -407,21 +224,6 @@
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.02em;
-}
-
-.status-online {
-    background-color: rgba(46, 139, 87, 0.1);
-    color: var(--accent-green);
-}
-
-.status-busy {
-    background-color: rgba(230, 126, 34, 0.1);
-    color: var(--accent-orange);
-}
-
-.status-offline {
-    background-color: var(--bg-tertiary);
-    color: var(--text-secondary);
 }
 
 .status-assigned {
@@ -434,38 +236,6 @@
     color: var(--accent-orange);
 }
 
-.btn-action {
-    padding: 8px 16px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--accent-blue);
-    background-color: var(--accent-blue);
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-    .btn-action:hover {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-sm);
-    }
-
-.btn-action-disabled {
-    background-color: var(--bg-tertiary);
-    border-color: var(--border-color);
-    color: var(--text-light);
-    cursor: not-allowed;
-}
-
-    .btn-action-disabled:hover {
-        transform: none;
-        box-shadow: none;
-    }
-
-/* Customer List */
 .customer-list {
     padding: 8px 0;
 }
