@@ -36,8 +36,6 @@ public class NotesController : Controller
             return RedirectToAction("Details", "Customers", new { id = note.CustomerId });
         }
 
-        // If we get here, validation failed. 
-        // This reloads the page so you can see the errors.
         return View(note);
     }
 
