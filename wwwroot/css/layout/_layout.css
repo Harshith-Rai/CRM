@@ -140,8 +140,8 @@ body {
     font-weight: 700;
     font-size: 1.125rem;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+/*    overflow: hidden;
+    text-overflow: ellipsis;*/
 }
 
 /* --- Search Bar (Flexible) --- */

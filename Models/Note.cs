@@ -9,20 +9,32 @@ namespace CRM.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Please provide a title")]
-        public string Title { get; set; } // e.g., "Call Summary"
+        public string Title { get; set; } 
 
         [Required]
-        public string Content { get; set; } // e.g., "Client is interested in..."
+        public string Content { get; set; } 
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? ReminderDate { get; set; } // Optional Reminder
+        private DateTime? reminderDate;
+        public DateTime? ReminderDate
+        {
+            get => reminderDate;
+            set
+            {
+                if (value.HasValue && value.Value.Kind == DateTimeKind.Unspecified)
+                {
+                    value = DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
+                }
+                reminderDate = value;
+            }
+        } 
         public bool IsReminderDone { get; set; } = false;
-        // Foreign Keys
+       
         public int CustomerId { get; set; }
         [ForeignKey("CustomerId")]
         public virtual Customer Customer { get; set; }
 
-        public string AuthorId { get; set; } // The User who wrote the note
+        public string AuthorId { get; set; } 
         [ForeignKey("AuthorId")]
         public virtual ApplicationUser Author { get; set; }
     }
