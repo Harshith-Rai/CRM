@@ -242,6 +242,32 @@ body {
     font-size: 0.9rem;
 }
 
+/* --- Add this to make the timeline scrollable --- */
+.timeline-wrapper {
+    max-height: 500px; /* Sets the fixed height */
+    overflow-y: auto; /* Enables vertical scrolling */
+    padding-right: 15px; /* Prevents text from hitting the scrollbar */
+}
+
+    /* Optional: Make the scrollbar look cleaner */
+    .timeline-wrapper::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .timeline-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .timeline-wrapper::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+
+        .timeline-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
     color: white;

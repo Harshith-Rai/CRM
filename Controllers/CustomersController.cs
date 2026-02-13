@@ -64,12 +64,8 @@ namespace CRM.Controllers
                 viewModel.Customer.SalesRepId = currentUserId;
             }
 
-            // --- FIX START ---
-            // 1. Remove "SalesExecutives" because the list is empty on POST
-            ModelState.Remove("SalesExecutives");
-
-            // 2. Remove "SelectedSalesExecutiveId" because Sales Reps don't send it
-            ModelState.Remove("SelectedSalesExecutiveId");
+           ModelState.Remove("SalesExecutives");
+           ModelState.Remove("SelectedSalesExecutiveId");
 
             // 3. Remove Customer navigation properties
             ModelState.Remove("Customer.SalesRepId"); // We set this manually above
@@ -84,8 +80,6 @@ namespace CRM.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // If we reach here, something else is wrong (like empty Company Name).
-            // This line refills the list so the page can reload without crashing.
             viewModel.SalesExecutives = await _customerService.GetSalesExecutivesAsync();
             return View(viewModel);
         }
@@ -150,14 +144,13 @@ namespace CRM.Controllers
         // POST: Customers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] // Ensure only Admins can delete/archive
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
 
             if (customer != null)
             {
-                // 1. Soft Delete: Mark as Inactive
                 customer.IsActive = false;
 
 
@@ -169,8 +162,6 @@ namespace CRM.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-
 
         // --- 6. NOTES ---
         [HttpPost]
@@ -184,9 +175,6 @@ namespace CRM.Controllers
             return RedirectToAction("Details", new { id = customerId });
         }
 
-        // --- 7. UTILITIES ---
-
-        // FIX 6: Restrict Access to Archived List
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Archived()
         {
@@ -202,7 +190,6 @@ namespace CRM.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // FIX 7: Prevent Sales Reps from Exporting
         [Authorize(Roles = "Admin, Sales Manager")]
         public async Task<IActionResult> Export()
         {
@@ -217,7 +204,6 @@ namespace CRM.Controllers
             var customer = await _context.Customers.FindAsync(id);
             if (customer != null)
             {
-                // Mark as hidden so it disappears from the list
                 customer.IsHiddenFromBin = true;
                 await _context.SaveChangesAsync();
             }
