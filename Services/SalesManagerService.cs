@@ -24,7 +24,8 @@ namespace CRM.Services
                 TotalCustomers = await GetTotalCustomersAsync(),
                 UnassignedCustomers = await GetUnassignedCustomersCountAsync(),
                 ActiveTeamMembers = await GetActiveMembersAsync(),
-                RecentlyAddedCustomers = await GetRecentlyAddedCustomersAsync()
+                RecentlyAddedCustomers = await GetRecentlyAddedCustomersAsync(),
+                CustomerDistribution = await GetCustomerDistribution()
             };
             return dashboardData;
         }
@@ -99,6 +100,33 @@ namespace CRM.Services
             {
                 _logger.LogError($"Error counting active team members: {ex.Message}");
                 return 0;
+            }
+        }
+
+        public async Task<Dictionary<string, int>> GetCustomerDistribution()
+        {
+            try
+            {
+                var distribution = await _context.Customers
+                    .Where(c => !string.IsNullOrEmpty(c.SalesRepId))
+                    .Join(_context.Users,
+                          c => c.SalesRepId,
+                          u => u.Id,
+                          (c, u) => new { u.FullName })
+                    .GroupBy(x => x.FullName)
+                    .Select(g => new
+                    {
+                        Name = g.Key,
+                        Count = g.Count()
+                    })
+                    .ToDictionaryAsync(x => x.Name, x => x.Count);
+
+                return distribution;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching customer distribution");
+                return new Dictionary<string, int>();
             }
         }
     }

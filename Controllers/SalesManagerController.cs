@@ -1,9 +1,11 @@
 ﻿using CRM.DTOS.SalesManager;
 using CRM.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRM.Controllers
 {
+    [Authorize]
     public class SalesManagerController : Controller
     {
         private readonly ISalesManagerService _salesManagerService;
