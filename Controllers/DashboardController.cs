@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace CRM.Controllers // Namespace is important!
+namespace CRM.Controllers 
 {
     [Route("api/[controller]")]
     [ApiController]
