@@ -110,6 +110,7 @@ namespace CRM.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var customer = await _context.Customers
+                .Include(c=>c.SalesRep)
                 .FirstOrDefaultAsync(c => c.Id == id && c.IsActive);
 
             if (customer == null) return NotFound();
@@ -135,14 +136,54 @@ namespace CRM.Controllers
         {
             if (id != customer.Id) return NotFound();
 
-            // Prevent Reps from changing the Owner if they hack the form
+           
+            var existingCustomer = await _context.Customers.FindAsync(id);
+
+            if (existingCustomer == null) return NotFound();
+
+            existingCustomer.CompanyName = customer.CompanyName;
+            existingCustomer.Industry = customer.Industry;
+            existingCustomer.Email = customer.Email;
+            existingCustomer.Phone = customer.Phone;
+            existingCustomer.Address = customer.Address;
+            existingCustomer.UpdatedAt = DateTime.UtcNow;
+
+  
+            if (User.IsInRole("Admin"))
+            {
+
+                existingCustomer.SalesRepId = customer.SalesRepId;
+            }
+
+
             ModelState.Remove("SalesRepId");
+            ModelState.Remove("SalesRep");
+            ModelState.Remove("Contacts");
+            ModelState.Remove("Notes");
 
             if (ModelState.IsValid)
             {
-                await _customerService.UpdateAsync(id, customer);
-                return RedirectToAction(nameof(Details), new { id = customer.Id });
+                try
+                {
+                    _context.Update(existingCustomer);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Details), new { id = customer.Id });
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Customers.Any(e => e.Id == id)) return NotFound();
+                    throw;
+                }
             }
+
+
+            if (User.IsInRole("Admin"))
+            {
+                var salesExecutives = await _userManager.GetUsersInRoleAsync("SalesExecutive");
+                ViewBag.SalesExecutives = salesExecutives.OrderBy(u => u.FullName).ToList();
+            }
+
+            // Return the original customer object to keep form data populated
             return View(customer);
         }
 

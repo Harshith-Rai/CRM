@@ -75,7 +75,7 @@
                             }
                             else
                             {
-                                <div class="col-md-6">
+                                <div class="col-md-12">
     <label class="form-label-top">Account Owner</label>
     <input type="hidden" asp-for="SalesRepId" />
 
@@ -90,7 +90,7 @@
             </div>
         </div>
 
-        <a href="mailto:admin@company.com?subject=Request Transfer for Customer #@Model.Id" 
+        <a href="mailto:admin@company.com?subject=Request Transfer for Customer  #@Model.Id" 
            class="btn btn-sm btn-white border shadow-sm fw-bold text-dark" 
            style="font-size: 0.75rem;">
             <i class="fa-solid fa-arrow-right-arrow-left me-1 text-primary"></i> Request Transfer
@@ -187,7 +187,7 @@
                             </p>
 
                             <div class="mt-2 pt-2 border-top border-secondary border-opacity-10">
-                                <a href="mailto:admin@yourcompany.com?subject=Request to Archive Customer: @Model.CompanyName&body=Please archive customer ID #@Model.Id"
+                                <a href="mailto:admin@yourcompany.com?subject=Request- to Archive Customer: @Model.CompanyName&body=Please archive customer ID #@Model.Id"
                                    class="text-decoration-none small fw-bold" style="color: #044D66; font-size: 0.75rem;">
                                     <i class="fa-regular fa-paper-plane me-1"></i> Request Removal
                                 </a>
