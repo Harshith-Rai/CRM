@@ -63,7 +63,7 @@
                             @if (User.IsInRole("Admin"))
                             {
                                  <label class="form-label-top">Account Owner</label>
-                                /* --- ADMIN VIEW: Dropdown to Reassign --- */
+                               
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user-tie text-muted"></i></span>
                                     <select asp-for="SalesRepId" class="form-select border-start-0 ps-0"
@@ -75,28 +75,28 @@
                             }
                             else
                             {
-                                <div class="col-md-6">
-    <label class="form-label-top">Account Owner</label>
-    <input type="hidden" asp-for="SalesRepId" />
+                             <div class="col-md-9">
+                                <label class="form-label-top">Account Owner</label>
+                                <input type="hidden" asp-for="SalesRepId" />
 
-    <div class="p-2 border rounded-3 bg-light d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-2">
-            <i class="fa-solid fa-lock text-muted opacity-50"></i>
-            <div>
-                <div class="fw-bold text-dark" style="font-size: 0.9rem;">
-                    @(Model.SalesRep?.FullName ?? "Unassigned")
-                </div>
-                <div class="small text-muted" style="font-size: 0.7rem;">Assignment Locked</div>
-            </div>
-        </div>
+                                <div class="p-2 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-lock text-muted opacity-50"></i>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                                @(Model.SalesRep?.FullName ?? "Unassigned")
+                                            </div>
+                                            <div class="small text-muted" style="font-size: 0.7rem;">Assignment Locked</div>
+                                        </div>
+                                    </div>
 
-        <a href="mailto:admin@company.com?subject=Request Transfer for Customer #@Model.Id" 
-           class="btn btn-sm btn-white border shadow-sm fw-bold text-dark" 
-           style="font-size: 0.75rem;">
-            <i class="fa-solid fa-arrow-right-arrow-left me-1 text-primary"></i> Request Transfer
-        </a>
-    </div>
-</div>
+                                    <a href="mailto:admin@company.com?subject=Request Transfer for Customer #@Model.Id" 
+                                       class="btn btn-sm btn-white border shadow-sm fw-bold text-dark" 
+                                       style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-arrow-right-arrow-left me-1 text-primary"></i> Request Transfer
+                                    </a>
+                                </div>
+                            </div>
                             }
                         </div>
                     </div>

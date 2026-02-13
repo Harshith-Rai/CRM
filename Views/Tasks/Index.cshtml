@@ -3,8 +3,6 @@
 @{
     ViewData["Title"] = "My Tasks";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
-    // Get current filter from Controller to highlight the correct button
     var currentFilter = ViewData["CurrentFilter"] as string ?? "all";
 }
 
@@ -17,19 +15,22 @@
             <p class="text-muted mb-0">Follow-ups and reminders scheduled for you.</p>
         </div>
 
-        <div class="btn-group shadow-sm" role="group">
-            <a asp-action="Index" asp-route-filter="all"
-               class="btn btn-outline-secondary @(currentFilter == "all" ? "active" : "")">
-                All
-            </a>
-            <a asp-action="Index" asp-route-filter="pending"
-               class="btn btn-outline-secondary @(currentFilter == "pending" ? "active" : "")">
-                Pending
-            </a>
-            <a asp-action="Index" asp-route-filter="completed"
-               class="btn btn-outline-secondary @(currentFilter == "completed" ? "active" : "")">
-                Completed
-            </a>
+        <div class="d-flex gap-3 align-items-center">
+
+            @if (User.IsInRole("Admin") || User.IsInRole("SalesExecutive") || User.IsInRole("SalesManager"))
+            {
+                <button type="button" class="btn text-white shadow-sm fw-bold px-4 rounded-pill d-flex align-items-center"
+                        style="background-color: var(--mri-blue); border: none;"
+                        data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                    <i class="fa-solid fa-plus me-2"></i> Add Task
+                </button>
+            }
+
+            <div class="btn-group shadow-sm" role="group">
+                <a asp-action="Index" asp-route-filter="all" class="btn btn-outline-secondary @(currentFilter == "all" ? "active" : "")">All</a>
+                <a asp-action="Index" asp-route-filter="pending" class="btn btn-outline-secondary @(currentFilter == "pending" ? "active" : "")">Pending</a>
+                <a asp-action="Index" asp-route-filter="completed" class="btn btn-outline-secondary @(currentFilter == "completed" ? "active" : "")">Completed</a>
+            </div>
         </div>
     </div>
 
@@ -62,55 +63,93 @@
                             </td>
                             <td>
                                 <div class="@textDecoration">@item.Title</div>
-                                <div class="small text-muted text-truncate" style="max-width: 300px;">
-                                    @item.Content
-                                </div>
+                                <div class="small text-muted text-truncate" style="max-width: 300px;">@item.Content</div>
                             </td>
                             <td>
                                 @if (item.Customer != null)
                                 {
-                                    <span class="badge bg-light text-dark border">
-                                        <i class="fa-solid fa-building me-1"></i> @item.Customer.CompanyName
-                                    </span>
+                                    <span class="badge bg-light text-dark border"><i class="fa-solid fa-building me-1"></i> @item.Customer.CompanyName</span>
                                 }
                             </td>
                             <td class="text-center">
                                 <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post">
                                     @if (item.IsReminderDone)
                                     {
-                                        <button type="submit" class="btn badge rounded-pill bg-success-subtle text-success border border-success"
-                                                title="Mark as Pending">
-                                            <i class="fa-solid fa-check me-1"></i> Completed
-                                        </button>
+                                        <button type="submit" class="btn badge rounded-pill bg-success-subtle text-success border border-success"><i class="fa-solid fa-check me-1"></i> Completed</button>
                                     }
                                     else
                                     {
-                                        <button type="submit" class="btn badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning"
-                                                title="Mark as Completed">
-                                            <i class="fa-regular fa-clock me-1"></i> Pending
-                                        </button>
+                                        <button type="submit" class="btn badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning"><i class="fa-regular fa-clock me-1"></i> Pending</button>
                                     }
                                 </form>
                             </td>
                             <td class="text-end pe-4">
-                                <a asp-controller="Customers" asp-action="Details" asp-route-id="@item.CustomerId"
-                                   class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-arrow-right"></i> View
-                                </a>
+                                <a asp-controller="Customers" asp-action="Details" asp-route-id="@item.CustomerId" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-arrow-right"></i> View</a>
                             </td>
                         </tr>
                     }
                     @if (!Model.Any())
                     {
-                        <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
-                                <i class="fa-solid fa-mug-hot fa-2x mb-3"></i>
-                                <p>No tasks found for this filter.</p>
-                            </td>
-                        </tr>
+                        <tr><td colspan="5" class="text-center py-5 text-muted"><p>No tasks found.</p></td></tr>
                     }
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+
+            <div class="modal-body p-0">
+                <div class="add-note-card p-4">
+                    <div class="section-header mb-3 d-flex justify-content-between align-items-center">
+                        <h4 style="font-size: 1.1rem; margin:0; color: var(--mri-blue);">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Log Interaction
+                        </h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form asp-action="AddNote" method="post">
+
+                        <div class="mb-2">
+                            <select name="customerId" class="form-select fw-bold" asp-items="ViewBag.Customers" required>
+                                <option value="">-- Select Customer --</option>
+                            </select>
+                        </div>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div class="mb-2">
+                                <label class="form-label small fw-bold text-muted mb-1">Assign To (Optional)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user-tag text-muted"></i></span>
+                                    <select name="assignedToId" class="form-select border-start-0 ps-0" asp-items="ViewBag.SalesReps">
+                                        <option value="">-- Assign to Me --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="mb-2">
+                            <input name="title" class="form-control" placeholder="Subject (e.g. Call Summary)" required style="font-weight:600;" />
+                        </div>
+                        <div class="mb-2">
+                            <textarea name="content" class="form-control" rows="4" placeholder="What happened?" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-label small fw-bold text-muted">Reminder:</label>
+                            <input type="date" name="reminderDate" class="form-control" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full w-100" style="background-color: var(--mri-blue); border:none;">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> Save Note
+                        </button>
+                    </form>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

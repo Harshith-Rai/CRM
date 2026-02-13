@@ -135,7 +135,7 @@ namespace CRM.Controllers
         {
             if (id != customer.Id) return NotFound();
 
-            // Prevent Reps from changing the Owner if they hack the form
+
             ModelState.Remove("SalesRepId");
 
             if (ModelState.IsValid)
@@ -160,8 +160,7 @@ namespace CRM.Controllers
                 // 1. Soft Delete: Mark as Inactive
                 customer.IsActive = false;
 
-                // 2. Set the Archive Time (CRITICAL STEP)
-                // Use UtcNow to prevent PostgreSQL errors
+
                 customer.ArchivedAt = DateTime.UtcNow;
 
                 _context.Customers.Update(customer);

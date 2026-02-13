@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; 
 using Microsoft.EntityFrameworkCore;
 using CRM.Data;
 using CRM.Models;
@@ -23,12 +24,21 @@ namespace CRM.Controllers
         public async Task<IActionResult> Index(string filter = "all")
         {
             var userId = _userManager.GetUserId(User);
+            ViewBag.Customers = new SelectList(_context.Customers.Where(c => c.IsActive), "Id", "CompanyName");
+
+            if (User.IsInRole("Admin"))
+            {
+                var salesReps = await _userManager.GetUsersInRoleAsync("Sales Rep");
+                ViewBag.SalesReps = new SelectList(salesReps, "Id", "FullName");
+            }
+            
 
             var query = _context.Notes
                 .Include(n => n.Customer)
-                .Where(n => n.AuthorId == userId)
+                .Where(n => n.AuthorId == userId) 
                 .Where(n => n.ReminderDate != null)
-                .Where(n => n.Customer.IsActive); 
+                .Where(n => n.Customer.IsActive);
+
             switch (filter.ToLower())
             {
                 case "pending":
@@ -40,7 +50,7 @@ namespace CRM.Controllers
             }
 
             var tasks = await query
-                .OrderBy(n => n.IsReminderDone) // Pending first
+                .OrderBy(n => n.IsReminderDone)
                 .ThenBy(n => n.ReminderDate)
                 .ToListAsync();
 
@@ -49,7 +59,38 @@ namespace CRM.Controllers
             return View(tasks);
         }
 
-        // POST: Toggle Status
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddNote(int customerId, string title, string content, DateTime? reminderDate, string? assignedToId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            string targetOwnerId = currentUserId;
+
+            if (User.IsInRole("Admin") && !string.IsNullOrEmpty(assignedToId))
+            {
+                targetOwnerId = assignedToId;
+            }
+
+            if (ModelState.IsValid)
+            {
+                var note = new Note
+                {
+                    CustomerId = customerId,
+                    Title = title,
+                    Content = content,
+                    ReminderDate = reminderDate,
+                    IsReminderDone = false,
+                    CreatedAt = DateTime.UtcNow,
+                    AuthorId = targetOwnerId 
+                };
+
+                _context.Notes.Add(note);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatus(int id)
@@ -58,7 +99,6 @@ namespace CRM.Controllers
             if (note != null)
             {
                 var userId = _userManager.GetUserId(User);
-                // Security check: ensure user owns the note
                 if (note.AuthorId == userId)
                 {
                     note.IsReminderDone = !note.IsReminderDone;
@@ -67,7 +107,7 @@ namespace CRM.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-        // [POST] Mark a task as done without reloading the page
+
         [HttpPost]
         public async Task<IActionResult> MarkDoneAjax(int id)
         {
@@ -76,7 +116,7 @@ namespace CRM.Controllers
 
             if (note != null && note.AuthorId == userId)
             {
-                note.IsReminderDone = true; // Set to Done
+                note.IsReminderDone = true;
                 await _context.SaveChangesAsync();
                 return Json(new { success = true });
             }
