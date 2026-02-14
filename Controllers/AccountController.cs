@@ -17,14 +17,15 @@ namespace CRM.Controllers
         public JwtService jwtService;
         private readonly INavigation _navigation;
 
-        public AccountController(UserManager<ApplicationUser> userManager, JwtService jwtService, SignInManager<ApplicationUser> signInManager, INavigation navigation)
+        //public AccountController(UserManager<ApplicationUser> userManager, JwtService jwtService, SignInManager<ApplicationUser> signInManager, INavigation navigation);
         private readonly IEmailSender _emailSender;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             JwtService jwtService,
             SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            INavigation navigation)
         {
             this.userManager = userManager;
             this.jwtService = jwtService;
