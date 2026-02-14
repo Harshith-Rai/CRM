@@ -2,25 +2,24 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using CRM.Models;
-using Microsoft.AspNetCore.Authorization;
+using CRM.Services;
 namespace CRM.Controllers
 {
     public class HomeController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly INavigation _navigation;
 
-        public HomeController(UserManager<ApplicationUser> userManager)
+        public HomeController(UserManager<ApplicationUser> userManager,INavigation navigation)
         {
             _userManager = userManager;
+            _navigation = navigation;
         }
         public IActionResult Index()
         {
             if (User.Identity.IsAuthenticated)
             {
-                if(User.IsInRole("Admin"))
-                    return RedirectToAction("dashboard", "Admin");
-                else 
-                    return RedirectToAction("dashboard", "SalesManager");
+                return LocalRedirect(_navigation.GetDashboardUrl(User));
             }
             return View();
         }

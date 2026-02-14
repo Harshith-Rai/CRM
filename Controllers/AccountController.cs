@@ -12,12 +12,14 @@ namespace CRM.Controllers
         public UserManager<ApplicationUser> userManager;
         public SignInManager<ApplicationUser> _signInManager;
         public JwtService jwtService;
+        private readonly INavigation _navigation;
 
-        public AccountController(UserManager<ApplicationUser> userManager, JwtService jwtService, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, JwtService jwtService, SignInManager<ApplicationUser> signInManager, INavigation navigation)
         {
             this.userManager = userManager;
             this.jwtService = jwtService;
             _signInManager = signInManager;
+            _navigation = navigation;
         }
 
         public IActionResult Register()
@@ -78,21 +80,12 @@ namespace CRM.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                //Expires = DateTimeOffset.UtcNow.AddHours(2)
+                Expires = DateTimeOffset.UtcNow.AddHours(2)
             });
 
             TempData["Successmessage"] = "Logged In Successfully";
 
-            string landingUrl = "/Home/Index";
-
-            if (await userManager.IsInRoleAsync(user, "Admin"))
-                landingUrl = "/Admin/Dashboard";
-            else if (await userManager.IsInRoleAsync(user, "SalesManager"))
-                landingUrl = "/SalesManager/Dashboard";
-
-
-
-            return LocalRedirect(landingUrl);
+            return LocalRedirect(_navigation.GetDashboardUrl(User));
         }
 
         [HttpPost]
