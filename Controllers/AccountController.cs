@@ -77,7 +77,8 @@ namespace CRM.Controllers
             Response.Cookies.Append("cookie", token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true
+                Secure = true,
+                //Expires = DateTimeOffset.UtcNow.AddHours(2)
             });
 
             TempData["Successmessage"] = "Logged In Successfully";
@@ -99,7 +100,7 @@ namespace CRM.Controllers
         {
             Response.Cookies.Delete("cookie");
             TempData["Successmessage"] = "Logged Out Successfully";
-            return RedirectToAction("login");
+            return RedirectToAction("Index","Home");
         }
     }
 }

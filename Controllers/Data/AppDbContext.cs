@@ -23,6 +23,8 @@ namespace CRM.Data
         public DbSet<Note> Notes { get; set; }
         //public DbSet<Lead> Leads { get; set; }
 
+        public DbSet<Activity> Tasks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

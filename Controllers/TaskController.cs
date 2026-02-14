@@ -5,122 +5,87 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CRM.Data;
 using CRM.Models;
+using CRM.Services;
 
 namespace CRM.Controllers
 {
     [Authorize]
+    [Route("tasks")]
     public class TasksController : Controller
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ITaskService taskService;
 
-        public TasksController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public TasksController(AppDbContext context, UserManager<ApplicationUser> userManager,ITaskService taskService)
         {
             _context = context;
             _userManager = userManager;
+            this.taskService = taskService;
         }
 
         // GET: /Tasks
-        public async Task<IActionResult> Index(string filter = "all")
+        public async Task<IActionResult> Index(string filter = "All")
         {
-            var userId = _userManager.GetUserId(User);
-            ViewBag.Customers = new SelectList(_context.Customers.Where(c => c.IsActive), "Id", "CompanyName");
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
 
-            if (User.IsInRole("Admin"))
+            var userId = user.Id;
+            // Get the first role or default to empty string
+            var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault() ?? "";
+
+            // 1. Get the raw List of users
+            var users = await taskService.GetAssignableUsers(userId, role);
+
+            var tasks = await taskService.GetAllTasks(userId);
+
+            if (filter == "pending") tasks = tasks.Where(t => t.Status == false).ToList();
+            if (filter == "completed") tasks = tasks.Where(t => t.Status == true).ToList();
+
+            var taskViewModel = new TaskDashBoardViewModel
             {
-                var salesReps = await _userManager.GetUsersInRoleAsync("Sales Rep");
-                ViewBag.SalesReps = new SelectList(salesReps, "Id", "FullName");
-            }
-            
+                Tasks = tasks,
 
-            var query = _context.Notes
-                .Include(n => n.Customer)
-                .Where(n => n.AuthorId == userId) 
-                .Where(n => n.ReminderDate != null)
-                .Where(n => n.Customer.IsActive);
+                // 2. Map the List to a SelectList (resolves the red squiggles)
+                // "Id" is the value sent to the server, "FullName" is what the user sees
+                AssigneeList = new SelectList(users, "Id", "FullName"),
 
-            switch (filter.ToLower())
-            {
-                case "pending":
-                    query = query.Where(n => !n.IsReminderDone);
-                    break;
-                case "completed":
-                    query = query.Where(n => n.IsReminderDone);
-                    break;
-            }
+                CurrentFilter = filter
+            };
 
-            var tasks = await query
-                .OrderBy(n => n.IsReminderDone)
-                .ThenBy(n => n.ReminderDate)
-                .ToListAsync();
-
-            ViewData["CurrentFilter"] = filter;
-
-            return View(tasks);
+            return View(taskViewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddNote(int customerId, string title, string content, DateTime? reminderDate, string? assignedToId)
+        public async Task<IActionResult> Create(Activity model)
         {
-            var currentUserId = _userManager.GetUserId(User);
-            string targetOwnerId = currentUserId;
+            // Fix for PostgreSQL: Convert the date to UTC
+            // PostgreSQL throws an error if Kind is 'Unspecified'
+            model.DueDate = DateTime.SpecifyKind(model.DueDate, DateTimeKind.Utc);
 
-            if (User.IsInRole("Admin") && !string.IsNullOrEmpty(assignedToId))
+            if (string.IsNullOrEmpty(model.AssignTo))
             {
-                targetOwnerId = assignedToId;
+                model.AssignTo = _userManager.GetUserId(User);
             }
 
-            if (ModelState.IsValid)
-            {
-                var note = new Note
-                {
-                    CustomerId = customerId,
-                    Title = title,
-                    Content = content,
-                    ReminderDate = reminderDate,
-                    IsReminderDone = false,
-                    CreatedAt = DateTime.UtcNow,
-                    AuthorId = targetOwnerId 
-                };
-
-                _context.Notes.Add(note);
-                await _context.SaveChangesAsync();
-            }
+                await taskService.CreateTask(model);
+                return RedirectToAction(nameof(Index));
 
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToggleStatus(int id)
+        // This explicitly maps the URL /Tasks/UpdateStatus/{id}/{status}
+        [Route("Tasks/UpdateStatus/{id}")]
+        public async Task<IActionResult> UpdateStatus(int id)
         {
-            var note = await _context.Notes.FindAsync(id);
-            if (note != null)
-            {
-                var userId = _userManager.GetUserId(User);
-                if (note.AuthorId == userId)
-                {
-                    note.IsReminderDone = !note.IsReminderDone;
-                    await _context.SaveChangesAsync();
-                }
-            }
-            return RedirectToAction(nameof(Index));
-        }
+            var result = await taskService.UpdateStatus(id,true);
+            if (!result) return NotFound();
 
-        [HttpPost]
-        public async Task<IActionResult> MarkDoneAjax(int id)
-        {
-            var userId = _userManager.GetUserId(User);
-            var note = await _context.Notes.FindAsync(id);
-
-            if (note != null && note.AuthorId == userId)
-            {
-                note.IsReminderDone = true;
-                await _context.SaveChangesAsync();
-                return Json(new { success = true });
-            }
-            return Json(new { success = false, message = "Task not found" });
+            //return Ok();
+            return RedirectToAction("Index", "Tasks");
         }
     }
 }

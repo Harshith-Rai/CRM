@@ -1,3 +1,4 @@
+using CRM.DTOS;
 using CRM.Models;
 using CRM.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -61,5 +62,30 @@ public class AdminController : Controller
         {
             return Json(new { success = false, message = ex.Message });
         }
+    }
+
+    [HttpPost("create-user")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateUser(AddUserViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] = "Please fill in all required fields correctly.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var result = await _adminService.RegisterNewUser(model);
+
+        if (result.Succeeded)
+        {
+            TempData["Success"] = "User created successfully!";
+        }
+        else
+        {
+            // This captures "Password must have a digit", "Password too short", etc.
+            TempData["Error"] = string.Join("\\n", result.Errors.Select(e => e.Description));
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 }

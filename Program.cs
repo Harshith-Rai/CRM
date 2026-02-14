@@ -54,7 +54,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ISalesManagerService, SalesManagerService>();
-
+builder.Services.AddScoped<ITaskService, TaskService>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

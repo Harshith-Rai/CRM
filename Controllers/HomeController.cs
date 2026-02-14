@@ -5,7 +5,6 @@ using CRM.Models;
 using Microsoft.AspNetCore.Authorization;
 namespace CRM.Controllers
 {
-    //[Authorize(Roles ="Admin")]
     public class HomeController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

@@ -166,5 +166,27 @@ namespace CRM.Services
                 return false;
             }
         }
+
+        public async Task<IdentityResult> RegisterNewUser(AddUserViewModel model)
+        {
+            var user = new ApplicationUser
+            {
+                Email = model.Email,
+                FullName=model.FullName,
+                UserName=model.Email,
+                EmailConfirmed=true
+            };
+
+            var res =await  _userManager.CreateAsync(user, model.Password);
+            if (res.Succeeded)
+            {
+                if (!String.IsNullOrEmpty(model.SelectedRole))
+                {
+                    await _userManager.AddToRoleAsync(user, model.SelectedRole);
+                }
+            }
+
+            return res;
+        }
     }
 }

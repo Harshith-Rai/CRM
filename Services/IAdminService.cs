@@ -1,5 +1,7 @@
-﻿using CRM.DTOS.admin;
+﻿using CRM.DTOS;
+using CRM.DTOS.admin;
 using CRM.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace CRM.Services
 {
@@ -9,5 +11,6 @@ namespace CRM.Services
         Task<IEnumerable<UserListDto>> GetAllUsersAsync();
         Task<bool> UpdateUserRoleAsync(string userId, string newRole);
         Task<bool> DeleteUserAsync(string userId);
+        Task<IdentityResult> RegisterNewUser(AddUserViewModel model);
     }
 }
