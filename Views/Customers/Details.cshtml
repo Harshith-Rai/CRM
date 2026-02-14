@@ -206,6 +206,21 @@
         font-size: 0.9rem;
     }
 
+    /* --- Add this to make the timeline scrollable --- */
+    .timeline-wrapper {
+        max-height: 500px;   /* Sets the fixed height */
+        overflow-y: auto;    /* Enables vertical scrolling */
+        padding-right: 15px; /* Prevents text from hitting the scrollbar */
+        padding-left:10px;
+        padding-top:5px;
+    }
+
+    /* Optional: Scrollbar styling */
+    .timeline-wrapper::-webkit-scrollbar { width: 6px; }
+    .timeline-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+    .timeline-wrapper::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+    .timeline-wrapper::-webkit-scrollbar-thumb:hover { background: #aaa; }
+
     .btn-primary {
         background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
         color: white;
@@ -387,12 +402,29 @@
                 {
                     @foreach (var note in Model.Notes.OrderByDescending(n => n.CreatedAt))
                     {
+
+                        var timeZoneId = "India Standard Time";
+                        DateTime localDate;
+
+                        try
+                        {
+                            var indianZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                            localDate = TimeZoneInfo.ConvertTimeFromUtc(note.CreatedAt, indianZone);
+                        }
+                        catch (TimeZoneNotFoundException)
+                        {
+                            // Fallback for Linux/Mac environments
+                            var indianZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
+                            localDate = TimeZoneInfo.ConvertTimeFromUtc(note.CreatedAt, indianZone);
+                        }
+                        // -------------------------------
+
                         <div class="timeline-item">
                             <div class="note-box">
                                 <div class="note-header">
                                     <div>
                                         <div class="note-title">@note.Title</div>
-                                        <div class="note-date">@note.CreatedAt.ToString("MMM dd, yyyy • hh:mm tt")</div>
+                                        <div class="note-date">@localDate.ToString("MMM dd, yyyy • hh:mm tt")</div>
                                     </div>
                                     <div class="note-actions">
                                         <a asp-controller="Notes" asp-action="Edit" asp-route-id="@note.Id" class="btn-sm btn-icon-edit"><i class="fa-solid fa-pen"></i></a>

@@ -50,7 +50,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 //builder.Services.AddScoped<IUserAdminService, UserAdminService>();
-
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ISalesManagerService, SalesManagerService>();

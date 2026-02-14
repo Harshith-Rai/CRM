@@ -433,3 +433,105 @@ body {
         align-items: flex-start;
     }
 }
+/* ========================================= */
+/* MOBILE RESPONSIVENESS (New Additions)     */
+/* ========================================= */
+
+/* Tablet Breakpoint (Up to 992px) */
+@media (max-width: 992px) {
+    /* 1. Header: Stack content vertically */
+    .dashboard-header {
+        text-align: center;
+        padding: 24px;
+    }
+
+        .dashboard-header .d-flex {
+            flex-direction: column;
+            gap: 16px;
+            align-items: center !important; /* Force center alignment */
+        }
+
+        .dashboard-header::before {
+            width: 300px;
+            height: 300px;
+            top: -20%;
+            right: -20%;
+        }
+
+    /* 2. Grid Layouts: Force single column on smaller tablets */
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .col-md-3, .col-md-4, .col-md-8 {
+        width: 100%;
+        margin-bottom: 24px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* 3. Quick Stats Bar: Stack items */
+    .quick-stats-bar {
+        flex-direction: column;
+        align-items: stretch; /* Full width items */
+        gap: 16px;
+    }
+
+    .quick-stat {
+        background: #f8fafc;
+        padding: 12px;
+        border-radius: 12px;
+        justify-content: flex-start; /* Left align content inside box */
+    }
+}
+
+/* Mobile Phone Breakpoint (Up to 576px) */
+@media (max-width: 576px) {
+
+    /* 1. Typography Adjustments */
+    .dashboard-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+
+    /* 2. KPI Cards: Make them compact */
+    .kpi-card {
+        padding: 20px;
+    }
+
+    .stat-icon-circle {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
+
+    /* 3. Charts: Allow scrolling if chart is wide */
+    .chart-container {
+        height: 250px; /* Reduce height for mobile */
+        overflow-x: auto; /* Allow horizontal scroll if needed */
+    }
+
+    /* 4. Activity Feed & Industries */
+    .activity-feed-item, .industry-item {
+        padding: 16px;
+        flex-direction: column; /* Stack content if needed */
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .activity-badge {
+        margin-left: 0;
+        margin-top: 4px;
+    }
+
+    /* 5. Buttons: Full width for better touch targets */
+    .btn-header {
+        width: 100%;
+        display: block;
+        text-align: center;
+    }
+}

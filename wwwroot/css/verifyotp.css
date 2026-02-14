@@ -1,0 +1,68 @@
+﻿@import url('login.css'); /* Reuses the body background and brand variables */
+
+/* Specific styling for the OTP input to make it look like 6 separate boxes */
+.otp-input-group {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.otp-input {
+    width: 100%;
+    /* This creates the visual spacing for 6 digits */
+    letter-spacing: 12px;
+    padding: 14px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    background: rgba(255, 255, 255, 0.36);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: 12px;
+    color: var(--mri-blue);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+    .otp-input:focus {
+        outline: none;
+        border-color: rgba(23,154,215,0.98);
+        background: rgba(255,255,255,0.32);
+        box-shadow: 0 10px 30px rgba(23,154,215,0.12);
+    }
+
+/* Timer and Resend styling */
+.otp-timer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: rgba(4, 40, 45, 0.75);
+}
+
+.resend-btn {
+    color: var(--bright-blue);
+    text-decoration: none;
+    font-weight: 700;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+    .resend-btn:hover {
+        color: var(--medium-blue);
+    }
+
+/* Reusing your button style */
+.btn-verify {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--bright-blue), var(--medium-blue));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(23, 154, 215, 0.35);
+}
