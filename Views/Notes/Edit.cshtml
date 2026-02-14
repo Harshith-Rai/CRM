@@ -29,10 +29,10 @@
                     <span asp-validation-for="Content" class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
+                @* <div class="mb-3">
                     <label asp-for="ReminderDate" class="form-label fw-bold">Update Reminder</label>
                     <input asp-for="ReminderDate" class="form-control" type="date" />
-                </div>
+                </div> *@
 
                 <div class="d-flex justify-content-between">
                     <a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-outline-secondary">Cancel</a>

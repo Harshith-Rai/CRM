@@ -12,18 +12,27 @@
     <link rel="stylesheet" href="~/css/AdminDashBoard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <script src="~/js/pages/admin-user-management.js"></script>
+    <style>
+        .user-add-button{
+            background-color: #044D66;
+            color: white;
+            /* padding-right:20px;
+            padding-left: 20px; */
+            padding:10px;
+            border-radius:10px;
+        }
+    </style>
 </head>
 <body>
     <!-- Toast Container -->
-    <div class="toast-container">
-        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <i class="fas fa-check-circle me-2"></i>
-                <strong class="me-auto">Success</strong>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="statusToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header" id="toastHeader">
+                <i id="toastIcon" class="fas fa-info-circle me-2"></i>
+                <strong class="me-auto" id="toastTitle">Notification</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <div class="toast-body" id="toastMessage">
-                @TempData["Success"]
+            <div class="toast-body" id="toastBody">
             </div>
         </div>
     </div>
@@ -44,7 +53,13 @@
                     <option value="SalesManager">Sales Manager</option>
                     <option value="SalesExecutive">Sales Executive</option>
                 </select>
+
+                <button class="user-add-button" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                    <i class="fas fa-plus me-1"></i> Add User
+                </button>
             </div>
+
+            
         </div>
     </div>
 
@@ -140,7 +155,6 @@
     </div>
 
     <!-- Delete User Confirmation Modal -->
-    <!-- Delete User Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -167,5 +181,80 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createUserModalLabel">
+                        <i class="fas fa-user-plus me-2"></i>Create New User
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createUserForm" asp-action="CreateUser" method="post">
+                        <div asp-validation-summary="All" class="text-danger mb-3" style="font-size: 14px;"></div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="FullName" class="form-control" required placeholder="John Doe" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="Email" class="form-control" required placeholder="john@example.com" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="Password" class="form-control" required placeholder="••••••••" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Assign Role</label>
+                            <select name="SelectedRole" class="form-select" required>
+                                <option value="">Select a role</option>
+                                <option value="SalesManager">Sales Manager</option>
+                                <option value="SalesExecutive">Sales Executive</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="createUserForm" class="btn btn-confirm-block" style="background-color: #044D66;">
+                        <i class="fas fa-plus-circle me-2"></i>Create User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (TempData["Error"] != null)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const toastElement = document.getElementById('statusToast');
+                const toastHeader = document.getElementById('toastHeader');
+                const toastTitle = document.getElementById('toastTitle');
+                const toastBody = document.getElementById('toastBody');
+                const toastIcon = document.getElementById('toastIcon');
+                const bootstrapToast = new bootstrap.Toast(toastElement);
+
+                // --- Handle Errors ---
+                @if (TempData["Error"] != null)
+                {
+                        <text>
+                        // Set UI to "Danger" mode
+                        toastHeader.className = "toast-header bg-danger text-white";
+                        toastTitle.innerText = "Action Failed";
+                        toastIcon.className = "fas fa-exclamation-triangle me-2";
+                        toastBody.innerText = "@Html.Raw(TempData["Error"])";
+
+                        bootstrapToast.show();
+
+                        // Auto-reopen the Create User modal so they can fix the password
+                        var createModal = new bootstrap.Modal(document.getElementById('createUserModal'));
+                        createModal.show();
+                        </text>
+                }
+            });
+        </script>
+    }
 </body>
 </html>

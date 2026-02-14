@@ -15,6 +15,9 @@ namespace CRM.Controllers
         public UserManager<ApplicationUser> userManager;
         public SignInManager<ApplicationUser> _signInManager;
         public JwtService jwtService;
+        private readonly INavigation _navigation;
+
+        public AccountController(UserManager<ApplicationUser> userManager, JwtService jwtService, SignInManager<ApplicationUser> signInManager, INavigation navigation)
         private readonly IEmailSender _emailSender;
 
         public AccountController(
@@ -26,6 +29,7 @@ namespace CRM.Controllers
             this.userManager = userManager;
             this.jwtService = jwtService;
             _signInManager = signInManager;
+            _navigation = navigation;
             _emailSender = emailSender;
         }
 
@@ -86,21 +90,13 @@ namespace CRM.Controllers
             Response.Cookies.Append("cookie", token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true
+                Secure = true,
+                Expires = DateTimeOffset.UtcNow.AddHours(2)
             });
 
             TempData["Successmessage"] = "Logged In Successfully";
 
-            string landingUrl = "/Home/Index";
-
-            if (await userManager.IsInRoleAsync(user, "Admin"))
-                landingUrl = "/Admin/Dashboard";
-            else if (await userManager.IsInRoleAsync(user, "SalesManager"))
-                landingUrl = "/SalesManager/Dashboard";
-
-
-
-            return LocalRedirect(landingUrl);
+            return LocalRedirect(_navigation.GetDashboardUrl(User));
         }
         [HttpGet]
         public IActionResult ForgotPassword() => View();
@@ -218,7 +214,7 @@ namespace CRM.Controllers
         {
             Response.Cookies.Delete("cookie");
             TempData["Successmessage"] = "Logged Out Successfully";
-            return RedirectToAction("login");
+            return RedirectToAction("Index","Home");
         }
     }
 }
