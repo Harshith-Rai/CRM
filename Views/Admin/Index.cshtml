@@ -27,14 +27,12 @@
             const userId = document.getElementById('deleteUserId').value;
             const loadingBar = document.getElementById('loadingBar');
 
-            // Start Loading UI
             if (loadingBar) loadingBar.style.width = '100%';
 
             try {
                 const response = await fetch(`/Admin/delete/${userId}`, {
                     method: 'DELETE',
                     headers: {
-                        // Important for anti-forgery tokens if you have them enabled
                         'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
                     }
                 });
@@ -42,11 +40,9 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Success: Close modal and refresh page to show updated list
                     showToast("Success", result.message, "success");
                     setTimeout(() => location.reload(), 1000);
                 } else {
-                    // Error from Server
                     showToast("Error", result.message || "Failed to delete user.", "danger");
                 }
             } catch (error) {
@@ -58,18 +54,41 @@
             }
         }
 
-        function showToast(title, message, type) {
+                // ONE function to rule them all
+        function showToast(title, message, type = "info") {
             const toastElement = document.getElementById('statusToast');
             const toastHeader = document.getElementById('toastHeader');
             const toastBody = document.getElementById('toastBody');
+            const toastIcon = document.getElementById('toastIcon');
 
-            toastHeader.className = `toast-header bg-${type} text-white`;
+            // 1. Set the Look
+            const typeClass = type === "success" ? "bg-success" : (type === "danger" ? "bg-danger" : "bg-primary");
+            toastHeader.className = `toast-header ${typeClass} text-white`;
+
+            // 2. Set the Icon
+            const iconClass = type === "success" ? "fa-check-circle" : (type === "danger" ? "fa-exclamation-triangle" : "fa-info-circle");
+            toastIcon.className = `fas ${iconClass} me-2`;
+
+            // 3. Set Content
             document.getElementById('toastTitle').innerText = title;
             toastBody.innerText = message;
 
+            // 4. Show
             const bsToast = new bootstrap.Toast(toastElement);
             bsToast.show();
         }
+
+        // 5. Automatic Listener for Server-Side TempData
+        document.addEventListener("DOMContentLoaded", function () {
+            @if (TempData["Success"] != null)
+            {
+                    <text>showToast("Success", "@Html.Raw(TempData["Success"])", "success");</text>
+            }
+            @if (TempData["Error"] != null)
+            {
+                    <text>showToast("Action Failed", "@Html.Raw(TempData["Error"])", "danger");</text>
+            }
+        });
     </script>
 </head>
 <body>
@@ -274,7 +293,7 @@
             </div>
         </div>
     </div>
-    @if (TempData["Error"] != null)
+    @* @if (TempData["Error"] != null)
     {
         <script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -304,6 +323,6 @@
                 }
             });
         </script>
-    }
+    } *@
 </body>
 </html>
