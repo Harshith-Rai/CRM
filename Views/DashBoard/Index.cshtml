@@ -154,7 +154,8 @@
                     <div class="task-list">
                         @if (eDto.RecentTasks != null && eDto.RecentTasks.Any())
                         {
-                            @foreach (var task in eDto.RecentTasks)
+                            @* FIX: Sort by Status (Pending first) and then by Due Date *@
+                            @foreach (var task in eDto.RecentTasks.OrderBy(t => t.Status).ThenBy(t => t.DueDate))
                             {
                                 <div class="customer-item">
                                     <div class="customer-icon" style="background: #ecfdf5; color: #10b981;">
@@ -162,13 +163,33 @@
                                             <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     </div>
+
                                     <div class="customer-details">
-                                        <div class="customer-name">@task.Subject</div>
+                                        <div class="customer-name" style="@(task.Status ? "text-decoration: line-through; color: #94a3b8;" : "")">
+                                            @task.Subject
+                                        </div>
                                         <div class="customer-meta">
-                                            <span class="customer-time text-danger">Due: @task.DueDate.ToString("MMM dd, yyyy")</span>
+                                            @if (!task.Status)
+                                            {
+                                                <span class="customer-time text-danger">Due: @task.DueDate.ToString("MMM dd, yyyy")</span>
+                                            }
                                         </div>
                                     </div>
-                                    @* <i class="fa-solid fa-chevron-right text-muted small"></i> *@
+
+                                    <div class="ms-auto">
+                                        @if (task.Status)
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2">
+                                                <i class="fa-solid fa-check me-1"></i> Completed
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-2">
+                                                <i class="fa-regular fa-clock me-1"></i> Pending
+                                            </span>
+                                        }
+                                    </div>
                                 </div>
                             }
                         }
