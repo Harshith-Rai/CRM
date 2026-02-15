@@ -45,7 +45,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.Tasks)
+                    @foreach (var item in Model.Tasks.OrderBy(t=>t.Status).ThenBy(t=>t.DueDate))
                     {
                         var isToday = item.DueDate.Date == DateTime.Today;
                         var dateClass = (isToday && !item.Status) ? "text-danger fw-bold" : "text-dark";
