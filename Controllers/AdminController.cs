@@ -47,8 +47,7 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // URL: /admin/delete/{id}
-    [HttpDelete("delete/{id}")]
+    [HttpDelete("/Admin/delete/{id}")]
     public async Task<IActionResult> DeleteUser(string id)
     {
         try

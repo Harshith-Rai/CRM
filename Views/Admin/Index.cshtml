@@ -22,6 +22,55 @@
             border-radius:10px;
         }
     </style>
+    <script>
+             async function executeDelete() {
+            const userId = document.getElementById('deleteUserId').value;
+            const loadingBar = document.getElementById('loadingBar');
+
+            // Start Loading UI
+            if (loadingBar) loadingBar.style.width = '100%';
+
+            try {
+                const response = await fetch(`/Admin/delete/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        // Important for anti-forgery tokens if you have them enabled
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Success: Close modal and refresh page to show updated list
+                    showToast("Success", result.message, "success");
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    // Error from Server
+                    showToast("Error", result.message || "Failed to delete user.", "danger");
+                }
+            } catch (error) {
+                showToast("Error", "A network error occurred."+error.message, "danger");
+            } finally {
+                if (loadingBar) loadingBar.style.width = '0%';
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                modal.hide();
+            }
+        }
+
+        function showToast(title, message, type) {
+            const toastElement = document.getElementById('statusToast');
+            const toastHeader = document.getElementById('toastHeader');
+            const toastBody = document.getElementById('toastBody');
+
+            toastHeader.className = `toast-header bg-${type} text-white`;
+            document.getElementById('toastTitle').innerText = title;
+            toastBody.innerText = message;
+
+            const bsToast = new bootstrap.Toast(toastElement);
+            bsToast.show();
+        }
+    </script>
 </head>
 <body>
     <!-- Toast Container -->
@@ -174,7 +223,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
                     <input type="hidden" id="deleteUserId" />
-                    <button type="button" class="btn btn-confirm-block" onclick="submitDeleteForm()">
+                    <button type="button" class="btn btn-confirm-block" onclick="executeDelete()">
                         <i class="fas fa-trash me-2"></i>Yes, Delete User
                     </button>
                 </div>
