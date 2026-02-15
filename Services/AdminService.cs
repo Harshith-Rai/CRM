@@ -83,7 +83,7 @@ namespace CRM.Services
 
                 MonthlyGrowth = monthlyGrowth,
 
-                RecentlyAddedCustomers = await _salesManagerService.GetRecentlyAddedCustomersAsync()
+                RecentlyAddedCustomers = await _salesManagerService.GetRecentlyAddedCustomersAsync(null)
             };
         }
 

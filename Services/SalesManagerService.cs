@@ -17,29 +17,45 @@ namespace CRM.Services
             _userManager = userManager;
         }
 
-        public async Task<SalesManagerDashBoardDto> GetDashboardDataAsync()
+        public async Task<DashboardBaseDto> GetDashboardDataAsync(String userId,bool isManager)
         {
-            var CustomerDistribution = await GetCustomerDistribution();
-            Console.WriteLine($"Distribution count: {CustomerDistribution?.Count ?? 0}");
-            var dashboardData = new SalesManagerDashBoardDto
+            if (isManager)
             {
-                TotalCustomers = await GetTotalCustomersAsync(),
-                UnassignedCustomers = await GetUnassignedCustomersCountAsync(),
-                ActiveTeamMembers = await GetActiveMembersAsync(),
-                RecentlyAddedCustomers = await GetRecentlyAddedCustomersAsync(),
-                CustomerDistribution = await GetCustomerDistribution()
-            };
-            return dashboardData;
+                return new ManagerDashboardDto
+                {
+                    TotalCustomers = await GetTotalCustomersAsync(),
+                    RecentlyAddedCustomers = await GetRecentlyAddedCustomersAsync(null),
+                    UnassignedCustomers = await GetUnassignedCustomersCountAsync(),
+                    ActiveTeamMembers = await GetActiveMembersAsync(),
+                    CustomerDistribution = await GetCustomerDistribution()
+                };
+            }
+            else
+            {
+                // Build the Executive version
+                return new ExecutiveDashboardDto
+                {
+                    RecentlyAddedCustomers = await GetRecentlyAddedCustomersAsync(userId),
+                    RecentTasks = await GetRecentTasks(userId)
+                };
+            }
         }
 
-        public async Task<IEnumerable<CustomerDashboardDto>> GetRecentlyAddedCustomersAsync(int count = 6)
+        public async Task<IEnumerable<CustomerDashboardDto>> GetRecentlyAddedCustomersAsync(String userId)
         {
             try
             {
-                var customers = await _context.Customers
+                var query = _context.Customers.AsQueryable();
+
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    query = query.Where(c => c.SalesRepId == userId);
+                }
+
+                var customers = await query
                     .Where(c => c.IsActive)
                     .OrderByDescending(c => c.CreatedAt)
-                    .Take(count)
+                    .Take(6)
                     .Select(c => new CustomerDashboardDto
                     {
                         Id = c.Id,
@@ -131,6 +147,24 @@ namespace CRM.Services
                 return new Dictionary<string, int>();
             }
         }
+
+        public Task<List<Activity>> GetRecentTasks(String userId)
+        {
+            try
+            {
+                var tasks = _context.Tasks
+                    .Where(a => a.AssignTo == userId)
+                    .OrderByDescending(a => a.DueDate)
+                    .Take(6)
+                    .ToListAsync();
+                return tasks;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error fetching recent tasks: {ex.Message}");
+                return Task.FromResult(new List<Activity>());
+            }
+            }
     }
 
     }
