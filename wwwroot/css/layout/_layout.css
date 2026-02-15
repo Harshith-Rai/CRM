@@ -209,3 +209,7 @@ body {
         flex: 1; /* Take up remaining space */
     }
 }
+
+.user-profile{
+    margin-bottom:-18px;
+}

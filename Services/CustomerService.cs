@@ -3,7 +3,7 @@ using CRM.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using CRM.DTOS.Customers;
+using CRM.DTOS;
 
 namespace CRM.Services
 {
@@ -32,18 +32,47 @@ namespace CRM.Services
         }
 
         // --- 1. GET ALL (Active Only) ---
-        public async Task<List<Customer>> GetAllCustomersAsync(string userId, bool isAdmin)
+        public async Task<PagedCustomerDto<Customer>> GetAllCustomersAsync(string userId,bool canSeeAll,int pageNumber,int pageSize,String searchTerm=null,string status=null,String industry=null)
         {
             var query = _context.Customers
                 .Include(c => c.SalesRep)
                 .Where(c => c.IsActive);
 
-            if (!isAdmin)
+            if (!canSeeAll)
             {
                 query = query.Where(c => c.SalesRepId == userId);
             }
 
-            return await query.OrderByDescending(c => c.CreatedAt).ToListAsync();
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(c => c.Email.Contains(searchTerm) ||
+                c.CompanyName.Contains(searchTerm));
+            }
+
+            if (!string.IsNullOrWhiteSpace(status)){
+                bool isActive = status.Equals("active", StringComparison.OrdinalIgnoreCase);
+                query = query.Where(q => q.IsActive == isActive);
+            }
+
+            if (!string.IsNullOrWhiteSpace(industry))
+            {
+                query = query.Where(c => c.Industry ==industry);
+            }
+
+            var totalcount = await query.CountAsync();
+
+            var customers = await query.OrderByDescending(c => c.CreatedAt).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedCustomerDto<Customer>
+            {
+                Customers = customers,
+                TotalCount = totalcount,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                SearchTerm = searchTerm,
+                Status = status,
+                Industry = industry
+            };
         }
 
         // --- 2. CREATE ---

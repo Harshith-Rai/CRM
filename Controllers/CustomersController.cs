@@ -24,14 +24,14 @@ namespace CRM.Controllers
         }
 
         // --- 1. LIST VIEW ---
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10,string searchTerm=null,String status=null,String industry=null)
         {
             var userId = _userManager.GetUserId(User);
 
             // FIX 1: Allow "Sales Manager" to see all records too
-            bool canSeeAll = User.IsInRole("Admin") || User.IsInRole("Sales Manager");
+            bool canSeeAll = User.IsInRole("Admin") || User.IsInRole("SalesManager");
 
-            var customers = await _customerService.GetAllCustomersAsync(userId, canSeeAll);
+            var customers = await _customerService.GetAllCustomersAsync(userId, canSeeAll, pageNumber, pageSize,searchTerm,status,industry);
             return View(customers);
         }
 

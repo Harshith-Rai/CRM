@@ -1,12 +1,13 @@
 ﻿using CRM.Models;
 using CRM.DTOS.Customers;
+using CRM.DTOS;
 namespace CRM.Services
 {
     public interface ICustomerService
     {
         Task<IEnumerable<ApplicationUser>> GetSalesExecutivesAsync();
         //Task<ApplicationUser> GetUserByIdAsync(string id);
-        Task<List<Customer>> GetAllCustomersAsync(string userId, bool isAdmin);
+        Task<PagedCustomerDto<Customer>> GetAllCustomersAsync(string userId, bool isAdmin, int pageNumber, int pageSize,String searchTem,String status,String industry);
         Task<List<Customer>> GetAllArchivedAsync(string userId, bool isAdmin);
         Task<Customer> GetDetailsAsync(int id);
         Task CreateAsync(Customer customer);

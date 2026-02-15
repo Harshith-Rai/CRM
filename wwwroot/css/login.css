@@ -131,7 +131,7 @@ body {
     justify-content: center;
     align-items: center;
     padding: 60px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+/*    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));*/
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-left: 1px solid rgba(255, 255, 255, 0.06);

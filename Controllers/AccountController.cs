@@ -97,7 +97,7 @@ namespace CRM.Controllers
 
             TempData["Successmessage"] = "Logged In Successfully";
 
-            return LocalRedirect(_navigation.GetDashboardUrl(User));
+            return RedirectToAction("Index", "Home");
         }
         [HttpGet]
         public IActionResult ForgotPassword() => View();
