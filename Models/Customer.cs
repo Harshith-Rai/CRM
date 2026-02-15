@@ -5,15 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CRM.Models
 {
-    public enum IndustryType
-    {
-        Technology,
-        Finance,
-        Manufacturing,
-        Healthcare,
-        Retail,
-        Other
-    }
     public class Customer
     {
         public int Id { get; set; }

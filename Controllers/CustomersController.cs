@@ -127,15 +127,14 @@ namespace CRM.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Customer customer)
         {
+
             if (id != customer.Id) return NotFound();
-
-
-            ModelState.Remove("SalesRepId");
 
             if (ModelState.IsValid)
             {
+
                 await _customerService.UpdateAsync(id, customer);
-                return RedirectToAction(nameof(Details), new { id = customer.Id });
+                return RedirectToAction("index","Customers");
             }
             return View(customer);
         }

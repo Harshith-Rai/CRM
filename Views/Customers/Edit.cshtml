@@ -28,7 +28,7 @@
 </div>
 
 <div class="container-fluid px-0">
-    <form asp-action="Edit" id="editCustomerForm">
+    <form asp-action="Edit" id="editCustomerForm" method="post">
         <input type="hidden" asp-for="Id" />
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 

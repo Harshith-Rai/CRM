@@ -19,6 +19,8 @@ namespace CRM.Services
 
         public async Task<SalesManagerDashBoardDto> GetDashboardDataAsync()
         {
+            var CustomerDistribution = await GetCustomerDistribution();
+            Console.WriteLine($"Distribution count: {CustomerDistribution?.Count ?? 0}");
             var dashboardData = new SalesManagerDashBoardDto
             {
                 TotalCustomers = await GetTotalCustomersAsync(),
