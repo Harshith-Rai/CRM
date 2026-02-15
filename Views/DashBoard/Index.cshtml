@@ -155,22 +155,25 @@
                         @if (eDto.RecentTasks != null && eDto.RecentTasks.Any())
                         {
                             @* FIX: Sort by Status (Pending first) and then by Due Date *@
-                            @* REPLACE THE FOREACH LOOP IN WIDGET 2 WITH THIS *@
+                            @* REPLACE THE EXISTING FOREACH LOOP WITH THIS PROFESSIONAL VERSION *@
+                            @* REPLACE THE FOREACH LOOP FOR TASKS WITH THIS *@
                             @foreach (var task in eDto.RecentTasks.OrderBy(t => t.Status).ThenBy(t => t.DueDate))
                             {
-                                // Logic to determine urgency
+                                // 1. Calculate Date Status Logic
                                 var isOverdue = !task.Status && task.DueDate.Date < DateTime.UtcNow.Date;
                                 var isToday = !task.Status && task.DueDate.Date == DateTime.UtcNow.Date;
                                 var isTomorrow = !task.Status && task.DueDate.Date == DateTime.UtcNow.Date.AddDays(1);
 
                                 <div class="customer-item py-3 border-bottom border-light">
-                                    @* 1. Status Icon *@
+
+                                    @* 2. Status Icon (Left) *@
                                     <div class="customer-icon shadow-sm rounded-circle d-flex align-items-center justify-content-center"
-                                         style="width: 40px; height: 40px; margin-right: 15px; flex-shrink: 0;
+                                         style="width: 42px; height: 42px; margin-right: 16px; flex-shrink: 0;
                          @(task.Status ? "background: #f8fafc; color: #cbd5e1;" :
                                                         isOverdue ? "background: #fef2f2; color: #ef4444;" :
                                                         isToday ? "background: #fffbeb; color: #f59e0b;" :
                                                         "background: #f0f9ff; color: #0ea5e9;")">
+
                                         @if (task.Status)
                                         {
                                             <i class="fa-solid fa-check"></i>
@@ -183,7 +186,7 @@
                                         else if (isToday)
                                         {
 
-                                            <i class="fa-regular fa-clock"></i>
+                                            <i class="fa-solid fa-bell"></i>
                                         }
                                         else
                                         {
@@ -192,59 +195,62 @@
                                         }
                                     </div>
 
-                                    @* 2. Task Details *@
+                                    @* 3. Task Content (Middle) *@
                                     <div class="customer-details flex-grow-1">
-                                        <div class="customer-name mb-1"
-                                             style="font-size: 0.95rem; font-weight: 600;
+                                        <div class="customer-name mb-2"
+                                             style="font-size: 0.95rem; font-weight: 600; letter-spacing: -0.2px;
                              @(task.Status ? "text-decoration: line-through; color: #94a3b8;" : "color: #334155;")">
                                             @task.Subject
                                         </div>
 
-                                        @* 3. Professional Date Badges *@
+                                        @* --- "ROUND BOX" (PILL BADGES) UI --- *@
                                         <div class="d-flex align-items-center">
                                             @if (task.Status)
                                             {
-                                                <span class="badge bg-light text-muted border fw-normal">Completed</span>
+                                                <span class="badge rounded-pill bg-light text-muted border fw-normal px-3 py-2">
+                                                    <i class="fa-solid fa-check-double me-1"></i> Completed
+                                                </span>
                                             }
                                             else if (isOverdue)
                                             {
-                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2">
+                                                <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fw-medium">
                                                     <i class="fa-solid fa-circle-exclamation me-1"></i>
                                                     Overdue: @task.DueDate.ToString("MMM dd")
                                                 </span>
                                             }
                                             else if (isToday)
                                             {
-                                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2">
-                                                    <i class="fa-solid fa-bell me-1"></i>
+                                                <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fw-medium">
+                                                    <i class="fa-solid fa-clock me-1"></i>
                                                     Due Today
                                                 </span>
                                             }
                                             else if (isTomorrow)
                                             {
-                                                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill px-2">
+                                                <span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-2 fw-medium">
                                                     <i class="fa-regular fa-calendar me-1"></i>
                                                     Tomorrow
                                                 </span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-light text-secondary border rounded-pill px-2 fw-normal">
-                                                    <i class="fa-regular fa-calendar me-1 text-muted"></i>
+                                                <span class="badge rounded-pill bg-white text-secondary border px-3 py-2 fw-normal shadow-sm">
+                                                    <i class="fa-regular fa-calendar me-2 text-muted"></i>
                                                     @task.DueDate.ToString("MMM dd, yyyy")
                                                 </span>
                                             }
                                         </div>
                                     </div>
 
-                                    @* 4. Action Arrow *@
+                                    @* 4. Action Button (Right) *@
                                     <div class="ms-3">
                                         @if (!task.Status)
                                         {
                                             <a asp-controller="Tasks" asp-action="Details" asp-route-id="@task.Id"
-                                               class="btn btn-sm btn-light border text-muted rounded-circle"
-                                               style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                                               class="btn btn-light border text-muted rounded-circle shadow-sm"
+                                               title="View Details"
+                                               style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem;"></i>
                                             </a>
                                         }
                                     </div>
