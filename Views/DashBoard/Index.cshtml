@@ -168,7 +168,7 @@
                                             <span class="customer-time text-danger">Due: @task.DueDate.ToString("MMM dd, yyyy")</span>
                                         </div>
                                     </div>
-                                    <i class="fa-solid fa-chevron-right text-muted small"></i>
+                                    @* <i class="fa-solid fa-chevron-right text-muted small"></i> *@
                                 </div>
                             }
                         }
@@ -180,8 +180,12 @@
                         }
                     </div>
                 </div>
-                <div class="widget-footer">
-                    <a href="#" class="view-all-link">View Task Calendar →</a>
+                <div class="widget-footer p-3">
+                    <a asp-controller="Tasks" asp-action="Index"
+                       class="btn w-100 shadow-sm"
+                       style="background-color: #044d66; color: white; font-weight: 600; border-radius: 10px; padding: 10px;">
+                        View Task Calendar →
+                    </a>
                 </div>
             </div>
         }
