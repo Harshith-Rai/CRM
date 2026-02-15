@@ -1,0 +1,270 @@
+﻿@using CRM.DTOS.SalesManager
+@model DashboardBaseDto
+@{
+    ViewData["Title"] = Model is ManagerDashboardDto ? "Manager Dashboard" : "Executive Dashboard";
+}
+
+<link rel="stylesheet" href="~/css/sales-manager-dashboard.css">
+
+<div class="dashboard-content">
+    <div class="dashboard-header">
+        <div>
+            <h1 class="page-title">
+                @(Model is ManagerDashboardDto ? "Sales Manager Dashboard" : "My Sales Dashboard")
+            </h1>
+            <p class="page-subtitle">
+                @(Model is ManagerDashboardDto
+                                ? "Monitor team performance and manage customer assignments"
+                                : "Track your personal pipeline and upcoming activities")
+            </p>
+        </div>
+    </div>
+
+    @* KPI Section: Only rendered for Managers *@
+    @if (Model is ManagerDashboardDto managerModel)
+    {
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Total Customers</span>
+                    @if (Model is ManagerDashboardDto manager)
+                    {
+                        <span>@manager.TotalCustomers</span>
+                    }
+                </div>
+            </div>
+
+            <div class="kpi-card kpi-card-warning">
+                <div class="kpi-icon kpi-icon-orange">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Unassigned Customers</span>
+                    <span class="kpi-value">@managerModel.UnassignedCustomers</span>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <polyline points="17 11 19 13 23 9"></polyline>
+                    </svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Active Team Members</span>
+                    <span class="kpi-value">@managerModel.ActiveTeamMembers</span>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="widgets-grid">
+        @* Widget 1: Recently Added Customers (Both Roles) *@
+        <div class="widget">
+            <div class="widget-header">
+                <div>
+                    <h3 class="widget-title">Recently Added Customers</h3>
+                    <p class="widget-subtitle">New business pipeline</p>
+                </div>
+            </div>
+            <div class="widget-content">
+                <div class="customer-list">
+                    @if (Model.RecentlyAddedCustomers != null && Model.RecentlyAddedCustomers.Any())
+                    {
+                        @foreach (var customer in Model.RecentlyAddedCustomers)
+                        {
+                            <div class="customer-item">
+                                <div class="customer-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="customer-details">
+                                    <div class="customer-name">@customer.CompanyName</div>
+                                    <div class="customer-meta">
+                                        <span class="customer-id">@customer.Email</span>
+                                        <span class="customer-time">@customer.CreatedAt.ToString("MMM dd")</span>
+                                    </div>
+                                </div>
+                                <span class="status-badge @(string.IsNullOrEmpty(customer.SalesRepId) ? "status-unassigned" : "status-assigned")">
+                                    @(string.IsNullOrEmpty(customer.SalesRepId) ? "Unassigned" : "Assigned")
+                                </span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <p>No recently added customers</p>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="widget-footer">
+                <a asp-controller="Customers" asp-action="index" class="view-all-link">View All Customers →</a>
+            </div>
+        </div>
+
+        @* Widget 2: Role-Specific Widget *@
+        @if (Model is ManagerDashboardDto mDto)
+        {
+            <div class="widget">
+                <div class="widget-header border-0 pt-4 px-4">
+                    <div class="d-flex align-items-center">
+                        <div style="width: 4px; height: 24px; background-color: #0061d5; border-radius: 2px; margin-right: 12px;"></div>
+                        <h3 class="widget-title mb-0" style="font-size: 1.25rem; color: #1e293b;">Customer Distribution</h3>
+                    </div>
+                </div>
+                <div class="widget-content py-4">
+                    <div class="d-flex flex-column align-items-center">
+                        <div style="width: 240px; height: 240px;">
+                            <canvas id="distributionPieChart"></canvas>
+                        </div>
+                        <div id="custom-legend" class="d-flex flex-wrap justify-content-center gap-3 px-3 py-3 border-top w-100 mt-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (Model is ExecutiveDashboardDto eDto)
+        {
+            <div class="widget">
+                <div class="widget-header border-0 pt-4 px-4">
+                    <div class="d-flex align-items-center">
+                        <div style="width: 4px; height: 24px; background-color: #10b981; border-radius: 2px; margin-right: 12px;"></div>
+                        <h3 class="widget-title mb-0" style="font-size: 1.25rem; color: #1e293b;">My Recent Tasks</h3>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="task-list">
+                        @if (eDto.RecentTasks != null && eDto.RecentTasks.Any())
+                        {
+                            @foreach (var task in eDto.RecentTasks)
+                            {
+                                <div class="customer-item">
+                                    <div class="customer-icon" style="background: #ecfdf5; color: #10b981;">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="customer-details">
+                                        <div class="customer-name">@task.Subject</div>
+                                        <div class="customer-meta">
+                                            <span class="customer-time text-danger">Due: @task.DueDate.ToString("MMM dd, yyyy")</span>
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-muted small"></i>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5 text-muted">
+                                <p>No pending tasks assigned to you.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="widget-footer">
+                    <a href="#" class="view-all-link">View Task Calendar →</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@functions {
+    private string GetRelativeTime(DateTime createdAt)
+    {
+        var timespan = DateTime.UtcNow - createdAt;
+
+        if (timespan.TotalMinutes < 60)
+            return $"{(int)timespan.TotalMinutes} minutes ago";
+        else if (timespan.TotalHours < 24)
+            return $"{(int)timespan.TotalHours} hours ago";
+        else if (timespan.TotalDays < 7)
+            return $"{(int)timespan.TotalDays} days ago";
+        else
+            return createdAt.ToString("MMM d, yyyy");
+    }
+}
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    @if (Model is ManagerDashboardDto manager)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Now we use 'manager' which is already cast to the correct type
+                const labels = @Html.Raw(Json.Serialize(manager.CustomerDistribution.Keys));
+                const counts = @Html.Raw(Json.Serialize(manager.CustomerDistribution.Values));
+                const colors = ['#0061d5', '#00ace1', '#1ec386', '#f59e0b', '#ec4899'];
+
+                const ctx = document.getElementById('distributionPieChart').getContext('2d');
+                if (!ctx) return; // Safety check
+
+                const myChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: counts,
+                            backgroundColor: colors,
+                            hoverOffset: 4,
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            cutout: '70%'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0F172A',
+                                padding: 12,
+                                bodyFont: { weight: 'bold' },
+                                callbacks: {
+                                    label: function (context) {
+                                        return ` ${context.label}: ${context.parsed} customers`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Legend Generation
+                const legendContainer = document.getElementById('custom-legend');
+                if (legendContainer) {
+                    const total = counts.reduce((a, b) => a + b, 0);
+                    labels.forEach((label, i) => {
+                        const percentage = total > 0 ? ((counts[i] / total) * 100).toFixed(1) : 0;
+                        const item = document.createElement('div');
+                        item.className = 'd-flex align-items-center';
+                        item.innerHTML = `
+                            <div style="width: 14px; height: 14px; background-color: ${colors[i % colors.length]}; border-radius: 50%; margin-right: 8px; border: 1px solid #64748b;"></div>
+                            <span style="font-size: 0.85rem; color: #1e293b; font-weight: 500;">${label} (${percentage}%)</span>
+                        `;
+                        legendContainer.appendChild(item);
+                    });
+                }
+            });
+        </script>
+    }
+}

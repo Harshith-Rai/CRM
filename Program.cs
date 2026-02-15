@@ -56,6 +56,7 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ISalesManagerService, SalesManagerService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<INavigation,NavigationService>();
+builder.Services.AddScoped<IDashBoardService, DashBoardService>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
