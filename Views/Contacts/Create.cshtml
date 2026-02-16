@@ -42,3 +42,23 @@
         </div>
     </div>
 </div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Optional: Phone Input Masking Script
+        document.addEventListener("DOMContentLoaded", function() {
+            var phoneInput = document.querySelector('input[name="Phone"]');
+            if(phoneInput) {
+                phoneInput.addEventListener('input', function (e) {
+                    var x = e.target.value.replace(/[^0-9+\-() ]/g, '');
+                    e.target.value = x;
+                });
+            }
+        });
+    </script>
+}
