@@ -137,24 +137,21 @@ body {
     border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Glassmorphism card - slightly lighter background for improved readability */
+
+
 .login-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.22));
-    border-radius: 24px;
-    padding: 56px 48px;
-    width: 100%;
+    background: linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.8));
+    border-radius: 18px;
+    padding: 40px;
     max-width: 460px;
+    width: 100%;
     position: relative;
-    overflow: hidden;
-    /* Stronger frosted shadow + softer inset highlight */
-    box-shadow: 0 12px 40px rgba(6, 12, 30, 0.55), inset 0 1px 0 rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.32);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    color: #052629; /* default text color inside card for readability */
+    box-shadow: 0 12px 30px rgba(6,12,30,.35);
+    border: 1px solid rgba(255,255,255,.28);
+    color: #052629;
 }
 
-    /* Softer top gradient stripe */
+   
     .login-card::before {
         content: '';
         position: absolute;
@@ -456,11 +453,15 @@ input[type="text"] {
     }
 
     .login-card {
-        padding: 32px 20px; /* Reduced padding to give form more room */
-        max-width: 100%; /* Allows the card to fill the screen width */
-        border-radius: 16px; /* Slightly smaller radius for mobile */
-        background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.12));
-        box-shadow: 0 8px 26px rgba(6, 12, 30, 0.45);
+        background: linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.8));
+        border-radius: 18px;
+        padding: 40px;
+        max-width: 460px;
+        width: 100%;
+        position: relative;
+        box-shadow: 0 12px 30px rgba(6,12,30,.35);
+        border: 1px solid rgba(255,255,255,.28);
+        color: #052629
     }
 
     .login-header h2 {

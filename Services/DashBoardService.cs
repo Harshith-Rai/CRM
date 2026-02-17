@@ -5,19 +5,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 namespace CRM.Services
 {
-    public class SalesManagerService : ISalesManagerService
+    public class DashBoardService:IDashBoardService
     {
         private readonly AppDbContext _context;
         private readonly ILogger<SalesManagerService> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        public SalesManagerService(AppDbContext context, ILogger<SalesManagerService> logger,UserManager<ApplicationUser> userManager)
+        public DashBoardService(AppDbContext context, ILogger<SalesManagerService> logger, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _logger = logger;
             _userManager = userManager;
         }
 
-        public async Task<DashboardBaseDto> GetDashboardDataAsync(String userId,bool isManager)
+        public async Task<DashboardBaseDto> GetDashboardDataAsync(String userId, bool isManager)
         {
             if (isManager)
             {
@@ -108,9 +108,9 @@ namespace CRM.Services
         {
             try
             {
-                var salesRep=await _userManager.GetUsersInRoleAsync("SalesExecutive");
+                var salesRep = await _userManager.GetUsersInRoleAsync("SalesExecutive");
                 _logger.LogInformation($"Found {salesRep.Count} active Sales Executives");
-                Console.WriteLine("the number of sales rep is here"+salesRep);
+                Console.WriteLine("the number of sales rep is here" + salesRep);
                 return salesRep.Count();
 
             }
@@ -164,7 +164,6 @@ namespace CRM.Services
                 _logger.LogError($"Error fetching recent tasks: {ex.Message}");
                 return Task.FromResult(new List<Activity>());
             }
-            }
-    }
-
-    }
+        }
+}
+}

@@ -133,7 +133,7 @@ namespace CRM.Services
                 existing.Email = customer.Email;
                 existing.Phone = customer.Phone;
                 existing.Address = customer.Address;
-
+                existing.SalesRepId = customer.SalesRepId;
                 // Track Last Edit in UTC
                 existing.UpdatedAt = DateTime.UtcNow;
 

@@ -1,44 +1,44 @@
 ﻿using CRM.Data;
+using CRM.Models;
+using CRM.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CRM.Controllers 
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class DashboardController : ControllerBase
+    public class DashboardController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IDashBoardService _dashboardService;
 
-        public DashboardController(AppDbContext context)
+        public DashboardController(AppDbContext context, UserManager<ApplicationUser> userManager,IDashBoardService dashboardServivce)
         {
             _context = context;
+            _userManager = userManager;
+            _dashboardService = dashboardServivce;
         }
 
-        [HttpGet("stats")]
-        public async Task<IActionResult> GetStats()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            var stats = new
+            try
             {
-                TotalCustomers = await _context.Customers.CountAsync(c => c.IsActive), // Only count Active ones!
-                TotalContacts = await _context.Contacts.CountAsync(),
-
-          
-                RecentNotes = await _context.Notes
-                    .OrderByDescending(n => n.CreatedAt)
-                    .Take(5)
-                    .Select(n => new
-                    {
-                        n.Id,
-                        n.Title,
-                        n.Content,
-                        CreatedAt = n.CreatedAt,
-                        CustomerName = n.Customer.CompanyName // Flatten the data for easier use
-                    })
-                    .ToListAsync()
-            };
-
-            return Ok(stats);
+                bool isManager = true;
+                string userId = null;
+                if (User.IsInRole("SalesExecutive"))
+                {
+                    isManager = false;
+                    userId = _userManager.GetUserId(User);
+                }
+                var dashboard = await _dashboardService.GetDashboardDataAsync(userId, isManager);
+                return View(dashboard);
+            }
+            catch (Exception ex)
+            {
+                return View(new DashboardBaseDto());
+            }
         }
     }
 }

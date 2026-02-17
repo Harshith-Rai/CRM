@@ -5,15 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CRM.Models
 {
-    public enum IndustryType
-    {
-        Technology,
-        Finance,
-        Manufacturing,
-        Healthcare,
-        Retail,
-        Other
-    }
     public class Customer
     {
         public int Id { get; set; }
@@ -22,20 +13,27 @@ namespace CRM.Models
         [Display(Name = "Company Name")]
         public string CompanyName { get; set; }
 
-        public string Industry { get; set; } // e.g., "Tech", "Real Estate"
+        public string Industry { get; set; }
 
-        [EmailAddress]
-        public string Email { get; set; } // Main company email
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
+        public string Email { get; set; }
 
-        public string Phone { get; set; } // Main HQ Phone
+        // --- VALIDATION ADDED HERE ---
+        [Required(ErrorMessage = "Phone Number is required")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$",
+            ErrorMessage = "Invalid phone number. Use format like 123-456-7890 or (123) 456-7890 or +91 9876543210")]
+        public string Phone { get; set; }
+        // -----------------------------
+
         public string Address { get; set; }
 
-        public string? SalesRepId { get; set; } // The User ID of the Sales Rep
+        public string? SalesRepId { get; set; }
         public DateTime? ArchivedAt { get; set; }
 
         [ForeignKey("SalesRepId")]
         public virtual ApplicationUser? SalesRep { get; set; }
-        public bool IsActive { get; set; } = true; // Soft Delete flag
+        public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // --- Relationships ---

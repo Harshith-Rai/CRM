@@ -28,7 +28,7 @@
 </div>
 
 <div class="container-fluid px-0">
-    <form asp-action="Edit" id="editCustomerForm">
+    <form asp-action="Edit" id="editCustomerForm" method="post">
         <input type="hidden" asp-for="Id" />
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -114,20 +114,25 @@
                                 <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
                                 <input asp-for="Email" class="form-control" />
                             </div>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
+
                         <div class="col-md-6">
                             <label asp-for="Phone" class="form-label-top">Phone Number</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
                                 <input asp-for="Phone" class="form-control" />
                             </div>
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
                         </div>
+
                         <div class="col-12">
                             <label asp-for="Address" class="form-label-top">Headquarters Address</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
                                 <textarea asp-for="Address" class="form-control" rows="3"></textarea>
                             </div>
+                            <span asp-validation-for="Address" class="text-danger small"></span>
                         </div>
                     </div>
                 </div>
@@ -234,4 +239,29 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Select the phone input
+            var phoneInput = document.querySelector('input[name="Phone"]');
+
+            if(phoneInput) {
+                phoneInput.addEventListener('input', function (e) {
+                    var x = e.target.value.replace(/[^0-9+\-() ]/g, '');
+                    e.target.value = x;
+                });
+
+                // 2. Formatting (Optional): Auto-format as (XXX) XXX-XXXX
+                // Uncomment below if you want auto-formatting behavior
+                
+                phoneInput.addEventListener('blur', function (e) {
+                    var x = e.target.value.replace(/\D/g, '').match(/(\d{3})(\d{3})(\d{4})/);
+                    if (x) {
+                        e.target.value = '(' + x[1] + ') ' + x[2] + '-' + x[3];
+                    }
+                });
+               
+            }
+        });
+    </script>
 }

@@ -22,6 +22,74 @@
             border-radius:10px;
         }
     </style>
+    <script>
+             async function executeDelete() {
+            const userId = document.getElementById('deleteUserId').value;
+            const loadingBar = document.getElementById('loadingBar');
+
+            if (loadingBar) loadingBar.style.width = '100%';
+
+            try {
+                const response = await fetch(`/Admin/delete/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast("Success", result.message, "success");
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast("Error", result.message || "Failed to delete user.", "danger");
+                }
+            } catch (error) {
+                showToast("Error", "A network error occurred."+error.message, "danger");
+            } finally {
+                if (loadingBar) loadingBar.style.width = '0%';
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                modal.hide();
+            }
+        }
+
+                // ONE function to rule them all
+        function showToast(title, message, type = "info") {
+            const toastElement = document.getElementById('statusToast');
+            const toastHeader = document.getElementById('toastHeader');
+            const toastBody = document.getElementById('toastBody');
+            const toastIcon = document.getElementById('toastIcon');
+
+            // 1. Set the Look
+            const typeClass = type === "success" ? "bg-success" : (type === "danger" ? "bg-danger" : "bg-primary");
+            toastHeader.className = `toast-header ${typeClass} text-white`;
+
+            // 2. Set the Icon
+            const iconClass = type === "success" ? "fa-check-circle" : (type === "danger" ? "fa-exclamation-triangle" : "fa-info-circle");
+            toastIcon.className = `fas ${iconClass} me-2`;
+
+            // 3. Set Content
+            document.getElementById('toastTitle').innerText = title;
+            toastBody.innerText = message;
+
+            // 4. Show
+            const bsToast = new bootstrap.Toast(toastElement);
+            bsToast.show();
+        }
+
+        // 5. Automatic Listener for Server-Side TempData
+        document.addEventListener("DOMContentLoaded", function () {
+            @if (TempData["Success"] != null)
+            {
+                    <text>showToast("Success", "@Html.Raw(TempData["Success"])", "success");</text>
+            }
+            @if (TempData["Error"] != null)
+            {
+                    <text>showToast("Action Failed", "@Html.Raw(TempData["Error"])", "danger");</text>
+            }
+        });
+    </script>
 </head>
 <body>
     <!-- Toast Container -->
@@ -174,7 +242,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
                     <input type="hidden" id="deleteUserId" />
-                    <button type="button" class="btn btn-confirm-block" onclick="submitDeleteForm()">
+                    <button type="button" class="btn btn-confirm-block" onclick="executeDelete()">
                         <i class="fas fa-trash me-2"></i>Yes, Delete User
                     </button>
                 </div>
@@ -225,7 +293,7 @@
             </div>
         </div>
     </div>
-    @if (TempData["Error"] != null)
+    @* @if (TempData["Error"] != null)
     {
         <script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -255,6 +323,6 @@
                 }
             });
         </script>
-    }
+    } *@
 </body>
 </html>

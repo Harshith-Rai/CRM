@@ -36,19 +36,25 @@ public class AdminController : Controller
         return View(users); // Ensure file is at Views/Admin/Index.cshtml
     }
 
-    // URL: /admin/update-role
     [HttpPost("update-role")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateRole(string id, string newRole)
     {
         var result = await _adminService.UpdateUserRoleAsync(id, newRole);
-        if (!result) TempData["Error"] = "Update failed.";
 
-        // Use the explicit route to avoid confusion
+        if (result)
+        {
+            TempData["Success"] = "Role updated successfully!";
+        }
+        else
+        {
+            TempData["Error"] = "Could not update the user role.";
+        }
         return RedirectToAction(nameof(Index));
     }
 
-    // URL: /admin/delete/{id}
-    [HttpDelete("delete/{id}")]
+    [HttpDelete("/Admin/delete/{id}")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteUser(string id)
     {
         try

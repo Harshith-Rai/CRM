@@ -15,7 +15,12 @@ namespace CRM.Models
 
         [EmailAddress]
         public string Email { get; set; }
-
+       
+        
+        [Required(ErrorMessage = "Phone Number is required")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$",
+                    ErrorMessage = "Invalid phone number. Use format like 123-456-7890 or (123) 456-7890")]
         public string Phone { get; set; }
 
         // Link back to Customer
