@@ -53,7 +53,7 @@ namespace CRM.Controllers
         public async Task<IActionResult> Create(CreateCustomerViewModel viewModel)
         {
             var currentUserId = _userManager.GetUserId(User);
-            bool isManagerialRole = User.IsInRole("Admin") || User.IsInRole("Sales Manager");
+            bool isManagerialRole = User.IsInRole("Admin") || User.IsInRole("SalesManager");
 
             if (isManagerialRole)
             {
@@ -92,7 +92,7 @@ namespace CRM.Controllers
             // FIX 3: Allow "Sales Manager" to view details
             bool hasAccess = customer.SalesRepId == _userManager.GetUserId(User) ||
                              User.IsInRole("Admin") ||
-                             User.IsInRole("Sales Manager");
+                             User.IsInRole("SalesManager");
 
             if (!hasAccess) return Forbid();
 
