@@ -8,9 +8,9 @@ namespace CRM.Services
     public class DashBoardService:IDashBoardService
     {
         private readonly AppDbContext _context;
-        private readonly ILogger<SalesManagerService> _logger;
+        private readonly ILogger<DashBoardService> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        public DashBoardService(AppDbContext context, ILogger<SalesManagerService> logger, UserManager<ApplicationUser> userManager)
+        public DashBoardService(AppDbContext context, ILogger<DashBoardService> logger, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _logger = logger;

@@ -10,13 +10,13 @@ namespace CRM.Services
     public class AdminService : IAdminService
     {
         private readonly AppDbContext _context;
-        private readonly ISalesManagerService _salesManagerService;
+        private readonly IDashBoardService _DashBoardService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public AdminService(AppDbContext context,ISalesManagerService salesManagerService,UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager)
+        public AdminService(AppDbContext context,IDashBoardService dashBoardService,UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager)
         {
             _context = context;
-            _salesManagerService = salesManagerService;
+            _DashBoardService=dashBoardService;
             _userManager = userManager;
             _roleManager = roleManager;
         }
@@ -61,21 +61,6 @@ namespace CRM.Services
                 NewCustomersThisMonth = await _context.Customers
                     .CountAsync(c=>c.CreatedAt >= startDate),
 
-                //TotalPipelineValue = await _context.Leads
-                //    .Where(l => l.SalesRepId == userId && l.Status != LeadStatus.Won && l.Status != LeadStatus.Lost)
-                //    .SumAsync(l => (decimal?)l.Value) ?? 0,
-
-                //TotalRevenueWon = await _context.Leads
-                //    .Where(l => l.SalesRepId == userId && l.Status == LeadStatus.Won)
-                //    .SumAsync(l => (decimal?)l.Value) ?? 0,
-
-                //RecentActivities = await _context.Notes
-                //    .Include(n => n.Customer)
-                //    .Where(n => n.AuthorId == userId && n.Customer.IsActive)
-                //    .OrderByDescending(n => n.CreatedAt)
-                //    .Take(5)
-                //    .ToListAsync(),
-
                 CustomersByIndustry = await _context.Customers
                     .GroupBy(c => c.Industry)
                     .Select(g => new { Industry = g.Key, Count = g.Count() })
@@ -83,7 +68,7 @@ namespace CRM.Services
 
                 MonthlyGrowth = monthlyGrowth,
 
-                RecentlyAddedCustomers = await _salesManagerService.GetRecentlyAddedCustomersAsync(null)
+                RecentlyAddedCustomers = await _DashBoardService.GetRecentlyAddedCustomersAsync(null)
             };
         }
 

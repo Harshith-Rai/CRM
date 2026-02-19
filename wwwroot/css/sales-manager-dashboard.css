@@ -417,3 +417,22 @@ input:focus-visible {
 .tableContainer:{
     background-color:darkred
 }
+/* Target mobile screens (768px and below) */
+@media (max-width: 768px) {
+    /* Hide the time ago text and the bullet separator */
+    .customer-time,
+    .customer-time::before {
+        display: none !important;
+    }
+
+    /* Adjust the meta container to remove extra gaps now that time is gone */
+    .customer-meta {
+        gap: 0;
+    }
+
+    /* Ensure the remaining details (ID/Email) wrap or hide properly if needed */
+    .customer-id {
+        font-size: 10px;
+        opacity: 0.8;
+    }
+}

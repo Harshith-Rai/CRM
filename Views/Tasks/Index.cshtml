@@ -3,22 +3,20 @@
 @{
     ViewData["Title"] = "My Tasks";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    // We get the filter state directly from our ViewModel now
     var currentFilter = Model.CurrentFilter ?? "all";
 }
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-end mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
         <div>
-            <h2 class="fw-bold" style="color: var(--mri-blue);">
+            <h2 class="fw-bold mb-1" style="color: var(--mri-blue);">
                 <i class="fa-solid fa-calendar-check me-2"></i> My Tasks
             </h2>
             <p class="text-muted mb-0">Tasks scheduled for you or your team.</p>
         </div>
 
-        <div class="d-flex gap-3 align-items-center">
-            @* Button visible to everyone who can log in *@
-            <button type="button" class="btn text-white shadow-sm fw-bold px-4 rounded-pill d-flex align-items-center"
+        <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch">
+            <button type="button" class="btn text-white shadow-sm fw-bold px-4 rounded-pill d-flex align-items-center justify-content-center"
                     style="background-color: var(--mri-blue); border: none;"
                     data-bs-toggle="modal" data-bs-target="#addTaskModal">
                 <i class="fa-solid fa-plus me-2"></i> Add Task
@@ -27,125 +25,111 @@
             <div class="btn-group shadow-sm" role="group">
                 <a asp-action="Index" asp-route-filter="all" class="btn btn-outline-secondary @(currentFilter == "all" ? "active" : "")">All</a>
                 <a asp-action="Index" asp-route-filter="pending" class="btn btn-outline-secondary @(currentFilter == "pending" ? "active" : "")">Pending</a>
-                <a asp-action="Index" asp-route-filter="completed" class="btn btn-outline-secondary @(currentFilter == "completed" ? "active" : "")">Completed</a>
+                <a asp-action="Index" asp-route-filter="completed" class="btn btn-outline-secondary @(currentFilter == "completed" ? "active" : "")">Done</a>
             </div>
         </div>
     </div>
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light" >
-                    <tr style="border-radius:10px">
-                        <th class="ps-4 py-3" style="background-color:#044D66;color:white">Due Date</th>
-                        <th style="background-color:#044D66;color:white">Subject / Description</th>
-                        <th style="background-color:#044D66;color:white">Assigned To</th>
-                        <th class="text-center" style="width: 150px; background-color:#044D66;color:white">State</th>
-                        @* <th class="text-end pe-4">Action</th> *@
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Tasks.OrderBy(t=>t.Status).ThenBy(t=>t.DueDate))
-                    {
-                        var isToday = item.DueDate.Date == DateTime.Today;
-                        var dateClass = (isToday && !item.Status) ? "text-danger fw-bold" : "text-dark";
-                        var textDecoration = item.Status ? "text-decoration-line-through text-muted" : "fw-bold";
-
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="min-width: 600px;">
+                    <thead class="bg-light">
                         <tr>
-                            <td class="ps-4 py-3 @dateClass">
-                                @item.DueDate.ToString("MMM dd, yyyy")
-                                @if (isToday && !item.Status)
-                                {
-                                    <span class='badge bg-danger ms-2'>Today</span>
-                                }
-                            </td>
-                            <td>
-                                <div class="@textDecoration">@item.Subject</div>
-                                <div class="small text-muted text-truncate" style="max-width: 300px;">@item.Description</div>
-                            </td>
-                            <td>
-                                @if (item.User != null)
-                                {
-                                    <span class="badge bg-light text-dark border">
-                                        <i class="fa-solid fa-user me-1"></i> @item.User.FullName
-                                    </span>
-                                }
-                            </td>
-                            <td class="text-center">
-                                <form asp-action="UpdateStatus" method="post" asp-route-id="@item.Id">
-                                    <input type="hidden" name="id" value="@item.Id" />
-                                    @if (item.Status)
+                            <th class="ps-4 py-3 text-white" style="background-color:#044D66;">Due Date</th>
+                            <th class="text-white" style="background-color:#044D66;">Subject / Description</th>
+                            <th class="text-white" style="background-color:#044D66;">Assigned To</th>
+                            <th class="text-center text-white" style="width: 150px; background-color:#044D66;">State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Tasks.OrderBy(t => t.Status).ThenBy(t => t.DueDate))
+                        {
+                            var isToday = item.DueDate.Date == DateTime.Today;
+                            var dateClass = (isToday && !item.Status) ? "text-danger fw-bold" : "text-dark";
+                            var textDecoration = item.Status ? "text-decoration-line-through text-muted" : "fw-bold";
+
+                            <tr>
+                                <td class="ps-4 py-3 @dateClass">
+                                    <div class="d-flex flex-column">
+                                        <span>@item.DueDate.ToString("MMM dd, yyyy")</span>
+                                        @if (isToday && !item.Status)
+                                        {
+                                            <span class='badge bg-danger mt-1' style="width: fit-content;">Today</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="@textDecoration text-truncate" style="max-width: 200px;">@item.Subject</div>
+                                    <div class="small text-muted text-truncate d-none d-sm-block" style="max-width: 250px;">@item.Description</div>
+                                </td>
+                                <td>
+                                    @if (item.User != null)
                                     {
-                                        <span class="badge rounded-pill bg-success-subtle text-success border border-success">
-                                            <i class="fa-solid fa-check me-1"></i> Completed
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="fa-solid fa-user me-1"></i> @item.User.FullName
                                         </span>
                                     }
-                                    else
-                                    {
-                                        <button type="submit"
-                                                onclick="markAsComplete('@item.Id',true)"
-                                                class="btn badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning hover-complete">
-                                            <i class="fa-regular fa-clock me-1"></i> Mark as Complete
-                                        </button>
-                                    }
-                                </form>
-                            </td>
-                            @* <td class="text-end pe-4">
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-magnifying-glass"></i> Details
-                                </a>
-                            </td> *@
-                        </tr>
-                    }
-                    @if (!Model.Tasks.Any())
-                    {
-                        <tr><td colspan="5" class="text-center py-5 text-muted"><p>No tasks found.</p></td></tr>
-                    }
-                </tbody>
-            </table>
+                                </td>
+                                <td class="text-center">
+                                    <form asp-action="UpdateStatus" method="post" asp-route-id="@item.Id">
+                                        @if (item.Status)
+                                        {
+                                            <span class="badge rounded-pill bg-success-subtle text-success border border-success px-3">
+                                                <i class="fa-solid fa-check me-1"></i> Done
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill fw-bold">
+                                                Mark Complete
+                                            </button>
+                                        }
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-body p-0">
-                <div class="add-note-card p-4">
-                    <div class="section-header mb-3 d-flex justify-content-between align-items-center">
-                        <h4 style="font-size: 1.1rem; margin:0; color: var(--mri-blue);">
-                            <i class="fa-solid fa-pen-to-square me-2"></i>Create New Task
-                        </h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color: var(--mri-blue);">
+                    <i class="fa-solid fa-pen-to-square me-2"></i>Create New Task
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form asp-action="Create" method="post">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Assign To</label>
+                        <select name="AssignTo" class="form-select" asp-items="Model.AssigneeList" required></select>
                     </div>
 
-                    <form asp-action="Create" method="post">
-                        <div class="mb-2">
-                            <label class="form-label small fw-bold text-muted mb-1">Assign To</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user-tag text-muted"></i></span>
-                                @* Using the AssigneeList from our ViewModel *@
-                                <select name="AssignTo" class="form-select border-start-0 ps-0" asp-items="Model.AssigneeList" required>
-                                </select>
-                            </div>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Subject</label>
+                        <input name="Subject" class="form-control fw-bold" placeholder="e.g. Call Client" required />
+                    </div>
 
-                        <div class="mb-2">
-                            <input name="Subject" class="form-control" placeholder="Subject (e.g. Call Client)" required style="font-weight:600;" />
-                        </div>
-                        <div class="mb-2">
-                            <textarea name="Description" class="form-control" rows="4" placeholder="Task details..." required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-label small fw-bold text-muted">Due Date:</label>
-                            <input type="date" name="DueDate" class="form-control" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Description</label>
+                        <textarea name="Description" class="form-control" rows="3" placeholder="Task details..." required></textarea>
+                    </div>
 
-                        <button type="submit" class="btn btn-primary btn-full w-100" style="background-color: var(--mri-blue); border:none;">
-                            <i class="fa-solid fa-floppy-disk me-2"></i> Create Task
-                        </button>
-                    </form>
-                </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted">Due Date</label>
+                        <input type="date" name="DueDate" class="form-control" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 shadow-sm" style="background-color: var(--mri-blue); border:none;">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> Create Task
+                    </button>
+                </form>
             </div>
         </div>
     </div>

@@ -1,9 +1,4 @@
-﻿/* wwwroot/css/customer-details.css */
-
-/* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
-
-:root {
+﻿:root {
     --primary-blue: #0066CC;
     --deep-blue: #003D82;
     --light-blue: #E6F2FF;
@@ -32,7 +27,7 @@ body {
     animation: fadeIn 0.6s ease-in-out;
 }
 
-@keyframes fadeIn {
+@@keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(20px);
@@ -126,17 +121,6 @@ body {
         transform: translateX(4px);
     }
 
-.contact-name {
-    font-weight: 700;
-    color: var(--deep-blue);
-}
-
-.contact-pos {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    margin-bottom: 10px;
-}
-
 /* Note styling */
 .note-box {
     background: white;
@@ -144,30 +128,6 @@ body {
     border-radius: 12px;
     width: 100%;
     border: 1px solid var(--border-color);
-}
-
-.note-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8px;
-}
-
-.note-title {
-    font-weight: 700;
-    color: var(--deep-blue);
-}
-
-.note-date {
-    font-size: 0.8rem;
-    color: var(--text-light);
-}
-
-.note-content {
-    margin: 0;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    white-space: pre-wrap;
 }
 
 /* Buttons & Badges */
@@ -179,12 +139,6 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
-}
-
-.customer-meta {
-    display: flex;
-    gap: 20px;
-    color: rgba(255,255,255,0.8);
 }
 
 .badge {
@@ -247,9 +201,11 @@ body {
     max-height: 500px; /* Sets the fixed height */
     overflow-y: auto; /* Enables vertical scrolling */
     padding-right: 15px; /* Prevents text from hitting the scrollbar */
+    padding-left: 10px;
+    padding-top: 5px;
 }
 
-    /* Optional: Make the scrollbar look cleaner */
+    /* Optional: Scrollbar styling */
     .timeline-wrapper::-webkit-scrollbar {
         width: 6px;
     }
@@ -271,10 +227,6 @@ body {
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
     color: white;
-}
-
-.btn-full {
-    width: 100%;
 }
 
 /* Timeline */
@@ -354,53 +306,3 @@ body {
         background: var(--danger-red);
         color: white;
     }
-
-/* Utilities */
-.mb-2 {
-    margin-bottom: 10px;
-}
-
-.mb-3 {
-    margin-bottom: 15px;
-}
-
-.text-label {
-    font-size: 0.8rem;
-    color: var(--text-light);
-    margin-bottom: 4px;
-    display: block;
-}
-
-.note-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-icon-edit {
-    color: #64748B;
-    padding: 4px;
-}
-
-.btn-icon-delete {
-    color: #DC2626;
-    padding: 4px;
-}
-
-.empty-state {
-    padding: 60px 0;
-    text-align: center;
-    color: #94a3b8;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-    .grid-layout {
-        grid-template-columns: 35% 63%;
-    }
-}
-
-@media (max-width: 992px) {
-    .grid-layout {
-        grid-template-columns: 1fr;
-    }
-}

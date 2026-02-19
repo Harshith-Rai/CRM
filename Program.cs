@@ -53,7 +53,6 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
-builder.Services.AddScoped<ISalesManagerService, SalesManagerService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<INavigation,NavigationService>();
 builder.Services.AddScoped<IDashBoardService, DashBoardService>();

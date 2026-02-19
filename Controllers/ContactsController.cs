@@ -54,7 +54,7 @@ namespace CRM.Controllers
                 }
             }
 
-            return View(contact);
+            return RedirectToAction("Details", "Customers", new { id = contact.CustomerId });
         }
 
         // GET: Contacts/Delete/5

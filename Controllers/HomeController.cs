@@ -1,5 +1,4 @@
-﻿using CRM.Extensions;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using CRM.Models;
 using CRM.Services;
