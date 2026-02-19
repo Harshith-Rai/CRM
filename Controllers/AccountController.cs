@@ -116,7 +116,7 @@ namespace CRM.Controllers
             var user = await userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return RedirectToAction("VerifyOtp", new { email = email });
+                return RedirectToAction("login","Account");
             }
 
             // Generate 6-digit OTP
