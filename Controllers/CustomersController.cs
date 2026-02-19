@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Security.Claims;
 using System.Text;
 
 namespace CRM.Controllers
@@ -92,7 +94,7 @@ namespace CRM.Controllers
             // FIX 3: Allow "Sales Manager" to view details
             bool hasAccess = customer.SalesRepId == _userManager.GetUserId(User) ||
                              User.IsInRole("Admin") ||
-                             User.IsInRole("Sales Manager");
+                             User.IsInRole("SalesManager");
 
             if (!hasAccess) return Forbid();
 
@@ -111,10 +113,11 @@ namespace CRM.Controllers
             // FIX 4: Allow "Sales Manager" to edit
             bool hasAccess = customer.SalesRepId == _userManager.GetUserId(User) ||
                              User.IsInRole("Admin") ||
-                             User.IsInRole("Sales Manager");
+                             User.IsInRole("SalesManager");
 
-            if (!hasAccess) return Forbid();
-            if (User.IsInRole("Admin"))
+            if (!hasAccess) return Forbid(); 
+
+            if (User.IsInRole("Admin")|| User.IsInRole("SalesManager"))
             {
                 var salesExecutives = await _userManager.GetUsersInRoleAsync("SalesExecutive");
                 ViewBag.SalesExecutives = salesExecutives.OrderBy(u => u.FullName).ToList();
@@ -146,20 +149,9 @@ namespace CRM.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            await _customerService.InactivateCustomerAsync(id);
 
-            if (customer != null)
-            {
-                customer.IsActive = false;
-
-
-                customer.ArchivedAt = DateTime.UtcNow;
-
-                _context.Customers.Update(customer);
-                await _context.SaveChangesAsync();
-            }
-
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("index","Customers");
         }
 
         // --- 6. NOTES ---

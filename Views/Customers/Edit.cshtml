@@ -60,7 +60,7 @@
                         <div class="col-md-6">
                            
 
-                            @if (User.IsInRole("Admin"))
+                            @if (User.IsInRole("Admin") || User.IsInRole("SalesManager"))
                             {
                                  <label class="form-label-top">Account Owner</label>
                                
@@ -71,7 +71,7 @@
                                         <option value="">-- Unassigned --</option>
                                     </select>
                                 </div>
-                                <div class="form-text small text-muted"><i class="fa-solid fa-circle-info me-1"></i>Admins can reassign accounts.</div>
+                                <div class="form-text small text-muted"><i class="fa-solid fa-circle-info me-1"></i>Admins and Manager can reassign accounts.</div>
                             }
                             else
                             {
@@ -84,9 +84,10 @@
                                         <i class="fa-solid fa-lock text-muted opacity-50"></i>
                                         <div>
                                             <div class="fw-bold text-dark" style="font-size: 0.9rem;">
-                                                @(Model.SalesRep?.FullName ?? "Unassigned")
+                                                @* @(Model.SalesRep?.FullName ?? "Unassigned") *@
+                                                Assigned to self
                                             </div>
-                                            <div class="small text-muted" style="font-size: 0.7rem;">Assignment Locked</div>
+                                            @* <div class="small text-muted" style="font-size: 0.7rem;">Assignment Locked</div> *@
                                         </div>
                                     </div>
 
@@ -170,10 +171,10 @@
                         <h6 class="text-danger fw-bold small text-uppercase">Danger Zone</h6>
                         <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
                             <p class="small text-danger mb-2" style="font-size: 0.8rem;">
-                                Archiving hides this customer from your lists.
+                                Deactvating hides this customer from your lists.
                             </p>
                             <button type="button" class="btn btn-outline-danger w-100 btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#archiveModal">
-                                <i class="fa-solid fa-box-archive me-2"></i> Archive Customer
+                                <i class="fa-solid fa-box-archive me-2"></i> Deactivate Customer
                             </button>
                         </div>
                         }
@@ -210,7 +211,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-danger">Archive Customer?</h5>
+                <h5 class="modal-title fw-bold text-danger">Deactivate Customer?</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center py-4">
@@ -228,7 +229,7 @@
                 <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal">Cancel</button>
 
                 <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
-                    <button type="submit" class="btn btn-danger fw-bold px-4">Yes, Archive It</button>
+                    <button type="submit" class="btn btn-danger fw-bold px-4">Yes, Deactivate</button>
                 </form>
             </div>
         </div>

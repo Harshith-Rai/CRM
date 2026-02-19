@@ -80,7 +80,7 @@
                                         <form asp-action="Restore" asp-route-id="@item.Id" method="post">
                                             <button type="submit" class="btn btn-sm btn-outline-success fw-bold"
                                                     onclick="return confirm('Restore @item.CompanyName to active list?');">
-                                                <i class="fa-solid fa-rotate-left me-1"></i> Restore
+                                                <i class="fa-solid fa-rotate-left me-1"></i> Activate customer
                                             </button>
                                         </form>
 
@@ -104,7 +104,7 @@
                                     <i class="fa-regular fa-folder-open fa-3x"></i>
                                 </div>
                                 <h6 class="fw-bold">The bin is empty</h6>
-                                <p class="mb-0 small">No archived customers found.</p>
+                                <p class="mb-0 small">No Inactive customers found.</p>
                             </td>
                         </tr>
                     }

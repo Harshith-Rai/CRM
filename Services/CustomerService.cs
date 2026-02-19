@@ -142,12 +142,12 @@ namespace CRM.Services
         }
 
         // --- 6. SOFT DELETE (ARCHIVE) ---
-        public async Task SoftDeleteAsync(int id, string userId, bool isAdmin)
+        public async Task InactivateCustomerAsync(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
 
             // Permission Check
-            if (customer != null && (customer.SalesRepId == userId || isAdmin))
+            if (customer != null)
             {
                 customer.IsActive = false;
 
@@ -156,6 +156,7 @@ namespace CRM.Services
 
                 customer.UpdatedAt = DateTime.UtcNow;
 
+                customer.SalesRepId = null;
                 await _context.SaveChangesAsync();
             }
         }
@@ -235,6 +236,27 @@ namespace CRM.Services
                 builder.AppendLine($"{c.CompanyName},{c.Industry},{c.Email},{c.Phone},{c.Address},{istDate}");
             }
             return builder.ToString();
+        }
+
+        public async Task<bool> ToggleCustomerStatusAsync(int id)
+        {
+            var customer = await _context.Customers.FindAsync(id);
+
+            if (customer == null)
+            {
+                return false;
+            }
+
+            // Toggle the boolean value
+            customer.IsActive = !customer.IsActive;
+
+            // Set the update timestamp
+            customer.UpdatedAt = DateTime.UtcNow;
+
+            _context.Customers.Update(customer);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         // ... Notes Methods ...
