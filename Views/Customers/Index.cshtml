@@ -139,7 +139,11 @@
                                             @item.CompanyName.Substring(0, 1).ToUpper()
                                         </div>
                                         <div class="company-info">
-                                            <div class="fw-bold text-dark">@item.CompanyName</div>
+                                            <div class="fw-bold text-dark">
+                                                @(item.CompanyName.Length > 10
+                                                  ? item.CompanyName.Substring(0, 10) + "..." 
+                                                    : item.CompanyName)
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -235,109 +239,6 @@
 
 @section Scripts {
     <script>
-        @* const searchInput = document.getElementById('searchInput');
-        const industryFilter = document.getElementById('industryFilter');
-        const statusFilter = document.getElementById('statusFilter');
-        const resetButton = document.getElementById('resetFilters');
-
-        // Stat Elements
-        const totalStatsCount = document.getElementById('totalStatsCount');
-        const newStatsCount = document.getElementById('newStatsCount');
-        const industryStatsCount = document.getElementById('industryStatsCount');
-        const visibleCountElement = document.getElementById('visibleCount');
-        const activeFiltersContainer = document.getElementById('activeFiltersContainer');
-        const activeFiltersChips = document.getElementById('activeFiltersChips');
-
-        // Initial Logic for "New" (30 days ago)
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-        let searchTimeout;
-        searchInput?.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(filterCustomers, 300);
-        });
-
-        industryFilter?.addEventListener('change', filterCustomers);
-        statusFilter?.addEventListener('change', filterCustomers);
-
-        resetButton?.addEventListener('click', function() {
-            searchInput.value = '';
-            industryFilter.value = '';
-            statusFilter.value = '';
-            filterCustomers();
-        });
-
-        function filterCustomers() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            const selectedIndustry = industryFilter.value;
-            const selectedStatus = statusFilter.value;
-            const rows = document.querySelectorAll('.customer-row');
-
-            // Dynamic Counters
-            let visibleCount = 0;
-            let newCustomersCount = 0;
-            let activeIndustriesSet = new Set();
-
-            rows.forEach(row => {
-                const company = row.dataset.company.toLowerCase();
-                const industry = row.dataset.industry;
-                const status = row.dataset.status;
-                const email = (row.dataset.email || '').toLowerCase();
-                const phone = (row.dataset.phone || '').toLowerCase();
-                const createdDateStr = row.dataset.created;
-
-                const matchesSearch = !searchTerm || company.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
-                const matchesIndustry = !selectedIndustry || industry === selectedIndustry;
-                const matchesStatus = !selectedStatus || status === selectedStatus;
-
-                if (matchesSearch && matchesIndustry && matchesStatus) {
-                    row.style.display = '';
-                    visibleCount++;
-                    const rowDate = new Date(createdDateStr);
-                    if (rowDate >= thirtyDaysAgo) {
-                        newCustomersCount++;
-                    }
-                    if (industry) {
-                        activeIndustriesSet.add(industry);
-                    }
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            if (totalStatsCount) totalStatsCount.innerText = visibleCount;
-            if (newStatsCount) newStatsCount.innerText = newCustomersCount;
-            if (industryStatsCount) industryStatsCount.innerText = activeIndustriesSet.size;
-            if (visibleCountElement) visibleCountElement.innerText = visibleCount;
-
-            updateActiveFilters();
-        }
-
-        function updateActiveFilters() {
-            const activeFilters = [];
-            if (searchInput.value) activeFilters.push({ type: 'search', label: `Search: "${searchInput.value}"` });
-            if (industryFilter.value) activeFilters.push({ type: 'industry', label: industryFilter.value });
-            if (statusFilter.value) activeFilters.push({ type: 'status', label: statusFilter.options[statusFilter.selectedIndex].text });
-
-            if (activeFilters.length > 0) {
-                activeFiltersContainer.style.display = 'flex';
-                activeFiltersChips.innerHTML = activeFilters.map(filter => `
-                    <div class="filter-tag">
-                        <span>${filter.label}</span>
-                        <i class="fa-solid fa-xmark" onclick="removeFilter('${filter.type}')"></i>
-                    </div>
-                `).join('');
-            } else {
-                activeFiltersContainer.style.display = 'none';
-            }
-        }
-
-        window.removeFilter = function(type) {
-            if (type === 'search') searchInput.value = '';
-            if (type === 'industry') industryFilter.value = '';
-            if (type === 'status') statusFilter.value = '';
-            filterCustomers();
-        }; *@
+        
     </script>
 }

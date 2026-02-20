@@ -293,36 +293,6 @@
             </div>
         </div>
     </div>
-    @* @if (TempData["Error"] != null)
-    {
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const toastElement = document.getElementById('statusToast');
-                const toastHeader = document.getElementById('toastHeader');
-                const toastTitle = document.getElementById('toastTitle');
-                const toastBody = document.getElementById('toastBody');
-                const toastIcon = document.getElementById('toastIcon');
-                const bootstrapToast = new bootstrap.Toast(toastElement);
-
-                // --- Handle Errors ---
-                @if (TempData["Error"] != null)
-                {
-                        <text>
-                        // Set UI to "Danger" mode
-                        toastHeader.className = "toast-header bg-danger text-white";
-                        toastTitle.innerText = "Action Failed";
-                        toastIcon.className = "fas fa-exclamation-triangle me-2";
-                        toastBody.innerText = "@Html.Raw(TempData["Error"])";
-
-                        bootstrapToast.show();
-
-                        // Auto-reopen the Create User modal so they can fix the password
-                        var createModal = new bootstrap.Modal(document.getElementById('createUserModal'));
-                        createModal.show();
-                        </text>
-                }
-            });
-        </script>
-    } *@
+    
 </body>
 </html>

@@ -133,7 +133,11 @@
                                         </svg>
                                     </div>
                                     <div class="customer-details">
-                                        <div class="customer-name">@customer.CompanyName</div>
+                                        <div class="customer-name">
+                                            @(customer.CompanyName.Length > 10
+                                           ? customer.CompanyName.Substring(0, 10) + "..." 
+                                            : customer.CompanyName)
+                                        </div>
                                         <div class="customer-meta">
                                             <span class="customer-id">Email: @customer.Email</span>
                                             <span class="customer-time">@GetRelativeTime(customer.CreatedAt)</span>
