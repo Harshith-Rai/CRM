@@ -79,7 +79,7 @@ namespace CRM.Services
         {
             try
             {
-                return await _context.Customers.CountAsync();
+                return await _context.Customers.Where(c=>c.IsActive==true).CountAsync();
             }
             catch (Exception ex)
             {
@@ -92,7 +92,7 @@ namespace CRM.Services
         {
             try
             {
-                return await _context.Customers.Where(c => String.IsNullOrEmpty(c.SalesRepId)).CountAsync();
+                return await _context.Customers.Where(c => c.IsActive && String.IsNullOrEmpty(c.SalesRepId)).CountAsync();
             }
             catch (Exception ex)
             {

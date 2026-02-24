@@ -196,7 +196,7 @@ namespace CRM.Services
         public async Task<string> GenerateCsvAsync(string userId)
         {
             var customers = await _context.Customers
-                .Where(c => c.IsActive && c.SalesRepId == userId)
+                .Where(c => c.IsActive)
                 .ToListAsync();
 
             var builder = new StringBuilder();
@@ -233,7 +233,7 @@ namespace CRM.Services
                     istDate = TimeZoneInfo.ConvertTimeFromUtc(c.CreatedAt, istZone);
                 }
 
-                builder.AppendLine($"{c.CompanyName},{c.Industry},{c.Email},{c.Phone},{c.Address},{istDate}");
+                builder.AppendLine($"\"{c.CompanyName}\",\"{c.Industry}\",\"{c.Email}\",=\"{c.Phone}\",\"{c.Address}\",\" {istDate:yyyy-MM-dd HH:mm}\"");
             }
             return builder.ToString();
         }

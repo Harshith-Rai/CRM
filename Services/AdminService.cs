@@ -52,16 +52,16 @@ namespace CRM.Services
 
             return new DashboardViewModel
             {
-                TotalCustomers = await _context.Customers.CountAsync(),
+                TotalCustomers = await _context.Customers.Where(c=>c.IsActive).CountAsync(),
 
                 TotalContacts = await _context.Contacts
                     .Include(c => c.Customer)
                     .CountAsync(),
 
-                NewCustomersThisMonth = await _context.Customers
+                NewCustomersThisMonth = await _context.Customers.Where(c => c.IsActive)
                     .CountAsync(c=>c.CreatedAt >= startDate),
 
-                CustomersByIndustry = await _context.Customers
+                CustomersByIndustry = await _context.Customers.Where(c=>c.IsActive)
                     .GroupBy(c => c.Industry)
                     .Select(g => new { Industry = g.Key, Count = g.Count() })
                     .ToDictionaryAsync(x => x.Industry, x => x.Count),
